@@ -1,0 +1,7 @@
+[submodule "unsafe-rust-benchmark"]
+	path = unsafe-rust-benchmark
+	url = git@github.com:GWSysSec/unsafe-rust-benchmark.git
+	branch = oscardev
+[submodule "external/perf-lib"]
+	path = external/perf-lib
+	url = git@github.com:GWSysSec/unsafe-dyn-rust-expr.git

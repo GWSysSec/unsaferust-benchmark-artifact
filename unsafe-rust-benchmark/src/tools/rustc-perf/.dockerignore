@@ -1,9 +1,0 @@
-/*
-!/database
-!/intern
-!/site
-/site/frontend/node_modules
-/site/frontend/dist
-!/collector
-!/Cargo.toml
-!/Cargo.lock

@@ -2,6 +2,26 @@
 
 We provide the artifacts for the paper in two formats, one as a docker image that has our prebuilt compiler and benchrmarks and instrumentation. Secondly as a repository that you can run and compile yourself.
 
+# Setup
+
+This repository uses **Git Submodules**. To set it up:
+
+```bash
+git clone --recursive git@github.com:GWSysSec/unsaferust-benchmark-artifact.git
+cd unsaferust-benchmark-artifact
+```
+
+Or if already cloned:
+```bash
+./update-repos.sh
+```
+
+# Directory Structure
+- `unsafe-rust-benchmark`: Submodule containing the compiler and benchmarks.
+- `external/perf-lib`: Submodule containing the instrumentation library.
+- `perf`: Symlink to `external/perf-lib/lib/perf` (for Docker compatibility).
+
+
 # Docker getting started
 
 To run the docker image please load our image into docker using

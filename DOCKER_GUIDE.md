@@ -9,18 +9,28 @@ This guide will help you build and run the Unsafe Rust Benchmark artifact in a D
 - At least 8GB of RAM available for Docker
 - 2-4 hours for the initial build
 
-## Quick Start
+## Setup
 
-### Option 1: Using the build script (Recommended)
+This artifact uses **Git Submodules** to manage dependencies. To set up the repository:
 
 ```bash
-./docker-build.sh
+git clone --recursive git@github.com:GWSysSec/unsaferust-benchmark-artifact.git
+cd unsaferust-benchmark-artifact
 ```
 
-This script will:
-1. Build the Docker image with all dependencies
-2. Compile the custom Rust compiler
-3. Set up instrumentation tools
+If you have already cloned it without submodules:
+
+```bash
+./update-repos.sh
+# OR manually:
+git submodule update --init --recursive
+```
+
+## Directory Structure
+
+- `unsafe-rust-benchmark/`: [Submodule] The modified Rust compiler and benchmarks (oscardev branch).
+- `external/perf-lib/`: [Submodule] The external performance instrumentation library.
+- `perf/`: [Symlink] Points to `external/perf-lib/lib/perf`, used by the Docker build.
 
 ### Option 2: Using docker-compose
 
