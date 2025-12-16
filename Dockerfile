@@ -23,14 +23,10 @@ WORKDIR /workspace
 # Note: This includes all files from your local clone
 COPY . /workspace/
 
-# Build the custom Rust compiler (this will take a long time)
-# We build only stage 1 to save time, which is sufficient for running the benchmarks
+# Build the custom Rust compiler
+# User requested optimization: single command without separate install step
 RUN cd unsafe-rust-benchmark && \
-    python3 x.py build --stage 1 || python3 x.py build --stage 1
-
-# Install the compiler
-RUN cd unsafe-rust-benchmark && \
-    python3 x.py install
+    python3 x.py
 
 # Build the instrumentation library (coverage as default)
 RUN cd perf && make coverage
