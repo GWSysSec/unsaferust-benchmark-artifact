@@ -26,7 +26,8 @@ COPY . /workspace/
 # Build the custom Rust compiler
 # User requested optimization: single command without separate install step
 RUN cd unsafe-rust-benchmark && \
-    python3 x.py
+    python3 x.py build && \
+    python3 x.py install
 
 # Build the instrumentation library (coverage as default)
 RUN cd perf && make coverage
