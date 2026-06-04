@@ -1,0 +1,10 @@
+{
+  "crate": "ron",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 1089309476.3333335,
+  "external_cycles": 602955829.6666669,
+  "internal_cycles": 486353646.6666666,
+  "unsafe_cycles": 322960293.0000001,
+  "unsafe_percentage": 66.40441481491516
+}

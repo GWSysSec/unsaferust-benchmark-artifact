@@ -1,0 +1,17 @@
+{
+  "crate": "arbitrary",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 3182,
+  "unsafe_functions_defined": 682,
+  "total_functions_executed": 2347,
+  "unsafe_functions_executed": 583,
+  "unsafe_functions_with_executed_insts": 372,
+  "total_function_calls": 811270056,
+  "unsafe_function_calls": 287642690,
+  "unsafe_calls_total": 659806646,
+  "static_rs_files": 50,
+  "static_total_fns": 220,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

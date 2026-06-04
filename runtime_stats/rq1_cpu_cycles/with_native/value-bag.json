@@ -1,0 +1,10 @@
+{
+  "crate": "value-bag",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 12374098.0,
+  "external_cycles": 7041358.0,
+  "internal_cycles": 5332740.0,
+  "unsafe_cycles": 69073.66666666667,
+  "unsafe_percentage": 1.295275349382619
+}

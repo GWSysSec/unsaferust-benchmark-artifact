@@ -1,0 +1,10 @@
+{
+  "crate": "signal-hook",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 8903583634.666668,
+  "external_cycles": 4747479370.333333,
+  "internal_cycles": 4156104264.333335,
+  "unsafe_cycles": 1816648.666666667,
+  "unsafe_percentage": 0.04371037277040182
+}

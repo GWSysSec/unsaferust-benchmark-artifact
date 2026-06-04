@@ -1,0 +1,16 @@
+{
+  "crate": "tokio",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 40960360933,
+  "unsafe_instructions": 9135117610,
+  "unsafe_loads": 1036073641,
+  "unsafe_stores": 2636306265,
+  "unsafe_calls_direct": 292904449,
+  "unsafe_calls_indirect": 18650524,
+  "unsafe_calls_intrinsic": 764057998,
+  "unsafe_casts": 37766945,
+  "unsafe_geps": 832004619,
+  "unsafe_atomics": 80830298,
+  "unsafe_others": 3436522871
+}

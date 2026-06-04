@@ -1,0 +1,11 @@
+{
+  "crate": "semver",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 639177203,
+  "unsafe_instructions": 12749356,
+  "unsafe_inst_pct": 1.9946512391494038,
+  "distinctive_pct": 27.500000000000004,
+  "exec_w_unsafe_pct": 20.36764705882353,
+  "accumulated_pct": 99.20095292340595
+}

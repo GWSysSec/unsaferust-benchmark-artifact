@@ -1,0 +1,17 @@
+{
+  "crate": "ron",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 339696,
+  "unsafe_functions_defined": 5862,
+  "total_functions_executed": 69865,
+  "unsafe_functions_executed": 1078,
+  "unsafe_functions_with_executed_insts": 954,
+  "total_function_calls": 5884028,
+  "unsafe_function_calls": 6576,
+  "unsafe_calls_total": 38202,
+  "static_rs_files": 19,
+  "static_total_fns": 582,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

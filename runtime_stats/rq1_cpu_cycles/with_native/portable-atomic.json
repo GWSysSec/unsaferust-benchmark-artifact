@@ -1,0 +1,10 @@
+{
+  "crate": "portable-atomic",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 216696572682.0,
+  "external_cycles": 30196756076.0,
+  "internal_cycles": 186499816606.0,
+  "unsafe_cycles": 170222887945.66666,
+  "unsafe_percentage": 91.27241572857949
+}

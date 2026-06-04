@@ -1,0 +1,10 @@
+{
+  "crate": "cc",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 6584983021.041413,
+  "external_cycles": 3045094125.9765196,
+  "internal_cycles": 3539888895.0648937,
+  "unsafe_cycles": 53434930.3333333,
+  "unsafe_percentage": 1.5095086856491218
+}

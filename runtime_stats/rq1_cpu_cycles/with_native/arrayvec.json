@@ -1,0 +1,10 @@
+{
+  "crate": "arrayvec",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 37300573721.666664,
+  "external_cycles": 18740579250.666664,
+  "internal_cycles": 18559994471.0,
+  "unsafe_cycles": 9438114212.333332,
+  "unsafe_percentage": 50.85192362034585
+}

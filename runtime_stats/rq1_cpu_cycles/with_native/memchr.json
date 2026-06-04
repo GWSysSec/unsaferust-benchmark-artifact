@@ -1,0 +1,10 @@
+{
+  "crate": "memchr",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 4407721581972.667,
+  "external_cycles": 1740651307721.6667,
+  "internal_cycles": 2667070274251.0,
+  "unsafe_cycles": 2039166443770.9998,
+  "unsafe_percentage": 76.45716963133505
+}

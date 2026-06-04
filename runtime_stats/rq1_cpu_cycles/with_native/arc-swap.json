@@ -1,0 +1,10 @@
+{
+  "crate": "arc-swap",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 107566996876.66667,
+  "external_cycles": 41283206647.66667,
+  "internal_cycles": 66283790229.0,
+  "unsafe_cycles": 25442098053.33333,
+  "unsafe_percentage": 38.38358966111459
+}

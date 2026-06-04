@@ -1,0 +1,17 @@
+{
+  "crate": "deranged",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 5718,
+  "unsafe_functions_defined": 854,
+  "total_functions_executed": 3193,
+  "unsafe_functions_executed": 789,
+  "unsafe_functions_with_executed_insts": 767,
+  "total_function_calls": 112165,
+  "unsafe_function_calls": 45577,
+  "unsafe_calls_total": 90057,
+  "static_rs_files": 4,
+  "static_total_fns": 164,
+  "static_unsafe_fns": 16,
+  "static_unsafe_fn_pct": 9.75609756097561
+}

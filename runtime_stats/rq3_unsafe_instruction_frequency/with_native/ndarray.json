@@ -1,0 +1,11 @@
+{
+  "crate": "ndarray",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 162860303306,
+  "unsafe_instructions": 18637994483,
+  "unsafe_inst_pct": 11.444160488870555,
+  "distinctive_pct": 28.53061287868201,
+  "exec_w_unsafe_pct": 20.923588143041258,
+  "accumulated_pct": 21.922585122209178
+}

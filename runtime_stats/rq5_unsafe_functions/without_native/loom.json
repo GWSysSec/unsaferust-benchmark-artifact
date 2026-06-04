@@ -1,0 +1,17 @@
+{
+  "crate": "loom",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 969848,
+  "unsafe_functions_defined": 87262,
+  "total_functions_executed": 177729,
+  "unsafe_functions_executed": 15744,
+  "unsafe_functions_with_executed_insts": 12361,
+  "total_function_calls": 1041152447,
+  "unsafe_function_calls": 16676515,
+  "unsafe_calls_total": 49873003,
+  "static_rs_files": 46,
+  "static_total_fns": 505,
+  "static_unsafe_fns": 25,
+  "static_unsafe_fn_pct": 4.9504950495049505
+}

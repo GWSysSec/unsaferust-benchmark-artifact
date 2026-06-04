@@ -1,0 +1,11 @@
+{
+  "crate": "pulldown-cmark",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 249346038,
+  "unsafe_instructions": 1328421,
+  "unsafe_inst_pct": 0.532762024476202,
+  "distinctive_pct": 3.9768998556240978,
+  "exec_w_unsafe_pct": 3.9375246095288094,
+  "accumulated_pct": 0.9848107048331105
+}

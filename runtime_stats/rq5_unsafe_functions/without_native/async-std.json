@@ -1,0 +1,17 @@
+{
+  "crate": "async-std",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 260178,
+  "unsafe_functions_defined": 30061,
+  "total_functions_executed": 40788,
+  "unsafe_functions_executed": 3737,
+  "unsafe_functions_with_executed_insts": 3137,
+  "total_function_calls": 100653356,
+  "unsafe_function_calls": 2790134,
+  "unsafe_calls_total": 14639748,
+  "static_rs_files": 239,
+  "static_total_fns": 935,
+  "static_unsafe_fns": 17,
+  "static_unsafe_fn_pct": 1.8181818181818181
+}

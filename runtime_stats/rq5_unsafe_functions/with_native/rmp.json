@@ -1,0 +1,17 @@
+{
+  "crate": "rmp",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 5223,
+  "unsafe_functions_defined": 528,
+  "total_functions_executed": 3116,
+  "unsafe_functions_executed": 253,
+  "unsafe_functions_with_executed_insts": 157,
+  "total_function_calls": 12098835,
+  "unsafe_function_calls": 11992204,
+  "unsafe_calls_total": 2134146,
+  "static_rs_files": 17,
+  "static_total_fns": 100,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

@@ -1,0 +1,11 @@
+{
+  "crate": "encoding_rs",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 78821134451,
+  "unsafe_instructions": 21431766666,
+  "unsafe_inst_pct": 27.190380873448717,
+  "distinctive_pct": 31.087441169185038,
+  "exec_w_unsafe_pct": 14.045082982412682,
+  "accumulated_pct": 66.65031501079906
+}

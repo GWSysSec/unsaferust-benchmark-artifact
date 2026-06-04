@@ -1,0 +1,10 @@
+{
+  "crate": "ego-tree",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 32877241.33333333,
+  "external_cycles": 20597957.33333333,
+  "internal_cycles": 12279284.0,
+  "unsafe_cycles": 2272331.0,
+  "unsafe_percentage": 18.505403083762864
+}

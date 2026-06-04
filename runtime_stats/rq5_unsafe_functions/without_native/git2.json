@@ -1,0 +1,17 @@
+{
+  "crate": "git2",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 84015,
+  "unsafe_functions_defined": 13718,
+  "total_functions_executed": 13819,
+  "unsafe_functions_executed": 1760,
+  "unsafe_functions_with_executed_insts": 1128,
+  "total_function_calls": 201245,
+  "unsafe_function_calls": 14884,
+  "unsafe_calls_total": 53053,
+  "static_rs_files": 63,
+  "static_total_fns": 1792,
+  "static_unsafe_fns": 120,
+  "static_unsafe_fn_pct": 6.696428571428571
+}

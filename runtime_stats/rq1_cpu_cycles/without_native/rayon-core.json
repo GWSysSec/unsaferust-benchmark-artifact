@@ -1,0 +1,10 @@
+{
+  "crate": "rayon-core",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 582374343365.8334,
+  "external_cycles": 33781963847.33333,
+  "internal_cycles": 548592379518.50006,
+  "unsafe_cycles": 220985198613.3333,
+  "unsafe_percentage": 40.282221712101105
+}

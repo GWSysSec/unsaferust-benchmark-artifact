@@ -1,0 +1,10 @@
+{
+  "crate": "loom",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 14279112536.666666,
+  "external_cycles": 6877846650.999999,
+  "internal_cycles": 7401265885.666667,
+  "unsafe_cycles": 4611089.333333336,
+  "unsafe_percentage": 0.06230136039651268
+}

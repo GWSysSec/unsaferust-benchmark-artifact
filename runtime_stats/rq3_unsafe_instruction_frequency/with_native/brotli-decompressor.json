@@ -1,0 +1,11 @@
+{
+  "crate": "brotli-decompressor",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 71859715579,
+  "unsafe_instructions": 8854937193,
+  "unsafe_inst_pct": 12.322533037672825,
+  "distinctive_pct": 22.264957264957264,
+  "exec_w_unsafe_pct": 12.649572649572649,
+  "accumulated_pct": 40.47807076352155
+}

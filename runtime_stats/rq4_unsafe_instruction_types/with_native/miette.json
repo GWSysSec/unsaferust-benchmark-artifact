@@ -1,0 +1,16 @@
+{
+  "crate": "miette",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 11234995,
+  "unsafe_instructions": 3523954,
+  "unsafe_loads": 366562,
+  "unsafe_stores": 965947,
+  "unsafe_calls_direct": 82534,
+  "unsafe_calls_indirect": 472,
+  "unsafe_calls_intrinsic": 406032,
+  "unsafe_casts": 136398,
+  "unsafe_geps": 189863,
+  "unsafe_atomics": 349,
+  "unsafe_others": 1375797
+}

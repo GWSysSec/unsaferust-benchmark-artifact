@@ -1,0 +1,17 @@
+{
+  "crate": "miette",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 38256,
+  "unsafe_functions_defined": 9504,
+  "total_functions_executed": 8756,
+  "unsafe_functions_executed": 2486,
+  "unsafe_functions_with_executed_insts": 2025,
+  "total_function_calls": 309571,
+  "unsafe_function_calls": 187291,
+  "unsafe_calls_total": 489038,
+  "static_rs_files": 29,
+  "static_total_fns": 457,
+  "static_unsafe_fns": 23,
+  "static_unsafe_fn_pct": 5.032822757111598
+}

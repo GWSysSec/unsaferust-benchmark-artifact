@@ -1,0 +1,16 @@
+{
+  "crate": "slotmap",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 486184567,
+  "unsafe_instructions": 115612063,
+  "unsafe_loads": 14612446,
+  "unsafe_stores": 29690103,
+  "unsafe_calls_direct": 5224627,
+  "unsafe_calls_indirect": 62034,
+  "unsafe_calls_intrinsic": 17039994,
+  "unsafe_casts": 522991,
+  "unsafe_geps": 6275838,
+  "unsafe_atomics": 10,
+  "unsafe_others": 42184020
+}

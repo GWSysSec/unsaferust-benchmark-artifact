@@ -1,0 +1,11 @@
+{
+  "crate": "rmp-serde",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 534287453,
+  "unsafe_instructions": 90751288,
+  "unsafe_inst_pct": 16.985479911690906,
+  "distinctive_pct": 12.23296032553408,
+  "exec_w_unsafe_pct": 9.181078331637844,
+  "accumulated_pct": 99.09433513170423
+}

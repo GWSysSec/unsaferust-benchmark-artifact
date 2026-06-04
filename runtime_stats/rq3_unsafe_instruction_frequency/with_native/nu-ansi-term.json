@@ -1,0 +1,11 @@
+{
+  "crate": "nu-ansi-term",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 534291090,
+  "unsafe_instructions": 90776208,
+  "unsafe_inst_pct": 16.99002841316332,
+  "distinctive_pct": 25.307125307125304,
+  "exec_w_unsafe_pct": 21.11132111132111,
+  "accumulated_pct": 99.4934267101647
+}

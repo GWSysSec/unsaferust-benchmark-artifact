@@ -1,0 +1,17 @@
+{
+  "crate": "async-lock",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 42161,
+  "unsafe_functions_defined": 11627,
+  "total_functions_executed": 16520,
+  "unsafe_functions_executed": 5460,
+  "unsafe_functions_with_executed_insts": 3240,
+  "total_function_calls": 51016506,
+  "unsafe_function_calls": 17223262,
+  "unsafe_calls_total": 13033483,
+  "static_rs_files": 8,
+  "static_total_fns": 182,
+  "static_unsafe_fns": 17,
+  "static_unsafe_fn_pct": 9.340659340659341
+}

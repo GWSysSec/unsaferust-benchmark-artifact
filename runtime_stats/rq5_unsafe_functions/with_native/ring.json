@@ -1,0 +1,17 @@
+{
+  "crate": "ring",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 10190,
+  "unsafe_functions_defined": 5571,
+  "total_functions_executed": 1887,
+  "unsafe_functions_executed": 1153,
+  "unsafe_functions_with_executed_insts": 1174,
+  "total_function_calls": 202608158,
+  "unsafe_function_calls": 130915306,
+  "unsafe_calls_total": 563045784,
+  "static_rs_files": 155,
+  "static_total_fns": 1121,
+  "static_unsafe_fns": 17,
+  "static_unsafe_fn_pct": 1.5165031222123104
+}

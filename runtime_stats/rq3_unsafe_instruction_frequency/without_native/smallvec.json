@@ -1,0 +1,11 @@
+{
+  "crate": "smallvec",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 484249,
+  "unsafe_instructions": 129118,
+  "unsafe_inst_pct": 26.663555319680576,
+  "distinctive_pct": 21.51793160967473,
+  "exec_w_unsafe_pct": 21.184320266889074,
+  "accumulated_pct": 21.214450422751728
+}

@@ -1,0 +1,17 @@
+{
+  "crate": "chrono",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 11053,
+  "unsafe_functions_defined": 1426,
+  "total_functions_executed": 6655,
+  "unsafe_functions_executed": 773,
+  "unsafe_functions_with_executed_insts": 520,
+  "total_function_calls": 318774583,
+  "unsafe_function_calls": 121039055,
+  "unsafe_calls_total": 290982100,
+  "static_rs_files": 40,
+  "static_total_fns": 1362,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

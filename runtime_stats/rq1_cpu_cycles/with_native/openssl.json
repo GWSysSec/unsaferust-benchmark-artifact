@@ -1,0 +1,10 @@
+{
+  "crate": "openssl",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 35572403227.66667,
+  "external_cycles": 25314578745.0,
+  "internal_cycles": 10257824482.666672,
+  "unsafe_cycles": 2346719557.6666665,
+  "unsafe_percentage": 22.877361195174224
+}

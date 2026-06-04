@@ -1,0 +1,17 @@
+{
+  "crate": "cssparser",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 17750,
+  "unsafe_functions_defined": 672,
+  "total_functions_executed": 6922,
+  "unsafe_functions_executed": 238,
+  "unsafe_functions_with_executed_insts": 136,
+  "total_function_calls": 28519597,
+  "unsafe_function_calls": 8568407,
+  "unsafe_calls_total": 39156063,
+  "static_rs_files": 13,
+  "static_total_fns": 282,
+  "static_unsafe_fns": 1,
+  "static_unsafe_fn_pct": 0.3546099290780142
+}

@@ -1,0 +1,11 @@
+{
+  "crate": "miette",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 11234995,
+  "unsafe_instructions": 3523954,
+  "unsafe_inst_pct": 31.365870656818274,
+  "distinctive_pct": 28.391959798994975,
+  "exec_w_unsafe_pct": 23.126998629511192,
+  "accumulated_pct": 60.50017605008221
+}

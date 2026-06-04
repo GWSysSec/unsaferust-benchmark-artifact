@@ -1,0 +1,16 @@
+{
+  "crate": "dlv-list",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 1040884,
+  "unsafe_instructions": 136474,
+  "unsafe_loads": 17172,
+  "unsafe_stores": 35360,
+  "unsafe_calls_direct": 3084,
+  "unsafe_calls_indirect": 12,
+  "unsafe_calls_intrinsic": 20098,
+  "unsafe_casts": 392,
+  "unsafe_geps": 9560,
+  "unsafe_atomics": 0,
+  "unsafe_others": 50796
+}

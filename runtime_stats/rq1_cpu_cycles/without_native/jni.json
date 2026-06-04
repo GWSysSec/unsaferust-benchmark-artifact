@@ -1,0 +1,10 @@
+{
+  "crate": "jni",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 379287198837.1669,
+  "external_cycles": 13331058765.500002,
+  "internal_cycles": 365956140071.6669,
+  "unsafe_cycles": 1718347275.9999998,
+  "unsafe_percentage": 0.4695500601966913
+}

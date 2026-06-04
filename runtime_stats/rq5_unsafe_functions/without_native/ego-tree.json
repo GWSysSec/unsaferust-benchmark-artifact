@@ -1,0 +1,17 @@
+{
+  "crate": "ego-tree",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 4841,
+  "unsafe_functions_defined": 101,
+  "total_functions_executed": 3209,
+  "unsafe_functions_executed": 101,
+  "unsafe_functions_with_executed_insts": 101,
+  "total_function_calls": 29227,
+  "unsafe_function_calls": 1949,
+  "unsafe_calls_total": 1387,
+  "static_rs_files": 5,
+  "static_total_fns": 124,
+  "static_unsafe_fns": 5,
+  "static_unsafe_fn_pct": 4.032258064516129
+}

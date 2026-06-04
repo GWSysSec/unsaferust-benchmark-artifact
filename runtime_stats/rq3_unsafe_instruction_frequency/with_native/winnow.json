@@ -1,0 +1,11 @@
+{
+  "crate": "winnow",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 4659870,
+  "unsafe_instructions": 750313,
+  "unsafe_inst_pct": 16.101586524945972,
+  "distinctive_pct": 56.439393939393945,
+  "exec_w_unsafe_pct": 54.45075757575758,
+  "accumulated_pct": 70.0746229439277
+}

@@ -1,0 +1,10 @@
+{
+  "crate": "fs4",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 2484016554.0,
+  "external_cycles": 189081119.0,
+  "internal_cycles": 2294935435.0,
+  "unsafe_cycles": 71582602.66666666,
+  "unsafe_percentage": 3.119155405200611
+}

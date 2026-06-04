@@ -1,0 +1,10 @@
+{
+  "crate": "serde_yaml",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 220001137.0,
+  "external_cycles": 97157942.66666666,
+  "internal_cycles": 122843194.33333334,
+  "unsafe_cycles": 28806264.666666664,
+  "unsafe_percentage": 23.44962195341588
+}

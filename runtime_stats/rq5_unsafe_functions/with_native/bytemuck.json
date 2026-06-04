@@ -1,0 +1,17 @@
+{
+  "crate": "bytemuck",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 2692,
+  "unsafe_functions_defined": 788,
+  "total_functions_executed": 1366,
+  "unsafe_functions_executed": 560,
+  "unsafe_functions_with_executed_insts": 473,
+  "total_function_calls": 8528,
+  "unsafe_function_calls": 3816,
+  "unsafe_calls_total": 4780,
+  "static_rs_files": 14,
+  "static_total_fns": 137,
+  "static_unsafe_fns": 19,
+  "static_unsafe_fn_pct": 13.86861313868613
+}

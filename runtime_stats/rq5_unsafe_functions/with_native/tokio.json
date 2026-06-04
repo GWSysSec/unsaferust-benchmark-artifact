@@ -1,0 +1,17 @@
+{
+  "crate": "tokio",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 2680480,
+  "unsafe_functions_defined": 737678,
+  "total_functions_executed": 424524,
+  "unsafe_functions_executed": 119454,
+  "unsafe_functions_with_executed_insts": 73305,
+  "total_function_calls": 1242117679,
+  "unsafe_function_calls": 498112352,
+  "unsafe_calls_total": 1075612971,
+  "static_rs_files": 365,
+  "static_total_fns": 4189,
+  "static_unsafe_fns": 172,
+  "static_unsafe_fn_pct": 4.105991883504417
+}

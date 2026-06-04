@@ -1,0 +1,11 @@
+{
+  "crate": "cpp_demangle",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 149255912282,
+  "unsafe_instructions": 299756825,
+  "unsafe_inst_pct": 0.20083413810345263,
+  "distinctive_pct": 0.010078613182826043,
+  "exec_w_unsafe_pct": 0.060471679096956256,
+  "accumulated_pct": 2.9790897706870017e-08
+}

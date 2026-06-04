@@ -1,0 +1,16 @@
+{
+  "crate": "openssl",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 1237369461,
+  "unsafe_instructions": 606143545,
+  "unsafe_loads": 67436914,
+  "unsafe_stores": 183222450,
+  "unsafe_calls_direct": 23128593,
+  "unsafe_calls_indirect": 566,
+  "unsafe_calls_intrinsic": 46562725,
+  "unsafe_casts": 2013932,
+  "unsafe_geps": 42394215,
+  "unsafe_atomics": 1790,
+  "unsafe_others": 241382360
+}

@@ -1,0 +1,10 @@
+{
+  "crate": "nu-ansi-term",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 212317393.3333333,
+  "external_cycles": 110659114.99999999,
+  "internal_cycles": 101658278.33333333,
+  "unsafe_cycles": 26341816.333333332,
+  "unsafe_percentage": 25.91212124108535
+}

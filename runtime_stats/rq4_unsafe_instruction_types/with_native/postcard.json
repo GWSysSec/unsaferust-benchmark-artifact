@@ -1,0 +1,16 @@
+{
+  "crate": "postcard",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 5547008,
+  "unsafe_instructions": 998914,
+  "unsafe_loads": 125942,
+  "unsafe_stores": 373470,
+  "unsafe_calls_direct": 35986,
+  "unsafe_calls_indirect": 0,
+  "unsafe_calls_intrinsic": 119222,
+  "unsafe_casts": 340,
+  "unsafe_geps": 78554,
+  "unsafe_atomics": 0,
+  "unsafe_others": 265400
+}

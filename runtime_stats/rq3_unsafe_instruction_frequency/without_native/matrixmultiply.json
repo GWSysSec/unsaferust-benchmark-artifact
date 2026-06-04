@@ -1,0 +1,11 @@
+{
+  "crate": "matrixmultiply",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 14329466416,
+  "unsafe_instructions": 4199035655,
+  "unsafe_inst_pct": 29.30350323659951,
+  "distinctive_pct": 16.089965397923876,
+  "exec_w_unsafe_pct": 13.84083044982699,
+  "accumulated_pct": 19.251586370653044
+}

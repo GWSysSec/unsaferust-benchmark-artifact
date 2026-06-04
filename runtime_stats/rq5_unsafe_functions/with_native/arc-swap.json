@@ -1,0 +1,17 @@
+{
+  "crate": "arc-swap",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 10080,
+  "unsafe_functions_defined": 2868,
+  "total_functions_executed": 5986,
+  "unsafe_functions_executed": 1944,
+  "unsafe_functions_with_executed_insts": 898,
+  "total_function_calls": 5773653994,
+  "unsafe_function_calls": 2614214071,
+  "unsafe_calls_total": 4481492751,
+  "static_rs_files": 21,
+  "static_total_fns": 175,
+  "static_unsafe_fns": 14,
+  "static_unsafe_fn_pct": 8.0
+}

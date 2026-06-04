@@ -1,0 +1,10 @@
+{
+  "crate": "jpeg-decoder",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 3651927878323.3335,
+  "external_cycles": 23861041437.666668,
+  "internal_cycles": 3628066836885.667,
+  "unsafe_cycles": 236924599751.33334,
+  "unsafe_percentage": 6.530326215123133
+}

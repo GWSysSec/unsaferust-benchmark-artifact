@@ -1,0 +1,10 @@
+{
+  "crate": "miette",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 8190890667.333334,
+  "external_cycles": 3239559539.3333335,
+  "internal_cycles": 4951331128.0,
+  "unsafe_cycles": 489975827.6666666,
+  "unsafe_percentage": 9.895840431592855
+}

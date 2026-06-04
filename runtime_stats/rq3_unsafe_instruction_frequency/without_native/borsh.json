@@ -1,0 +1,11 @@
+{
+  "crate": "borsh",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 418129628,
+  "unsafe_instructions": 179275,
+  "unsafe_inst_pct": 0.042875459664867374,
+  "distinctive_pct": 4.99439731070914,
+  "exec_w_unsafe_pct": 5.698735392988635,
+  "accumulated_pct": 0.04286556859957062
+}

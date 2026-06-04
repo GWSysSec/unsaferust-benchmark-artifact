@@ -1,0 +1,11 @@
+{
+  "crate": "jpeg-decoder",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 545038274954,
+  "unsafe_instructions": 4393292680,
+  "unsafe_inst_pct": 0.8060521401677312,
+  "distinctive_pct": 1.6327854671280277,
+  "exec_w_unsafe_pct": 1.4922145328719723,
+  "accumulated_pct": 0.027260589056562742
+}

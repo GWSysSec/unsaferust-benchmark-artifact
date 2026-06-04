@@ -1,0 +1,10 @@
+{
+  "crate": "parity-scale-codec",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 316195982526.9999,
+  "external_cycles": 155165308308.33328,
+  "internal_cycles": 161030674218.6666,
+  "unsafe_cycles": 121413245114.66667,
+  "unsafe_percentage": 75.39758850527902
+}

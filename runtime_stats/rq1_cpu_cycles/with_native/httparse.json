@@ -1,0 +1,10 @@
+{
+  "crate": "httparse",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 780933510032.0,
+  "external_cycles": 426219556063.6667,
+  "internal_cycles": 354713953968.3333,
+  "unsafe_cycles": 273125455580.0,
+  "unsafe_percentage": 76.9987908635765
+}

@@ -1,0 +1,17 @@
+{
+  "crate": "native-tls",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 9267,
+  "unsafe_functions_defined": 298,
+  "total_functions_executed": 3995,
+  "unsafe_functions_executed": 151,
+  "unsafe_functions_with_executed_insts": 148,
+  "total_function_calls": 6235334,
+  "unsafe_function_calls": 10101,
+  "unsafe_calls_total": 14456043,
+  "static_rs_files": 5,
+  "static_total_fns": 182,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

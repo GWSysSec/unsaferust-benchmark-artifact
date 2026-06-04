@@ -1,0 +1,16 @@
+{
+  "crate": "metrics",
+  "variant": "without_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 50435722,
+  "unsafe_instructions": 1066029,
+  "unsafe_loads": 11430,
+  "unsafe_stores": 55315,
+  "unsafe_calls_direct": 323570,
+  "unsafe_calls_indirect": 84,
+  "unsafe_calls_intrinsic": 622148,
+  "unsafe_casts": 68,
+  "unsafe_geps": 16946,
+  "unsafe_atomics": 0,
+  "unsafe_others": 36468
+}

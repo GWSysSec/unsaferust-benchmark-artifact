@@ -1,0 +1,17 @@
+{
+  "crate": "jni",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 11524,
+  "unsafe_functions_defined": 457,
+  "total_functions_executed": 2642,
+  "unsafe_functions_executed": 34,
+  "unsafe_functions_with_executed_insts": 34,
+  "total_function_calls": 38137,
+  "unsafe_function_calls": 169,
+  "unsafe_calls_total": 516,
+  "static_rs_files": 43,
+  "static_total_fns": 392,
+  "static_unsafe_fns": 46,
+  "static_unsafe_fn_pct": 11.73469387755102
+}

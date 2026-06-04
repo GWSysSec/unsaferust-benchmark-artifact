@@ -1,0 +1,17 @@
+{
+  "crate": "openssl",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 39332,
+  "unsafe_functions_defined": 11773,
+  "total_functions_executed": 12847,
+  "unsafe_functions_executed": 3328,
+  "unsafe_functions_with_executed_insts": 1888,
+  "total_function_calls": 32719085,
+  "unsafe_function_calls": 8052587,
+  "unsafe_calls_total": 41214440,
+  "static_rs_files": 57,
+  "static_total_fns": 2065,
+  "static_unsafe_fns": 124,
+  "static_unsafe_fn_pct": 6.004842615012106
+}

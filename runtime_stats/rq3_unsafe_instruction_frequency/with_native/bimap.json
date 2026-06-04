@@ -1,0 +1,11 @@
+{
+  "crate": "bimap",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 5213731,
+  "unsafe_instructions": 1747013,
+  "unsafe_inst_pct": 33.50792359636506,
+  "distinctive_pct": 31.557639036863417,
+  "exec_w_unsafe_pct": 17.558065203494564,
+  "accumulated_pct": 45.13091477993919
+}

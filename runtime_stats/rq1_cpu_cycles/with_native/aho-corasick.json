@@ -1,0 +1,10 @@
+{
+  "crate": "aho-corasick",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 324307222201.6667,
+  "external_cycles": 44758153156.666664,
+  "internal_cycles": 279549069045.0,
+  "unsafe_cycles": 177661628431.66666,
+  "unsafe_percentage": 63.55293152597401
+}

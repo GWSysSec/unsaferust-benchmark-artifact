@@ -1,0 +1,11 @@
+{
+  "crate": "petgraph",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 10842546285,
+  "unsafe_instructions": 36075088,
+  "unsafe_inst_pct": 0.33271786028626577,
+  "distinctive_pct": 6.466589288675179,
+  "exec_w_unsafe_pct": 5.092735154084847,
+  "accumulated_pct": 0.24692474268286696
+}

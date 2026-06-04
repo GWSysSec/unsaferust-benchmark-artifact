@@ -1,0 +1,11 @@
+{
+  "crate": "siphasher",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 175971091,
+  "unsafe_instructions": 1208043,
+  "unsafe_inst_pct": 0.686500829843693,
+  "distinctive_pct": 30.440331844288448,
+  "exec_w_unsafe_pct": 26.483726866624124,
+  "accumulated_pct": 1.1884468825359424
+}

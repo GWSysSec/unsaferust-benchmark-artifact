@@ -1,0 +1,17 @@
+{
+  "crate": "dashmap",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 32054,
+  "unsafe_functions_defined": 10425,
+  "total_functions_executed": 17404,
+  "unsafe_functions_executed": 6459,
+  "unsafe_functions_with_executed_insts": 4421,
+  "total_function_calls": 1206394,
+  "unsafe_function_calls": 567911,
+  "unsafe_calls_total": 1645754,
+  "static_rs_files": 21,
+  "static_total_fns": 329,
+  "static_unsafe_fns": 19,
+  "static_unsafe_fn_pct": 5.775075987841945
+}

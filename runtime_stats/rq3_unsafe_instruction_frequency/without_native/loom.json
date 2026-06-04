@@ -1,0 +1,11 @@
+{
+  "crate": "loom",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 35934733666,
+  "unsafe_instructions": 392768193,
+  "unsafe_inst_pct": 1.0930043245920074,
+  "distinctive_pct": 8.858430531877184,
+  "exec_w_unsafe_pct": 6.954970770105047,
+  "accumulated_pct": 1.6017361384542756
+}

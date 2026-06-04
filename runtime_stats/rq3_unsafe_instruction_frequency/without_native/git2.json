@@ -1,0 +1,11 @@
+{
+  "crate": "git2",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 6189377,
+  "unsafe_instructions": 303851,
+  "unsafe_inst_pct": 4.909233998833808,
+  "distinctive_pct": 12.736087994789782,
+  "exec_w_unsafe_pct": 8.162674578478905,
+  "accumulated_pct": 7.395960148078213
+}

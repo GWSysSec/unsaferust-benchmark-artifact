@@ -1,0 +1,11 @@
+{
+  "crate": "rmp",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 534291107,
+  "unsafe_instructions": 7276181,
+  "unsafe_inst_pct": 1.3618383133597618,
+  "distinctive_pct": 0.03209242618741977,
+  "exec_w_unsafe_pct": 0.03209242618741977,
+  "accumulated_pct": 8.265069370380239e-06
+}

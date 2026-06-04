@@ -1,0 +1,10 @@
+{
+  "crate": "brotli-decompressor",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 145990740308.66666,
+  "external_cycles": 62984866637.0,
+  "internal_cycles": 83005873671.66666,
+  "unsafe_cycles": 43621336505.666664,
+  "unsafe_percentage": 52.55210815346967
+}

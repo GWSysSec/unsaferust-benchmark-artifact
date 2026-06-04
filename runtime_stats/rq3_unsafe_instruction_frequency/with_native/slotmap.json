@@ -1,0 +1,11 @@
+{
+  "crate": "slotmap",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 486184567,
+  "unsafe_instructions": 115612063,
+  "unsafe_inst_pct": 23.779459663514988,
+  "distinctive_pct": 31.72231985940246,
+  "exec_w_unsafe_pct": 18.312829525483306,
+  "accumulated_pct": 37.45343218136167
+}

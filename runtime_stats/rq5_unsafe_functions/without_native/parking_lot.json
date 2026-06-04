@@ -1,0 +1,17 @@
+{
+  "crate": "parking_lot",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 30628,
+  "unsafe_functions_defined": 1846,
+  "total_functions_executed": 13637,
+  "unsafe_functions_executed": 876,
+  "unsafe_functions_with_executed_insts": 694,
+  "total_function_calls": 1400414866,
+  "unsafe_function_calls": 326752642,
+  "unsafe_calls_total": 941328896,
+  "static_rs_files": 13,
+  "static_total_fns": 222,
+  "static_unsafe_fns": 27,
+  "static_unsafe_fn_pct": 12.162162162162163
+}

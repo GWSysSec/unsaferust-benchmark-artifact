@@ -1,0 +1,11 @@
+{
+  "crate": "fragile",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 1557896,
+  "unsafe_instructions": 442458,
+  "unsafe_inst_pct": 28.400997242434666,
+  "distinctive_pct": 36.16731075244374,
+  "exec_w_unsafe_pct": 19.53853148442828,
+  "accumulated_pct": 41.506231398809526
+}

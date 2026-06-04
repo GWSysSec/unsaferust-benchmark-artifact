@@ -1,0 +1,11 @@
+{
+  "crate": "clru",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 128043792,
+  "unsafe_instructions": 33886927,
+  "unsafe_inst_pct": 26.46510734389997,
+  "distinctive_pct": 30.757910228108905,
+  "exec_w_unsafe_pct": 12.288447387785135,
+  "accumulated_pct": 48.720653454090154
+}

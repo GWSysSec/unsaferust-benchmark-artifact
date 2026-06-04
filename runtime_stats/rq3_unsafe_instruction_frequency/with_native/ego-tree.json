@@ -1,0 +1,11 @@
+{
+  "crate": "ego-tree",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 1491545,
+  "unsafe_instructions": 253032,
+  "unsafe_inst_pct": 16.96442279649625,
+  "distinctive_pct": 25.210345902150205,
+  "exec_w_unsafe_pct": 20.660641944531005,
+  "accumulated_pct": 35.56642830259691
+}

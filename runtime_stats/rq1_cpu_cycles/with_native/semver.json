@@ -1,0 +1,10 @@
+{
+  "crate": "semver",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 1625875893.9999998,
+  "external_cycles": 1265523100.0,
+  "internal_cycles": 360352793.99999976,
+  "unsafe_cycles": 327416432.6666667,
+  "unsafe_percentage": 90.85996781994339
+}

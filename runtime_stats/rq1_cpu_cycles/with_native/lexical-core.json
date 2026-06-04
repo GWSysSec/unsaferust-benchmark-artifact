@@ -1,0 +1,10 @@
+{
+  "crate": "lexical-core",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 8337489.666666666,
+  "external_cycles": 5279424.0,
+  "internal_cycles": 3058065.666666666,
+  "unsafe_cycles": 50418.0,
+  "unsafe_percentage": 1.6486892531302744
+}

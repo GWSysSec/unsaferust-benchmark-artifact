@@ -1,0 +1,11 @@
+{
+  "crate": "gimli",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 10476379320,
+  "unsafe_instructions": 221149203,
+  "unsafe_inst_pct": 2.1109316133467377,
+  "distinctive_pct": 3.1004318458642453,
+  "exec_w_unsafe_pct": 2.4360535931790497,
+  "accumulated_pct": 2.2605258352689814
+}

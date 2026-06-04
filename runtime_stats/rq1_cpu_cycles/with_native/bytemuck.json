@@ -1,0 +1,10 @@
+{
+  "crate": "bytemuck",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 28168403.66666667,
+  "external_cycles": 17895406.333333336,
+  "internal_cycles": 10272997.333333336,
+  "unsafe_cycles": 671526.3333333333,
+  "unsafe_percentage": 6.536810159138233
+}

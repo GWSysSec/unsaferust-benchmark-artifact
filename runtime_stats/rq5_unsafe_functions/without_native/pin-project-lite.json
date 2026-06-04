@@ -1,0 +1,17 @@
+{
+  "crate": "pin-project-lite",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 2041,
+  "unsafe_functions_defined": 29,
+  "total_functions_executed": 573,
+  "unsafe_functions_executed": 29,
+  "unsafe_functions_with_executed_insts": 30,
+  "total_function_calls": 13845011,
+  "unsafe_function_calls": 47,
+  "unsafe_calls_total": 1966960,
+  "static_rs_files": 1,
+  "static_total_fns": 10,
+  "static_unsafe_fns": 2,
+  "static_unsafe_fn_pct": 20.0
+}

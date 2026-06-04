@@ -1,0 +1,10 @@
+{
+  "crate": "dlv-list",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 18788524.333333332,
+  "external_cycles": 7178654.0,
+  "internal_cycles": 11609870.333333332,
+  "unsafe_cycles": 156867.6666666667,
+  "unsafe_percentage": 1.3511577835308013
+}

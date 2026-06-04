@@ -1,0 +1,10 @@
+{
+  "crate": "cssparser",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 4805968673.0,
+  "external_cycles": 2386796953.0,
+  "internal_cycles": 2419171720.0,
+  "unsafe_cycles": 1048821326.3333334,
+  "unsafe_percentage": 43.35456295485024
+}

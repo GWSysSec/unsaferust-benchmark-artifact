@@ -1,0 +1,10 @@
+{
+  "crate": "winnow",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 44200285643.0,
+  "external_cycles": 22789787996.666668,
+  "internal_cycles": 21410497646.333332,
+  "unsafe_cycles": 5436482.0,
+  "unsafe_percentage": 0.0253916657604221
+}

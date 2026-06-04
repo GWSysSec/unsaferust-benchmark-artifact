@@ -1,0 +1,10 @@
+{
+  "crate": "bimap",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 16238588.0,
+  "external_cycles": 7735543.0,
+  "internal_cycles": 8503045.0,
+  "unsafe_cycles": 2088385.6666666667,
+  "unsafe_percentage": 24.56044471911729
+}

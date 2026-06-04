@@ -1,0 +1,10 @@
+{
+  "crate": "matrixmultiply",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 397775752426.3334,
+  "external_cycles": 70291937492.33333,
+  "internal_cycles": 327483814934.00006,
+  "unsafe_cycles": 50911484913.33334,
+  "unsafe_percentage": 15.546259873512792
+}

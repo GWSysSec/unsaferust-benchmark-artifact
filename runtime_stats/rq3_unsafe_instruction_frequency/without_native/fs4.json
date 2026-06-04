@@ -1,0 +1,11 @@
+{
+  "crate": "fs4",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 78821,
+  "unsafe_instructions": 5189,
+  "unsafe_inst_pct": 6.583270955709773,
+  "distinctive_pct": 1.8315018315018317,
+  "exec_w_unsafe_pct": 2.197802197802198,
+  "accumulated_pct": 5.525291828793774
+}

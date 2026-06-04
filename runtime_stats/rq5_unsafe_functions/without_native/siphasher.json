@@ -1,0 +1,17 @@
+{
+  "crate": "siphasher",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 3041,
+  "unsafe_functions_defined": 95,
+  "total_functions_executed": 1567,
+  "unsafe_functions_executed": 71,
+  "unsafe_functions_with_executed_insts": 71,
+  "total_function_calls": 543230,
+  "unsafe_function_calls": 2560,
+  "unsafe_calls_total": 13409,
+  "static_rs_files": 5,
+  "static_total_fns": 147,
+  "static_unsafe_fns": 2,
+  "static_unsafe_fn_pct": 1.3605442176870748
+}

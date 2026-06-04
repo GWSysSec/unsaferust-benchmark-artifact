@@ -1,0 +1,10 @@
+{
+  "crate": "async-lock",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 65326011636.0,
+  "external_cycles": 2601347806.0000005,
+  "internal_cycles": 62724663830.0,
+  "unsafe_cycles": 62446620681.0,
+  "unsafe_percentage": 99.55672436961389
+}

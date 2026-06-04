@@ -1,0 +1,10 @@
+{
+  "crate": "borsh",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 681899839.3333333,
+  "external_cycles": 659884505.3333334,
+  "internal_cycles": 22015333.99999988,
+  "unsafe_cycles": 66271.0,
+  "unsafe_percentage": 0.3010220058437467
+}

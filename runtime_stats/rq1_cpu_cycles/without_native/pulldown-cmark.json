@@ -1,0 +1,10 @@
+{
+  "crate": "pulldown-cmark",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 177152061.33333334,
+  "external_cycles": 117770853.33333334,
+  "internal_cycles": 59381208.0,
+  "unsafe_cycles": 14691393.666666668,
+  "unsafe_percentage": 24.740813064406954
+}

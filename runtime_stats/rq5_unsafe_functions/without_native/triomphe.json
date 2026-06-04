@@ -1,0 +1,17 @@
+{
+  "crate": "triomphe",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 5023,
+  "unsafe_functions_defined": 622,
+  "total_functions_executed": 3462,
+  "unsafe_functions_executed": 578,
+  "unsafe_functions_with_executed_insts": 568,
+  "total_function_calls": 29926,
+  "unsafe_function_calls": 1574,
+  "unsafe_calls_total": 14089,
+  "static_rs_files": 10,
+  "static_total_fns": 229,
+  "static_unsafe_fns": 24,
+  "static_unsafe_fn_pct": 10.480349344978166
+}

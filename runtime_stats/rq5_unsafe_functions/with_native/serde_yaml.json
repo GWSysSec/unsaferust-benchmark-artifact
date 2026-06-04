@@ -1,0 +1,17 @@
+{
+  "crate": "serde_yaml",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 67947,
+  "unsafe_functions_defined": 15813,
+  "total_functions_executed": 21013,
+  "unsafe_functions_executed": 4709,
+  "unsafe_functions_with_executed_insts": 2281,
+  "total_function_calls": 2840376,
+  "unsafe_function_calls": 1082599,
+  "unsafe_calls_total": 4206658,
+  "static_rs_files": 24,
+  "static_total_fns": 906,
+  "static_unsafe_fns": 8,
+  "static_unsafe_fn_pct": 0.8830022075055187
+}

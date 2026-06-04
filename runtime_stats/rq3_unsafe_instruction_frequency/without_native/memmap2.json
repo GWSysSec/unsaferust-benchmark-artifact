@@ -1,0 +1,11 @@
+{
+  "crate": "memmap2",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 5424625,
+  "unsafe_instructions": 8152,
+  "unsafe_inst_pct": 0.1502776689632924,
+  "distinctive_pct": 11.528150134048257,
+  "exec_w_unsafe_pct": 10.187667560321715,
+  "accumulated_pct": 0.264151108428782
+}

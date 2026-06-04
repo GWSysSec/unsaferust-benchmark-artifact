@@ -1,0 +1,11 @@
+{
+  "crate": "serde_with",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 125700609,
+  "unsafe_instructions": 766113,
+  "unsafe_inst_pct": 0.6094743741456337,
+  "distinctive_pct": 2.126044039483675,
+  "exec_w_unsafe_pct": 1.8775453855180508,
+  "accumulated_pct": 1.8129154763485638
+}

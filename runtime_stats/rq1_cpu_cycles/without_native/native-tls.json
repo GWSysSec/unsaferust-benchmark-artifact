@@ -1,0 +1,10 @@
+{
+  "crate": "native-tls",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 15184110621.0,
+  "external_cycles": 4395126915.0,
+  "internal_cycles": 10788983706.0,
+  "unsafe_cycles": 171955601.3333333,
+  "unsafe_percentage": 1.5938072205791254
+}

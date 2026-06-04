@@ -1,0 +1,10 @@
+{
+  "crate": "zopfli",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 194060568002.66663,
+  "external_cycles": 110825883364.99998,
+  "internal_cycles": 83234684637.66664,
+  "unsafe_cycles": 38885161672.66667,
+  "unsafe_percentage": 46.71749744945842
+}

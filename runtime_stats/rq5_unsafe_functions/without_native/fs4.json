@@ -1,0 +1,17 @@
+{
+  "crate": "fs4",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 776,
+  "unsafe_functions_defined": 10,
+  "total_functions_executed": 546,
+  "unsafe_functions_executed": 10,
+  "unsafe_functions_with_executed_insts": 12,
+  "total_function_calls": 2570,
+  "unsafe_function_calls": 142,
+  "unsafe_calls_total": 575,
+  "static_rs_files": 36,
+  "static_total_fns": 156,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

@@ -1,0 +1,11 @@
+{
+  "crate": "simdutf8",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 557085548,
+  "unsafe_instructions": 273135099,
+  "unsafe_inst_pct": 49.02929181713398,
+  "distinctive_pct": 38.64734299516908,
+  "exec_w_unsafe_pct": 34.78260869565217,
+  "accumulated_pct": 50.14150664215574
+}

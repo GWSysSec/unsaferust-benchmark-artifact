@@ -1,0 +1,17 @@
+{
+  "crate": "signal-hook",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 7593,
+  "unsafe_functions_defined": 2875,
+  "total_functions_executed": 2699,
+  "unsafe_functions_executed": 1011,
+  "unsafe_functions_with_executed_insts": 410,
+  "total_function_calls": 13668026,
+  "unsafe_function_calls": 13544999,
+  "unsafe_calls_total": 108909,
+  "static_rs_files": 12,
+  "static_total_fns": 104,
+  "static_unsafe_fns": 4,
+  "static_unsafe_fn_pct": 3.8461538461538463
+}

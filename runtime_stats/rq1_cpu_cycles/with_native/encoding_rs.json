@@ -1,0 +1,10 @@
+{
+  "crate": "encoding_rs",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 206494995633.66666,
+  "external_cycles": 64553599342.333336,
+  "internal_cycles": 141941396291.3333,
+  "unsafe_cycles": 138565485750.0,
+  "unsafe_percentage": 97.62161664634868
+}

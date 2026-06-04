@@ -1,0 +1,11 @@
+{
+  "crate": "jni",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 982156,
+  "unsafe_instructions": 2778,
+  "unsafe_inst_pct": 0.28284712408212137,
+  "distinctive_pct": 1.2869038607115821,
+  "exec_w_unsafe_pct": 1.2869038607115821,
+  "accumulated_pct": 0.4431392086425256
+}

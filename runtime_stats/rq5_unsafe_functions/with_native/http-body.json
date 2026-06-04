@@ -1,0 +1,17 @@
+{
+  "crate": "http-body",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 4164,
+  "unsafe_functions_defined": 861,
+  "total_functions_executed": 2016,
+  "unsafe_functions_executed": 480,
+  "unsafe_functions_with_executed_insts": 441,
+  "total_function_calls": 15834,
+  "unsafe_function_calls": 8550,
+  "unsafe_calls_total": 19656,
+  "static_rs_files": 3,
+  "static_total_fns": 42,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

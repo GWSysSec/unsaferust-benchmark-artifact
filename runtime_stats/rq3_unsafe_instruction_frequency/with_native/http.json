@@ -1,0 +1,11 @@
+{
+  "crate": "http",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 30577086633,
+  "unsafe_instructions": 6136611786,
+  "unsafe_inst_pct": 20.069314842366722,
+  "distinctive_pct": 23.718901774209534,
+  "exec_w_unsafe_pct": 15.095648726335614,
+  "accumulated_pct": 57.58289347420327
+}

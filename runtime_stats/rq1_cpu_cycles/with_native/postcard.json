@@ -1,0 +1,10 @@
+{
+  "crate": "postcard",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 37376978.666666664,
+  "external_cycles": 23228900.666666668,
+  "internal_cycles": 14148077.999999996,
+  "unsafe_cycles": 9139178.666666666,
+  "unsafe_percentage": 64.59660928266489
+}

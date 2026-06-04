@@ -1,0 +1,11 @@
+{
+  "crate": "chrono",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 13519857953,
+  "unsafe_instructions": 1892377597,
+  "unsafe_inst_pct": 13.99702277626437,
+  "distinctive_pct": 11.615326821938392,
+  "exec_w_unsafe_pct": 7.813673929376409,
+  "accumulated_pct": 37.97010848885653
+}

@@ -1,0 +1,11 @@
+{
+  "crate": "sharded-slab",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 10750564081,
+  "unsafe_instructions": 1050913898,
+  "unsafe_inst_pct": 9.775430294465496,
+  "distinctive_pct": 29.496402877697843,
+  "exec_w_unsafe_pct": 15.567120771467932,
+  "accumulated_pct": 24.868695254755853
+}

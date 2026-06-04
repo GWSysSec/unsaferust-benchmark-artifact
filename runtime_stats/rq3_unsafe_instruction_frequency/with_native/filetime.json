@@ -1,0 +1,11 @@
+{
+  "crate": "filetime",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 81812,
+  "unsafe_instructions": 16720,
+  "unsafe_inst_pct": 20.437099691976726,
+  "distinctive_pct": 14.736842105263156,
+  "exec_w_unsafe_pct": 14.210526315789473,
+  "accumulated_pct": 26.68500687757909
+}

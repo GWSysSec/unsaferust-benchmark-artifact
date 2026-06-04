@@ -1,0 +1,10 @@
+{
+  "crate": "uuid",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 11893350299.333334,
+  "external_cycles": 3712055208.666667,
+  "internal_cycles": 8181295090.666667,
+  "unsafe_cycles": 1547381809.0000002,
+  "unsafe_percentage": 18.913653545699315
+}

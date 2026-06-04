@@ -1,0 +1,17 @@
+{
+  "crate": "zopfli",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 11858,
+  "unsafe_functions_defined": 3178,
+  "total_functions_executed": 6950,
+  "unsafe_functions_executed": 2118,
+  "unsafe_functions_with_executed_insts": 842,
+  "total_function_calls": 8591877197,
+  "unsafe_function_calls": 2253537311,
+  "unsafe_calls_total": 5466267620,
+  "static_rs_files": 17,
+  "static_total_fns": 178,
+  "static_unsafe_fns": 1,
+  "static_unsafe_fn_pct": 0.5617977528089888
+}

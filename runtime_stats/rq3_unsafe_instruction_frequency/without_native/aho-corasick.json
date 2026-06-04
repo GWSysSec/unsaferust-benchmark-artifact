@@ -1,0 +1,11 @@
+{
+  "crate": "aho-corasick",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 152717527793,
+  "unsafe_instructions": 7091192267,
+  "unsafe_inst_pct": 4.643338829195632,
+  "distinctive_pct": 6.614211949840176,
+  "exec_w_unsafe_pct": 4.143103024342267,
+  "accumulated_pct": 4.688927245764732
+}

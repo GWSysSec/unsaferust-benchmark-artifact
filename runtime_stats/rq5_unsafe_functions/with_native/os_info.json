@@ -1,0 +1,17 @@
+{
+  "crate": "os_info",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 5697,
+  "unsafe_functions_defined": 1095,
+  "total_functions_executed": 3110,
+  "unsafe_functions_executed": 595,
+  "unsafe_functions_with_executed_insts": 379,
+  "total_function_calls": 12078894,
+  "unsafe_function_calls": 11994646,
+  "unsafe_calls_total": 2188899,
+  "static_rs_files": 24,
+  "static_total_fns": 222,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

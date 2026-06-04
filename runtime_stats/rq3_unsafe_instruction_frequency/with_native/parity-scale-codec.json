@@ -1,0 +1,11 @@
+{
+  "crate": "parity-scale-codec",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 102054550296,
+  "unsafe_instructions": 26145362783,
+  "unsafe_inst_pct": 25.619007390819654,
+  "distinctive_pct": 25.828806892676532,
+  "exec_w_unsafe_pct": 14.206780295935568,
+  "accumulated_pct": 46.1411966218291
+}

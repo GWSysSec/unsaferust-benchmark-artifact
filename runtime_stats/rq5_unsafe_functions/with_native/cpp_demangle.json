@@ -1,0 +1,17 @@
+{
+  "crate": "cpp_demangle",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 24372,
+  "unsafe_functions_defined": 2898,
+  "total_functions_executed": 9922,
+  "unsafe_functions_executed": 1097,
+  "unsafe_functions_with_executed_insts": 870,
+  "total_function_calls": 3356729998,
+  "unsafe_function_calls": 1284080879,
+  "unsafe_calls_total": 2513954148,
+  "static_rs_files": 7,
+  "static_total_fns": 389,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

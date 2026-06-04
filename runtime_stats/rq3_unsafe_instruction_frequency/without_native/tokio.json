@@ -1,0 +1,11 @@
+{
+  "crate": "tokio",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 41045838922,
+  "unsafe_instructions": 2584681404,
+  "unsafe_inst_pct": 6.297060729862794,
+  "distinctive_pct": 7.979409797771436,
+  "exec_w_unsafe_pct": 6.771878267258187,
+  "accumulated_pct": 11.13779528521383
+}

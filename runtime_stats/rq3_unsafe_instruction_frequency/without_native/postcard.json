@@ -1,0 +1,11 @@
+{
+  "crate": "postcard",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 5547008,
+  "unsafe_instructions": 94920,
+  "unsafe_inst_pct": 1.711192772752446,
+  "distinctive_pct": 2.773757838880849,
+  "exec_w_unsafe_pct": 2.484322238301978,
+  "accumulated_pct": 3.201755545567512
+}

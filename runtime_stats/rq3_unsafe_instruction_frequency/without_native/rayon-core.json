@@ -1,0 +1,11 @@
+{
+  "crate": "rayon-core",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 21586177302,
+  "unsafe_instructions": 1864404331,
+  "unsafe_inst_pct": 8.637028710161013,
+  "distinctive_pct": 6.627800859770888,
+  "exec_w_unsafe_pct": 5.093181872763515,
+  "accumulated_pct": 6.75784956011269
+}

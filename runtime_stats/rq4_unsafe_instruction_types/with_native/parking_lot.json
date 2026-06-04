@@ -1,0 +1,16 @@
+{
+  "crate": "parking_lot",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 59156316468,
+  "unsafe_instructions": 19952087135,
+  "unsafe_loads": 2700329844,
+  "unsafe_stores": 5692818574,
+  "unsafe_calls_direct": 205713011,
+  "unsafe_calls_indirect": 0,
+  "unsafe_calls_intrinsic": 1477288525,
+  "unsafe_casts": 211740011,
+  "unsafe_geps": 1602126867,
+  "unsafe_atomics": 484290278,
+  "unsafe_others": 7577780025
+}

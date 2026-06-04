@@ -1,0 +1,11 @@
+{
+  "crate": "native-tls",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 302371566,
+  "unsafe_instructions": 53658987,
+  "unsafe_inst_pct": 17.746042628889253,
+  "distinctive_pct": 3.7797246558197743,
+  "exec_w_unsafe_pct": 3.704630788485607,
+  "accumulated_pct": 0.16199613364737156
+}

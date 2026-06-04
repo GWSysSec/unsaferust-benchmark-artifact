@@ -1,0 +1,11 @@
+{
+  "crate": "os_info",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 534291113,
+  "unsafe_instructions": 7276181,
+  "unsafe_inst_pct": 1.3618382980665449,
+  "distinctive_pct": 0.03215434083601286,
+  "exec_w_unsafe_pct": 0.03215434083601286,
+  "accumulated_pct": 8.278903681082059e-06
+}

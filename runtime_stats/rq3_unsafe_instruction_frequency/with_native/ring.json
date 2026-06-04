@@ -1,0 +1,11 @@
+{
+  "crate": "ring",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 312329149935,
+  "unsafe_instructions": 65935483070,
+  "unsafe_inst_pct": 21.110896336035903,
+  "distinctive_pct": 61.10227874933757,
+  "exec_w_unsafe_pct": 62.21515633280339,
+  "accumulated_pct": 64.61502206638689
+}

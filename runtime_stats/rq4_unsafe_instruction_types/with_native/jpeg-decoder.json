@@ -1,0 +1,16 @@
+{
+  "crate": "jpeg-decoder",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 545424222350,
+  "unsafe_instructions": 177080748332,
+  "unsafe_loads": 30853276777,
+  "unsafe_stores": 77931078806,
+  "unsafe_calls_direct": 2252755684,
+  "unsafe_calls_indirect": 1028020,
+  "unsafe_calls_intrinsic": 4884915540,
+  "unsafe_casts": 79198036,
+  "unsafe_geps": 27481381992,
+  "unsafe_atomics": 1311278,
+  "unsafe_others": 33595800563
+}

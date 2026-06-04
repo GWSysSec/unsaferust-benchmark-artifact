@@ -1,0 +1,11 @@
+{
+  "crate": "ouroboros",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 534291099,
+  "unsafe_instructions": 90544094,
+  "unsafe_inst_pct": 16.946584768016134,
+  "distinctive_pct": 16.94915254237288,
+  "exec_w_unsafe_pct": 16.94915254237288,
+  "accumulated_pct": 99.95584471743689
+}

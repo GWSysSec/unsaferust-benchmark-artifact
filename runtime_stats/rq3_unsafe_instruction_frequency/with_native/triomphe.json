@@ -1,0 +1,11 @@
+{
+  "crate": "triomphe",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 1126213,
+  "unsafe_instructions": 189736,
+  "unsafe_inst_pct": 16.847257135195562,
+  "distinctive_pct": 36.27960716348932,
+  "exec_w_unsafe_pct": 29.636048526863085,
+  "accumulated_pct": 32.319721980886186
+}

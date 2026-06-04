@@ -1,0 +1,10 @@
+{
+  "crate": "pin-project-lite",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 9003314661.666666,
+  "external_cycles": 4277044353.6666665,
+  "internal_cycles": 4726270308.0,
+  "unsafe_cycles": 1528164773.3333335,
+  "unsafe_percentage": 32.33341882174322
+}

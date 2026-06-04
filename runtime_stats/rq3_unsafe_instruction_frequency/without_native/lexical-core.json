@@ -1,0 +1,11 @@
+{
+  "crate": "lexical-core",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 5319,
+  "unsafe_instructions": 516,
+  "unsafe_inst_pct": 9.701071630005641,
+  "distinctive_pct": 12.5,
+  "exec_w_unsafe_pct": 9.375,
+  "accumulated_pct": 18.6046511627907
+}

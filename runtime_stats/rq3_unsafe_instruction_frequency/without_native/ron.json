@@ -1,0 +1,11 @@
+{
+  "crate": "ron",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 206088355,
+  "unsafe_instructions": 235019,
+  "unsafe_inst_pct": 0.11403798142791716,
+  "distinctive_pct": 1.5429757389250698,
+  "exec_w_unsafe_pct": 1.365490588993058,
+  "accumulated_pct": 0.11176017517251788
+}

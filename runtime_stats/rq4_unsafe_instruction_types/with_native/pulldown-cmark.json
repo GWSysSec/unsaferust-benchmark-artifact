@@ -1,0 +1,16 @@
+{
+  "crate": "pulldown-cmark",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 256780232,
+  "unsafe_instructions": 27550005,
+  "unsafe_loads": 3358119,
+  "unsafe_stores": 8270533,
+  "unsafe_calls_direct": 603701,
+  "unsafe_calls_indirect": 1101,
+  "unsafe_calls_intrinsic": 2739085,
+  "unsafe_casts": 142689,
+  "unsafe_geps": 2287408,
+  "unsafe_atomics": 2508,
+  "unsafe_others": 10144861
+}

@@ -1,0 +1,16 @@
+{
+  "crate": "bimap",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 5213731,
+  "unsafe_instructions": 1747013,
+  "unsafe_loads": 203095,
+  "unsafe_stores": 480558,
+  "unsafe_calls_direct": 61802,
+  "unsafe_calls_indirect": 182,
+  "unsafe_calls_intrinsic": 221525,
+  "unsafe_casts": 7622,
+  "unsafe_geps": 135552,
+  "unsafe_atomics": 0,
+  "unsafe_others": 636677
+}

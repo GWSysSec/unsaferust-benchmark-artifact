@@ -1,0 +1,10 @@
+{
+  "crate": "fixedbitset",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 239965130.66666666,
+  "external_cycles": 114856857.66666667,
+  "internal_cycles": 125108272.99999999,
+  "unsafe_cycles": 35433910.0,
+  "unsafe_percentage": 28.32259542100785
+}

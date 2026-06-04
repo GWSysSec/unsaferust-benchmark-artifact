@@ -1,0 +1,11 @@
+{
+  "crate": "uuid",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 534475517,
+  "unsafe_instructions": 90707087,
+  "unsafe_inst_pct": 16.971233314696434,
+  "distinctive_pct": 15.736040609137056,
+  "exec_w_unsafe_pct": 12.013536379018612,
+  "accumulated_pct": 99.85622557682055
+}

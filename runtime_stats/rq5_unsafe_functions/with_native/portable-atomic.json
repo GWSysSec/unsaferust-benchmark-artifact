@@ -1,0 +1,17 @@
+{
+  "crate": "portable-atomic",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 48142,
+  "unsafe_functions_defined": 8781,
+  "total_functions_executed": 32703,
+  "unsafe_functions_executed": 6142,
+  "unsafe_functions_with_executed_insts": 3602,
+  "total_function_calls": 5465804176,
+  "unsafe_function_calls": 2418057848,
+  "unsafe_calls_total": 11474953872,
+  "static_rs_files": 49,
+  "static_total_fns": 905,
+  "static_unsafe_fns": 191,
+  "static_unsafe_fn_pct": 21.104972375690608
+}

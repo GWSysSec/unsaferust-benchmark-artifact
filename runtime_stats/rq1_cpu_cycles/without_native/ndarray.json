@@ -1,0 +1,10 @@
+{
+  "crate": "ndarray",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 223723070371.3334,
+  "external_cycles": 84503920042.33333,
+  "internal_cycles": 139219150329.00006,
+  "unsafe_cycles": 66099510836.0,
+  "unsafe_percentage": 47.47874892196575
+}

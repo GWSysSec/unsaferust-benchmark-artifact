@@ -1,0 +1,17 @@
+{
+  "crate": "gimli",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 30948,
+  "unsafe_functions_defined": 4900,
+  "total_functions_executed": 18061,
+  "unsafe_functions_executed": 3305,
+  "unsafe_functions_with_executed_insts": 1675,
+  "total_function_calls": 232920487,
+  "unsafe_function_calls": 74449526,
+  "unsafe_calls_total": 177160470,
+  "static_rs_files": 44,
+  "static_total_fns": 1801,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

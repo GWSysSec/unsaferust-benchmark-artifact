@@ -1,0 +1,10 @@
+{
+  "crate": "libsecp256k1",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 792769613.0,
+  "external_cycles": 659320872.3333334,
+  "internal_cycles": 133448740.66666663,
+  "unsafe_cycles": 63039057.00000001,
+  "unsafe_percentage": 47.238405312090116
+}

@@ -1,0 +1,11 @@
+{
+  "crate": "libsecp256k1",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 107522658,
+  "unsafe_instructions": 383665,
+  "unsafe_inst_pct": 0.35682246620056585,
+  "distinctive_pct": 4.97357786757849,
+  "exec_w_unsafe_pct": 4.849238420889027,
+  "accumulated_pct": 0.2265059631371841
+}

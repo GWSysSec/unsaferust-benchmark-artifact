@@ -1,0 +1,17 @@
+{
+  "crate": "jpeg-decoder",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 49540,
+  "unsafe_functions_defined": 14244,
+  "total_functions_executed": 18493,
+  "unsafe_functions_executed": 5458,
+  "unsafe_functions_with_executed_insts": 2235,
+  "total_function_calls": 23015085083,
+  "unsafe_function_calls": 10683770090,
+  "unsafe_calls_total": 7138699244,
+  "static_rs_files": 17,
+  "static_total_fns": 143,
+  "static_unsafe_fns": 8,
+  "static_unsafe_fn_pct": 5.594405594405594
+}

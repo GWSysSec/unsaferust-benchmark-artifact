@@ -1,0 +1,17 @@
+{
+  "crate": "fragile",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 18278,
+  "unsafe_functions_defined": 5722,
+  "total_functions_executed": 8798,
+  "unsafe_functions_executed": 3182,
+  "unsafe_functions_with_executed_insts": 1719,
+  "total_function_calls": 43008,
+  "unsafe_function_calls": 17851,
+  "unsafe_calls_total": 81797,
+  "static_rs_files": 8,
+  "static_total_fns": 117,
+  "static_unsafe_fns": 2,
+  "static_unsafe_fn_pct": 1.7094017094017095
+}

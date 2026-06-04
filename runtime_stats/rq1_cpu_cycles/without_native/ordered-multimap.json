@@ -1,0 +1,10 @@
+{
+  "crate": "ordered-multimap",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 19929772.666666668,
+  "external_cycles": 8755206.0,
+  "internal_cycles": 11174566.666666668,
+  "unsafe_cycles": 300491.3333333334,
+  "unsafe_percentage": 2.6890647512058634
+}

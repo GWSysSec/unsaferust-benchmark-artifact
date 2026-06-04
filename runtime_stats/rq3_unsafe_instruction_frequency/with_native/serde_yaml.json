@@ -1,0 +1,11 @@
+{
+  "crate": "serde_yaml",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 128529946,
+  "unsafe_instructions": 26494472,
+  "unsafe_inst_pct": 20.61346232884903,
+  "distinctive_pct": 22.40993670584876,
+  "exec_w_unsafe_pct": 10.855184885547043,
+  "accumulated_pct": 38.11463693539166
+}

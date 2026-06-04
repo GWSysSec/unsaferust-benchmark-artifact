@@ -1,0 +1,10 @@
+{
+  "crate": "simdutf8",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 200042687.0,
+  "external_cycles": 101673305.66666666,
+  "internal_cycles": 98369381.33333334,
+  "unsafe_cycles": 94030655.0,
+  "unsafe_percentage": 95.58935283060164
+}

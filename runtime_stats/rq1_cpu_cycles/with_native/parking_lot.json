@@ -1,0 +1,10 @@
+{
+  "crate": "parking_lot",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 2248558185717.001,
+  "external_cycles": 49649379659.666664,
+  "internal_cycles": 2198908806057.3342,
+  "unsafe_cycles": 198811213036.00024,
+  "unsafe_percentage": 9.041357808397283
+}

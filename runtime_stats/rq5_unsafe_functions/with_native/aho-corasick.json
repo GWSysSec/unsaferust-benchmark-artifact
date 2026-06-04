@@ -1,0 +1,17 @@
+{
+  "crate": "aho-corasick",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 10342,
+  "unsafe_functions_defined": 3148,
+  "total_functions_executed": 8134,
+  "unsafe_functions_executed": 2726,
+  "unsafe_functions_with_executed_insts": 1146,
+  "total_function_calls": 5110808549,
+  "unsafe_function_calls": 2298666538,
+  "unsafe_calls_total": 6579410285,
+  "static_rs_files": 32,
+  "static_total_fns": 864,
+  "static_unsafe_fns": 169,
+  "static_unsafe_fn_pct": 19.560185185185187
+}

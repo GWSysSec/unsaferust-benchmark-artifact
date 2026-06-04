@@ -1,0 +1,10 @@
+{
+  "crate": "git2",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 5878344319.999999,
+  "external_cycles": 4973586795.666667,
+  "internal_cycles": 904757524.3333321,
+  "unsafe_cycles": 877206.6666666269,
+  "unsafe_percentage": 0.09695489046228094
+}

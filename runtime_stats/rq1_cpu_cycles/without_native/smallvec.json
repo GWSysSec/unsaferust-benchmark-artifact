@@ -1,0 +1,10 @@
+{
+  "crate": "smallvec",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 18805837.333333332,
+  "external_cycles": 7885946.666666667,
+  "internal_cycles": 10919890.666666664,
+  "unsafe_cycles": 252635.66666666666,
+  "unsafe_percentage": 2.3135365946276876
+}

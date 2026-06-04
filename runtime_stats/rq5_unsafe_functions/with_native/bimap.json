@@ -1,0 +1,17 @@
+{
+  "crate": "bimap",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 7083,
+  "unsafe_functions_defined": 2226,
+  "total_functions_executed": 4693,
+  "unsafe_functions_executed": 1481,
+  "unsafe_functions_with_executed_insts": 824,
+  "total_function_calls": 135508,
+  "unsafe_function_calls": 61156,
+  "unsafe_calls_total": 283509,
+  "static_rs_files": 5,
+  "static_total_fns": 153,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

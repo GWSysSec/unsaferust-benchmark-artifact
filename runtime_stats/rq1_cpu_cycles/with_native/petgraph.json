@@ -1,0 +1,10 @@
+{
+  "crate": "petgraph",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 735526405052.6665,
+  "external_cycles": 246164630506.33334,
+  "internal_cycles": 489361774546.3331,
+  "unsafe_cycles": 474282609853.9999,
+  "unsafe_percentage": 96.91860593191764
+}

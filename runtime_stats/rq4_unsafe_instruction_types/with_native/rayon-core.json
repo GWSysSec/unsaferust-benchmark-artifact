@@ -1,0 +1,16 @@
+{
+  "crate": "rayon-core",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 17420257768,
+  "unsafe_instructions": 3852679284,
+  "unsafe_loads": 488538633,
+  "unsafe_stores": 920564676,
+  "unsafe_calls_direct": 44868471,
+  "unsafe_calls_indirect": 1792,
+  "unsafe_calls_intrinsic": 353865407,
+  "unsafe_casts": 17333803,
+  "unsafe_geps": 320625436,
+  "unsafe_atomics": 103118389,
+  "unsafe_others": 1603762102
+}

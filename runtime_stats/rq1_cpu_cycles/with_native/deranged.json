@@ -1,0 +1,10 @@
+{
+  "crate": "deranged",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 59397402.66666667,
+  "external_cycles": 27662157.666666668,
+  "internal_cycles": 31735245.000000004,
+  "unsafe_cycles": 10040832.0,
+  "unsafe_percentage": 31.63937130468033
+}

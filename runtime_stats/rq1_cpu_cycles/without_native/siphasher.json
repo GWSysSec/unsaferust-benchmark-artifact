@@ -1,0 +1,10 @@
+{
+  "crate": "siphasher",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 138444369.6666667,
+  "external_cycles": 71540822.66666667,
+  "internal_cycles": 66903547.000000015,
+  "unsafe_cycles": 20513977.0,
+  "unsafe_percentage": 30.662017067645152
+}

@@ -1,0 +1,10 @@
+{
+  "crate": "sharded-slab",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 3744582868.0,
+  "external_cycles": 2744857286.6666665,
+  "internal_cycles": 999725581.3333335,
+  "unsafe_cycles": 199751838.66666666,
+  "unsafe_percentage": 19.98066693464598
+}

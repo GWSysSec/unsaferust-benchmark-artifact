@@ -1,0 +1,11 @@
+{
+  "crate": "signal-hook",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 935397902,
+  "unsafe_instructions": 68520792,
+  "unsafe_inst_pct": 7.32530956649505,
+  "distinctive_pct": 37.458317895516856,
+  "exec_w_unsafe_pct": 15.19081141163394,
+  "accumulated_pct": 99.09989196684292
+}

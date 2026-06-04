@@ -1,0 +1,10 @@
+{
+  "crate": "ouroboros",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 6655414257.666666,
+  "external_cycles": 3329138041.3333335,
+  "internal_cycles": 3326276216.3333325,
+  "unsafe_cycles": 1390118982.0,
+  "unsafe_percentage": 41.79204887357116
+}

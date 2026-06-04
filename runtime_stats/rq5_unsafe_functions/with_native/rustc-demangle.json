@@ -1,0 +1,17 @@
+{
+  "crate": "rustc-demangle",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 4041,
+  "unsafe_functions_defined": 795,
+  "total_functions_executed": 2285,
+  "unsafe_functions_executed": 490,
+  "unsafe_functions_with_executed_insts": 319,
+  "total_function_calls": 36725711,
+  "unsafe_function_calls": 14183856,
+  "unsafe_calls_total": 26439418,
+  "static_rs_files": 3,
+  "static_total_fns": 116,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

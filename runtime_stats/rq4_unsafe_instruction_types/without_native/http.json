@@ -1,0 +1,16 @@
+{
+  "crate": "http",
+  "variant": "without_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 31620911096,
+  "unsafe_instructions": 803933176,
+  "unsafe_loads": 92584514,
+  "unsafe_stores": 226251670,
+  "unsafe_calls_direct": 30685167,
+  "unsafe_calls_indirect": 4427500,
+  "unsafe_calls_intrinsic": 82253977,
+  "unsafe_casts": 8374621,
+  "unsafe_geps": 68376776,
+  "unsafe_atomics": 0,
+  "unsafe_others": 290978951
+}

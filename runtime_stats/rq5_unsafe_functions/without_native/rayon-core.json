@@ -1,0 +1,17 @@
+{
+  "crate": "rayon-core",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 346521,
+  "unsafe_functions_defined": 20790,
+  "total_functions_executed": 166556,
+  "unsafe_functions_executed": 11039,
+  "unsafe_functions_with_executed_insts": 8483,
+  "total_function_calls": 637678090,
+  "unsafe_function_calls": 43093326,
+  "unsafe_calls_total": 249469204,
+  "static_rs_files": 26,
+  "static_total_fns": 380,
+  "static_unsafe_fns": 39,
+  "static_unsafe_fn_pct": 10.263157894736842
+}

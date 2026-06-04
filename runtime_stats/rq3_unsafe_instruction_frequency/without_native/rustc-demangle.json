@@ -1,0 +1,11 @@
+{
+  "crate": "rustc-demangle",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 1174006349,
+  "unsafe_instructions": 16976789,
+  "unsafe_inst_pct": 1.4460559786972669,
+  "distinctive_pct": 0.0437636761487965,
+  "exec_w_unsafe_pct": 0.0437636761487965,
+  "accumulated_pct": 2.722888060628697e-06
+}

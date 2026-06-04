@@ -1,0 +1,10 @@
+{
+  "crate": "clru",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 321438772.0,
+  "external_cycles": 159291687.66666666,
+  "internal_cycles": 162147084.33333334,
+  "unsafe_cycles": 93602315.0,
+  "unsafe_percentage": 57.72679501752701
+}

@@ -1,0 +1,16 @@
+{
+  "crate": "rmp-serde",
+  "variant": "without_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 534291103,
+  "unsafe_instructions": 7276181,
+  "unsafe_loads": 786608,
+  "unsafe_stores": 2359792,
+  "unsafe_calls_direct": 1573120,
+  "unsafe_calls_indirect": 0,
+  "unsafe_calls_intrinsic": 393664,
+  "unsafe_casts": 16,
+  "unsafe_geps": 393376,
+  "unsafe_atomics": 0,
+  "unsafe_others": 1769605
+}

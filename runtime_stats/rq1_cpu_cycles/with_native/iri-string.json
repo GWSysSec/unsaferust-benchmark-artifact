@@ -1,0 +1,10 @@
+{
+  "crate": "iri-string",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 2252478845.6666665,
+  "external_cycles": 1166462486.3333333,
+  "internal_cycles": 1086016359.3333333,
+  "unsafe_cycles": 625604478.3333334,
+  "unsafe_percentage": 57.60543779629339
+}

@@ -1,0 +1,17 @@
+{
+  "crate": "matrixmultiply",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 1808,
+  "unsafe_functions_defined": 334,
+  "total_functions_executed": 1156,
+  "unsafe_functions_executed": 186,
+  "unsafe_functions_with_executed_insts": 160,
+  "total_function_calls": 552554662,
+  "unsafe_function_calls": 106375538,
+  "unsafe_calls_total": 958530528,
+  "static_rs_files": 23,
+  "static_total_fns": 252,
+  "static_unsafe_fns": 70,
+  "static_unsafe_fn_pct": 27.77777777777778
+}

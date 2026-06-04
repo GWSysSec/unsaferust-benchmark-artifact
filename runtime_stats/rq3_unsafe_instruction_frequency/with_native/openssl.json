@@ -1,0 +1,11 @@
+{
+  "crate": "openssl",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 1237369461,
+  "unsafe_instructions": 606143545,
+  "unsafe_inst_pct": 48.98646395476217,
+  "distinctive_pct": 36.92690900599362,
+  "exec_w_unsafe_pct": 18.011987234373784,
+  "accumulated_pct": 49.38369033095058
+}

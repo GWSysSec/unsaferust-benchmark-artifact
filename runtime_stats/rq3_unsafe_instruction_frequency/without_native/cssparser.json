@@ -1,0 +1,11 @@
+{
+  "crate": "cssparser",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 1644666386,
+  "unsafe_instructions": 377533827,
+  "unsafe_inst_pct": 22.955040013811043,
+  "distinctive_pct": 3.4383126264085524,
+  "exec_w_unsafe_pct": 1.9647500722334585,
+  "accumulated_pct": 30.043927338804966
+}

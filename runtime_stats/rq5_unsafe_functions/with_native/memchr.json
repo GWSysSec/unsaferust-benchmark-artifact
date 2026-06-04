@@ -1,0 +1,17 @@
+{
+  "crate": "memchr",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 4909,
+  "unsafe_functions_defined": 1438,
+  "total_functions_executed": 3166,
+  "unsafe_functions_executed": 1174,
+  "unsafe_functions_with_executed_insts": 528,
+  "total_function_calls": 32710241082,
+  "unsafe_function_calls": 14900780161,
+  "unsafe_calls_total": 55166433398,
+  "static_rs_files": 45,
+  "static_total_fns": 694,
+  "static_unsafe_fns": 198,
+  "static_unsafe_fn_pct": 28.530259365994237
+}

@@ -1,0 +1,10 @@
+{
+  "crate": "rustc-demangle",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 3533887083.6666665,
+  "external_cycles": 2574751921.0,
+  "internal_cycles": 959135162.6666665,
+  "unsafe_cycles": 774821525.6666665,
+  "unsafe_percentage": 80.7833510672723
+}

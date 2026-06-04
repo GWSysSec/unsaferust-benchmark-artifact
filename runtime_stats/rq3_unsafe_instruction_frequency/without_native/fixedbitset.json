@@ -1,0 +1,11 @@
+{
+  "crate": "fixedbitset",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 649235086,
+  "unsafe_instructions": 20953285,
+  "unsafe_inst_pct": 3.227380258989885,
+  "distinctive_pct": 2.16787103946637,
+  "exec_w_unsafe_pct": 2.112284602556976,
+  "accumulated_pct": 6.473312122774842
+}

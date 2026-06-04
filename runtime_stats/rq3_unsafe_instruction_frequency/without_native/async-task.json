@@ -1,0 +1,11 @@
+{
+  "crate": "async-task",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 359035643,
+  "unsafe_instructions": 46305777,
+  "unsafe_inst_pct": 12.897264631745767,
+  "distinctive_pct": 12.671649574135232,
+  "exec_w_unsafe_pct": 11.107248392143228,
+  "accumulated_pct": 0.03313791304816837
+}

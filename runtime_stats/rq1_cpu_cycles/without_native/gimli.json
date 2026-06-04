@@ -1,0 +1,10 @@
+{
+  "crate": "gimli",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 4455673011.0,
+  "external_cycles": 3007896001.666667,
+  "internal_cycles": 1447777009.333333,
+  "unsafe_cycles": 654125976.3333334,
+  "unsafe_percentage": 45.181403773951544
+}

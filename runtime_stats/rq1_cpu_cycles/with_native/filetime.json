@@ -1,0 +1,10 @@
+{
+  "crate": "filetime",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 19791417.333333332,
+  "external_cycles": 12614135.0,
+  "internal_cycles": 7177282.333333332,
+  "unsafe_cycles": 210360.33333333334,
+  "unsafe_percentage": 2.930919024271351
+}

@@ -1,0 +1,10 @@
+{
+  "crate": "chrono",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 180641830869.66666,
+  "external_cycles": 19075820228.333332,
+  "internal_cycles": 161566010641.3333,
+  "unsafe_cycles": 143375292478.33334,
+  "unsafe_percentage": 88.74099936565108
+}

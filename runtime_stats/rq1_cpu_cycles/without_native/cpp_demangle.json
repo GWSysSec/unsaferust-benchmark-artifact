@@ -1,0 +1,10 @@
+{
+  "crate": "cpp_demangle",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 40633864344.66667,
+  "external_cycles": 31524819670.000004,
+  "internal_cycles": 9109044674.666668,
+  "unsafe_cycles": 954887080.6666666,
+  "unsafe_percentage": 10.482845509829595
+}

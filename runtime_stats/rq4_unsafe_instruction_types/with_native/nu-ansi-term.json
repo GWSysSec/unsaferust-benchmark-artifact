@@ -1,0 +1,16 @@
+{
+  "crate": "nu-ansi-term",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 534291090,
+  "unsafe_instructions": 90776208,
+  "unsafe_loads": 901733,
+  "unsafe_stores": 37918627,
+  "unsafe_calls_direct": 1596421,
+  "unsafe_calls_indirect": 0,
+  "unsafe_calls_intrinsic": 535774,
+  "unsafe_casts": 7744,
+  "unsafe_geps": 469816,
+  "unsafe_atomics": 0,
+  "unsafe_others": 49346093
+}

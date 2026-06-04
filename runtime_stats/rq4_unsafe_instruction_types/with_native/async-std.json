@@ -1,0 +1,16 @@
+{
+  "crate": "async-std",
+  "variant": "with_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 3731254336,
+  "unsafe_instructions": 796869826,
+  "unsafe_loads": 117918851,
+  "unsafe_stores": 209680098,
+  "unsafe_calls_direct": 8533531,
+  "unsafe_calls_indirect": 201104,
+  "unsafe_calls_intrinsic": 38808601,
+  "unsafe_casts": 473000,
+  "unsafe_geps": 64646875,
+  "unsafe_atomics": 29554767,
+  "unsafe_others": 327052999
+}

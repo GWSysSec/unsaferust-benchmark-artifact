@@ -1,0 +1,11 @@
+{
+  "crate": "zopfli",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 331529341621,
+  "unsafe_instructions": 28829414630,
+  "unsafe_inst_pct": 8.6958863095012,
+  "distinctive_pct": 0.5755395683453237,
+  "exec_w_unsafe_pct": 0.5755395683453237,
+  "accumulated_pct": 3.934574897503948
+}

@@ -1,0 +1,17 @@
+{
+  "crate": "postcard",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 5857,
+  "unsafe_functions_defined": 437,
+  "total_functions_executed": 4146,
+  "unsafe_functions_executed": 389,
+  "unsafe_functions_with_executed_insts": 274,
+  "total_function_calls": 151292,
+  "unsafe_function_calls": 59512,
+  "unsafe_calls_total": 155208,
+  "static_rs_files": 13,
+  "static_total_fns": 282,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

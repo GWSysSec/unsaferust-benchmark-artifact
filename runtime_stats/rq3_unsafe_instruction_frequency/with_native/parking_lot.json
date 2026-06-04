@@ -1,0 +1,11 @@
+{
+  "crate": "parking_lot",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 59156316468,
+  "unsafe_instructions": 19952087135,
+  "unsafe_inst_pct": 33.727737503387104,
+  "distinctive_pct": 39.74735605170388,
+  "exec_w_unsafe_pct": 21.643654524089307,
+  "accumulated_pct": 63.62164279241761
+}

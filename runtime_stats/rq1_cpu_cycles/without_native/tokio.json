@@ -1,0 +1,10 @@
+{
+  "crate": "tokio",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 231555301178.66663,
+  "external_cycles": 72639953242.33339,
+  "internal_cycles": 158915347936.33325,
+  "unsafe_cycles": 9132029425.999954,
+  "unsafe_percentage": 5.746474172940519
+}

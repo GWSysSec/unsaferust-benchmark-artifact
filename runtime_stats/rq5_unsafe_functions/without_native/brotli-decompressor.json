@@ -1,0 +1,17 @@
+{
+  "crate": "brotli-decompressor",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 8964,
+  "unsafe_functions_defined": 6,
+  "total_functions_executed": 4680,
+  "unsafe_functions_executed": 6,
+  "unsafe_functions_with_executed_insts": 6,
+  "total_function_calls": 1293378820,
+  "unsafe_function_calls": 6,
+  "unsafe_calls_total": 2465823,
+  "static_rs_files": 23,
+  "static_total_fns": 385,
+  "static_unsafe_fns": 25,
+  "static_unsafe_fn_pct": 6.493506493506493
+}

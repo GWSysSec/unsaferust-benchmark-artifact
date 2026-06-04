@@ -1,0 +1,17 @@
+{
+  "crate": "value-bag",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 1776,
+  "unsafe_functions_defined": 21,
+  "total_functions_executed": 876,
+  "unsafe_functions_executed": 21,
+  "unsafe_functions_with_executed_insts": 21,
+  "total_function_calls": 3231,
+  "unsafe_function_calls": 27,
+  "unsafe_calls_total": 0,
+  "static_rs_files": 18,
+  "static_total_fns": 720,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

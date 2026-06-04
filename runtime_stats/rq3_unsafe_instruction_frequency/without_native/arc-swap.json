@@ -1,0 +1,11 @@
+{
+  "crate": "arc-swap",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 213220881657,
+  "unsafe_instructions": 4261420530,
+  "unsafe_inst_pct": 1.9985943669697317,
+  "distinctive_pct": 7.492074086434173,
+  "exec_w_unsafe_pct": 5.9402636409144,
+  "accumulated_pct": 5.2396005960881045
+}

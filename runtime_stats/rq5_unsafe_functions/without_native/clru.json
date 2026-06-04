@@ -1,0 +1,17 @@
+{
+  "crate": "clru",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 3958,
+  "unsafe_functions_defined": 204,
+  "total_functions_executed": 2718,
+  "unsafe_functions_executed": 188,
+  "unsafe_functions_with_executed_insts": 166,
+  "total_function_calls": 3229915,
+  "unsafe_function_calls": 408904,
+  "unsafe_calls_total": 2761266,
+  "static_rs_files": 4,
+  "static_total_fns": 142,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

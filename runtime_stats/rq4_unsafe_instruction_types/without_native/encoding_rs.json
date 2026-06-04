@@ -1,0 +1,16 @@
+{
+  "crate": "encoding_rs",
+  "variant": "without_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 78821134451,
+  "unsafe_instructions": 1363268806,
+  "unsafe_loads": 123883970,
+  "unsafe_stores": 171843888,
+  "unsafe_calls_direct": 19651049,
+  "unsafe_calls_indirect": 0,
+  "unsafe_calls_intrinsic": 36708093,
+  "unsafe_casts": 972288,
+  "unsafe_geps": 93141206,
+  "unsafe_atomics": 0,
+  "unsafe_others": 917068312
+}

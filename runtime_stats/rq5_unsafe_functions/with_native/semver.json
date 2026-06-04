@@ -1,0 +1,17 @@
+{
+  "crate": "semver",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 2438,
+  "unsafe_functions_defined": 564,
+  "total_functions_executed": 1360,
+  "unsafe_functions_executed": 374,
+  "unsafe_functions_with_executed_insts": 277,
+  "total_function_calls": 11461152,
+  "unsafe_function_calls": 11369572,
+  "unsafe_calls_total": 214107,
+  "static_rs_files": 9,
+  "static_total_fns": 94,
+  "static_unsafe_fns": 6,
+  "static_unsafe_fn_pct": 6.382978723404255
+}

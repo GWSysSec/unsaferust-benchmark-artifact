@@ -1,0 +1,17 @@
+{
+  "crate": "pulldown-cmark",
+  "variant": "without_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 43623,
+  "unsafe_functions_defined": 2619,
+  "total_functions_executed": 15238,
+  "unsafe_functions_executed": 606,
+  "unsafe_functions_with_executed_insts": 600,
+  "total_function_calls": 5468259,
+  "unsafe_function_calls": 53852,
+  "unsafe_calls_total": 201165,
+  "static_rs_files": 12,
+  "static_total_fns": 345,
+  "static_unsafe_fns": 3,
+  "static_unsafe_fn_pct": 0.8695652173913043
+}

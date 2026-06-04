@@ -1,0 +1,17 @@
+{
+  "crate": "uuid",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 1641,
+  "unsafe_functions_defined": 246,
+  "total_functions_executed": 1182,
+  "unsafe_functions_executed": 186,
+  "unsafe_functions_with_executed_insts": 142,
+  "total_function_calls": 12058473,
+  "unsafe_function_calls": 12041136,
+  "unsafe_calls_total": 2044853,
+  "static_rs_files": 23,
+  "static_total_fns": 392,
+  "static_unsafe_fns": 1,
+  "static_unsafe_fn_pct": 0.25510204081632654
+}

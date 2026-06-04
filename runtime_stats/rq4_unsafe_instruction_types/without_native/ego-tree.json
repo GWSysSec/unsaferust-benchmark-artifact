@@ -1,0 +1,16 @@
+{
+  "crate": "ego-tree",
+  "variant": "without_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 1491545,
+  "unsafe_instructions": 58188,
+  "unsafe_loads": 2959,
+  "unsafe_stores": 8864,
+  "unsafe_calls_direct": 766,
+  "unsafe_calls_indirect": 0,
+  "unsafe_calls_intrinsic": 621,
+  "unsafe_casts": 0,
+  "unsafe_geps": 3831,
+  "unsafe_atomics": 0,
+  "unsafe_others": 41147
+}

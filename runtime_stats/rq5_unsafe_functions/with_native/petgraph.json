@@ -1,0 +1,17 @@
+{
+  "crate": "petgraph",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 61534,
+  "unsafe_functions_defined": 14930,
+  "total_functions_executed": 42196,
+  "unsafe_functions_executed": 11066,
+  "unsafe_functions_with_executed_insts": 5811,
+  "total_function_calls": 355221864,
+  "unsafe_function_calls": 83649989,
+  "unsafe_calls_total": 113533098,
+  "static_rs_files": 56,
+  "static_total_fns": 1291,
+  "static_unsafe_fns": 3,
+  "static_unsafe_fn_pct": 0.23237800154918667
+}

@@ -1,0 +1,11 @@
+{
+  "crate": "pin-project-lite",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 613080643,
+  "unsafe_instructions": 103013893,
+  "unsafe_inst_pct": 16.802666040134625,
+  "distinctive_pct": 21.81500872600349,
+  "exec_w_unsafe_pct": 20.94240837696335,
+  "accumulated_pct": 99.98747563291931
+}

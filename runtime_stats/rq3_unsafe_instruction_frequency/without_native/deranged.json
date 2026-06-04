@@ -1,0 +1,11 @@
+{
+  "crate": "deranged",
+  "variant": "without_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 6706167,
+  "unsafe_instructions": 285469,
+  "unsafe_inst_pct": 4.256813169132233,
+  "distinctive_pct": 20.426065162907268,
+  "exec_w_unsafe_pct": 20.30075187969925,
+  "accumulated_pct": 22.646219686162624
+}

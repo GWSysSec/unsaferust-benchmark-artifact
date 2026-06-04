@@ -1,0 +1,16 @@
+{
+  "crate": "smallvec",
+  "variant": "without_native",
+  "research_question": "rq4_unsafe_instruction_types",
+  "total_instructions": 484249,
+  "unsafe_instructions": 129118,
+  "unsafe_loads": 17412,
+  "unsafe_stores": 28524,
+  "unsafe_calls_direct": 5124,
+  "unsafe_calls_indirect": 0,
+  "unsafe_calls_intrinsic": 18997,
+  "unsafe_casts": 2515,
+  "unsafe_geps": 11991,
+  "unsafe_atomics": 0,
+  "unsafe_others": 44555
+}

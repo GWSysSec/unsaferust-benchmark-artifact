@@ -1,0 +1,10 @@
+{
+  "crate": "slotmap",
+  "variant": "with_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 1806609449.3333333,
+  "external_cycles": 574755739.6666667,
+  "internal_cycles": 1231853709.6666665,
+  "unsafe_cycles": 1095243165.6666667,
+  "unsafe_percentage": 88.91016498728848
+}

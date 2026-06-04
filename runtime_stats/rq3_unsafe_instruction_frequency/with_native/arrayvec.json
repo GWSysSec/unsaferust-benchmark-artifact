@@ -1,0 +1,11 @@
+{
+  "crate": "arrayvec",
+  "variant": "with_native",
+  "research_question": "rq3_unsafe_instruction_frequency",
+  "total_instructions": 4767176591,
+  "unsafe_instructions": 1537445779,
+  "unsafe_inst_pct": 32.25065716891124,
+  "distinctive_pct": 32.69944341372913,
+  "exec_w_unsafe_pct": 23.051948051948052,
+  "accumulated_pct": 90.14783688452435
+}

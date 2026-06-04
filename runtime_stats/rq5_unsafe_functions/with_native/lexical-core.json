@@ -1,0 +1,17 @@
+{
+  "crate": "lexical-core",
+  "variant": "with_native",
+  "research_question": "rq5_unsafe_functions",
+  "total_functions_defined": 210,
+  "unsafe_functions_defined": 45,
+  "total_functions_executed": 96,
+  "unsafe_functions_executed": 15,
+  "unsafe_functions_with_executed_insts": 9,
+  "total_function_calls": 129,
+  "unsafe_function_calls": 30,
+  "unsafe_calls_total": 0,
+  "static_rs_files": 1,
+  "static_total_fns": 12,
+  "static_unsafe_fns": 0,
+  "static_unsafe_fn_pct": 0.0
+}

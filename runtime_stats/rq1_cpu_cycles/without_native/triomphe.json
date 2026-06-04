@@ -1,0 +1,10 @@
+{
+  "crate": "triomphe",
+  "variant": "without_native",
+  "research_question": "rq1_cpu_cycles",
+  "total_cycles": 17193763.0,
+  "external_cycles": 10441171.666666666,
+  "internal_cycles": 6752591.333333334,
+  "unsafe_cycles": 82077.33333333334,
+  "unsafe_percentage": 1.215493864232072
+}
