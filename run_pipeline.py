@@ -9,21 +9,26 @@ from pathlib import Path
 from datetime import datetime
 
 # Impor aggregator
-sys.path.append(str(Path(__file__).parent / "pipeline"))
 try:
-    from pipeline.aggregator import Aggregator
-except ImportError:
-    # If standard import fails (e.g. running from root), try relative
-    sys.path.append("pipeline")
+    # Legacy stats aggregator (retired in this artifact); kept import optional so
+    # --showstats degrades gracefully and the per-binary .stat files remain the
+    # source of truth.
     from aggregator import Aggregator
+except ImportError:
+    Aggregator = None
 
 # Configuration
 SCRIPT_DIR = Path(__file__).parent.absolute()
 BENCHMARK_DIR = SCRIPT_DIR / "benchmarks"
-PERF_DIR = SCRIPT_DIR / "perf"
+PERF_DIR = SCRIPT_DIR / "unsafe_perf_source"
 PERF_TARGET_DIR = PERF_DIR / "target" / "release"
 PERF_RLIB = PERF_TARGET_DIR / "libunsafe_perf.rlib"
 PERF_DEPS = PERF_TARGET_DIR / "deps"
+# Prebuilt per-feature instrumentation libraries shipped with the artifact
+# (unsafe_perf_prebuilt/<feature>/libunsafe_perf.rlib + deps/). Built once with
+# the same stage1 compiler that ships under toolchain/, so they are
+# link-compatible.
+RUNTIME_DIR = SCRIPT_DIR / "unsafe_perf_prebuilt"
 
 # Experiment Definitions
 EXPERIMENTS = {
@@ -162,22 +167,38 @@ def run_cmd(cmd, cwd=None, env=None, timeout=600):
         return False
 
 def build_perf(feature):
-    """Build the perf library with the specified feature."""
-    print(f"building perf library with feature: {feature}...")
-    
-    # Ensure RUSTFLAGS is NOT set for this build to avoid circular dependencies/errors
-    env = os.environ.copy()
-    if "RUSTFLAGS" in env:
-        del env["RUSTFLAGS"]
+    """Provision the instrumentation library for the given feature.
 
-    if not feature: # Skip build for native
+    Prefers the prebuilt per-feature library shipped under
+    unsafe_perf_prebuilt/<feature>/ (rlib + deps) and stages it into
+    unsafe_perf_source/target/release/, so no per-feature recompilation is
+    needed. Falls back to compiling it from source only when no prebuilt library
+    exists for the feature (e.g. unsafe_coverage)."""
+    if not feature:  # native: no instrumentation library
         return
 
-    # Clean first ensures no feature mixing
-    run_cmd("cargo clean", cwd=PERF_DIR, env=env) 
-    
-    cmd = f"cargo build --release --features {feature}"
-    if not run_cmd(cmd, cwd=PERF_DIR, env=env):
+    prebuilt_rlib = RUNTIME_DIR / feature / "libunsafe_perf.rlib"
+    prebuilt_deps = RUNTIME_DIR / feature / "deps"
+
+    if prebuilt_rlib.exists():
+        print(f"using prebuilt instrumentation library for feature: {feature}")
+        # Replace unsafe_perf_source/target/release with this feature's prebuilt
+        # rlib + deps so the PERF_RLIB / PERF_DEPS paths resolve to the right
+        # instrumentation and features never mix.
+        if PERF_TARGET_DIR.exists():
+            shutil.rmtree(PERF_TARGET_DIR)
+        PERF_TARGET_DIR.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(prebuilt_rlib, PERF_RLIB)
+        if prebuilt_deps.is_dir():
+            shutil.copytree(prebuilt_deps, PERF_DEPS)
+        return
+
+    # Fallback: compile the library from source with the prebuilt stage1 compiler.
+    print(f"no prebuilt instrumentation library for '{feature}'; building from source...")
+    env = os.environ.copy()
+    env.pop("RUSTFLAGS", None)  # avoid injecting instrumentation flags into this build
+    run_cmd("cargo clean", cwd=PERF_DIR, env=env)
+    if not run_cmd(f"cargo build --release --features {feature}", cwd=PERF_DIR, env=env):
         print(f"Failed to build perf library for {feature}")
         sys.exit(1)
 
@@ -388,9 +409,14 @@ def main():
     # Aggregation
     if args.showstats:
         print("\n=== Aggregating Results ===")
-        agg = Aggregator(base_output_dir)
-        agg.collect_all()
-        agg.print_table()
+        if Aggregator is None:
+            print("Stats aggregator is not bundled in this artifact; "
+                  "the per-binary .stat files in the results directory are the "
+                  "source of truth.")
+        else:
+            agg = Aggregator(base_output_dir)
+            agg.collect_all()
+            agg.print_table()
     
     print(f"\nFull results in: {base_output_dir}")
 

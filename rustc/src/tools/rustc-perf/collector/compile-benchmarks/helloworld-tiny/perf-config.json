@@ -1,6 +1,0 @@
-{
-    "category": "secondary",
-    "excluded_profiles": ["Doc", "Check", "Debug"],
-    "excluded_scenarios": ["IncrFull", "IncrPatched", "IncrUnchanged"],
-    "artifact": "binary"
-}

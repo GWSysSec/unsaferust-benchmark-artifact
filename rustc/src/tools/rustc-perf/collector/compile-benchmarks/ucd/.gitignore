@@ -1,6 +1,0 @@
-target
-Cargo.lock
-*.swp
-__pycache__
-.DS_Store
-tests/data/*

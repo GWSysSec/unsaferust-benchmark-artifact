@@ -1,221 +1,168 @@
 # Dynamic Analysis of Unsafe Rust: Behavior and Benchmarks
 
-We provide the artifacts for the paper in two formats:
+This is the research artifact for our paper on the dynamic (runtime) behavior of
+unsafe Rust. It bundles everything needed to reproduce our measurements:
 
-1. **Docker Image**: A pre-built environment with our modified compiler, benchmarks, and instrumentation tools.
-2. **Repository**: The source code to build and run everything from scratch.
+- a **prebuilt instrumented Rust compiler** (`rustc 1.80.0-dev` with our LLVM
+  instrumentation passes),
+- the **instrumentation runtime library** (`unsafe_perf`), prebuilt per feature,
+- the **benchmark suite** and the **enhanced coverage workloads** (LLM-generated
+  integration tests) used to drive execution,
+- the **dynamic measurement results** for all 100 analyzed crates, and
+- the scripts to re-run any experiment.
 
-## Setup
+The compiler and instrumentation libraries are shipped **prebuilt**, so there is
+no multi-hour `rustc`/LLVM build. The Docker image builds in a few minutes.
 
-This repository contains everything needed to build the artifact. No external dependencies or submodules are required for the standard flow.
+## Important: clone with Git LFS
 
-## Directory Structure
-
-- `rustc/`: The modified Rust compiler source code.
-- `perf/`: The instrumentation library and runtime tools.
-- `benchmarks/`: The collection of crates used for benchmarking.
-- `pipeline/`: Scripts for running automated experiment pipelines.
-- `config.toml`: Configuration file for the build process (controls custom `rustc` build).
-- `Dockerfile`: Configuration for building the Docker image.
-- `master_runtime_stats.json`: Aggregated runtime data (CPU, Heap, Unsafe Counts) for all crates.
-- `benchmark_configs.md`: Detailed configuration and static characteristics of the benchmarks.
-- `benchmark_runtime_stats.csv`: Summary of crate metadata (LOC, downloads, unsafe %) and runtime statistics.
-
-## Experiment Methodology & Data Sources
-
-We distinguish between two types of data and experiments in this artifact:
-
-1. **Runtime Behavior Analysis (100 Crates)**
-   - **Source**: Dataset of 100 popular crates.
-   - **Method**: Executed via **`cargo test`** suites.
-   - **Instrumentation**: `cpu_cycle`, `heap_tracker`, `unsafe_counter`.
-   - **Data**: The aggregated results are stored in `master_runtime_stats.json`. This corresponds to the runtime analysis phase described in the paper.
-
-2. **Benchmark Dynamics (Benchmark Suite)**
-   - **Source**: The specific benchmarks located in the `benchmarks/` directory (e.g., `ring`, `regex`).
-   - **Method**: Executed via **`cargo bench`** performance benchmarks.
-   - **Configuration**: Detailed commands and flags are listed in `benchmark_configs.md`.
-   - **Goal**: To analyze behavior under specific high-load scenarios.
-
-## Docker: Getting Started
-
-You can load our pre-built image or build it locally.
-
-### 1. Download and Load Tarball Docker Image (Recommended)
-
-If you have the offline archive:
+The prebuilt compiler and instrumentation libraries (~0.9 GB) are stored with
+**Git LFS**. Install LFS *before* cloning, or the large files arrive as small
+pointer text files:
 
 ```bash
-unzip unsaferustbenchv3.zip
-docker load -i unsaferustbenchv3.tar
-docker run -it unsaferustbench:v3
+git lfs install
+git clone <repo-url>
+
+# If you already cloned without LFS:
+git lfs pull
 ```
 
-### 2. Build Locally
-
-If you prefer to build the image yourself (e.g., to include local changes):
+Quick check that the real binaries are present (not pointers):
 
 ```bash
-./docker-build.sh
+file toolchain/lib/librustc_driver-*.so   # should say "ELF ... shared object"
 ```
 
-This will build the image `unsaferust-bench:local`. It takes 1-2 hours as it compiles Rust from source.
+## Repository layout
 
-## Automating Experiments (AIO)
+| Path | Contents |
+|------|----------|
+| `toolchain/` | Prebuilt instrumented compiler (`rustc`/`rustdoc` + sysroot). Linked as the `stage1` rustup toolchain. |
+| `unsafe_perf_source/` | Source of the `unsafe_perf` instrumentation library (`Makefile`, `src/`). |
+| `unsafe_perf_prebuilt/` | Prebuilt `libunsafe_perf.rlib` (+ `deps/`) for each feature: `cpu_cycle_counter/`, `heap_tracker/`, `unsafe_counter/`. |
+| `benchmarks/` | The benchmark suite (real crates run under `cargo bench`/`cargo test`). |
+| `generated_tests/` | Enhanced coverage workloads: LLM-generated integration tests, per crate. |
+| `dynamic_analysis_results/` | Per-crate dynamic measurements, grouped by research question (`rq1`–`rq5`) and variant. See its own `README.md`. |
+| `analyzed_crates.csv` | The 100-crate dataset: version, LOC, static-unsafe %, and pre/post API coverage. |
+| `workload_descriptions/` | One-line workload summary per crate (`workload_descriptions.csv`). |
+| `experiment_env/` | Per-experiment environment presets for the manual flow (`env/*.sh`). |
+| `benchmark_configs.md` | Per-benchmark commands, flags, and static characteristics. |
+| `run_pipeline.py` | Automated experiment driver. |
+| `Dockerfile`, `docker-compose.yml`, `docker-build.sh` | Container build/run. |
 
-We provide a comprehensive script to run experiments automatically.
-
-### 1. Run Native Baseline (All Crates)
-
-To run a native baseline (compilation and execution without extra instrumentation) for **all crates**, use the following command with no arguments:
+## Quick start (Docker, recommended)
 
 ```bash
-# Inside the container:
-python3 run_pipeline.py --showstats
+git lfs pull                 # ensure prebuilt binaries are materialized
+./docker-build.sh            # builds image unsaferust-bench:local (a few minutes)
+docker run -it unsaferust-bench:local
 ```
 
-_Note: This defaults to `-experiment native` and runs all crates._
-
-### 2. Run Coverage Experiment (All Crates)
-
-To run the unsafe coverage instrumentation on all crates:
+Or with Compose:
 
 ```bash
-python3 run_pipeline.py --experiment coverage --showstats
+docker compose build
+docker compose run --rm unsaferust-bench
 ```
 
-### 3. Run Specific Experiments
+The container links the prebuilt compiler as the `stage1` toolchain and stages a
+ready-to-use instrumentation library, so experiments run out of the box.
 
-You can also use the script to run other experiments (`cpu_cycle`, `heap_tracker`, `unsafe_counter`):
+## Running experiments
+
+Inside the container (working dir `/workspace`):
 
 ```bash
-python3 run_pipeline.py --experiment cpu_cycle --showstats
+# Native baseline (compile + run, no instrumentation), all crates:
+python3 run_pipeline.py
+
+# A specific instrumentation experiment, all crates:
+python3 run_pipeline.py --experiment unsafe_counter --showstats
+
+# Everything:
+python3 run_pipeline.py --all --showstats
 ```
 
-### Options
+Options:
 
-- `--experiment <name>`: Choose from `native`, `coverage`, `cpu_cycle`, `heap_tracker`, `unsafe_counter`.
-- `--crate <name>`: Run for a specific crate only.
-- `--showstats`: Display aggregated statistics table in the console.
-- `--output <dir>`: Specify output directory.
+- `--experiment <name>`: one of `native`, `coverage`, `cpu_cycle`,
+  `heap_tracker`, `unsafe_counter`.
+- `--crate <name>`: restrict to a single crate.
+- `--showstats`: print an aggregated summary table.
+- `--output <dir>`: results directory (default: `results/<timestamp>/`).
 
-## Manual Usage (Inside Container)
+For each feature the driver stages the matching prebuilt library from
+`unsafe_perf_prebuilt/` (no recompilation). `coverage` is the one feature that is
+not prebuilt; it is compiled from `unsafe_perf_source/` on demand with the
+prebuilt compiler.
 
-If you wish to run benchmarks manually or inspect specific crates, follow these steps inside the container (`/workspace`):
-
-### 1. Build Instrumentation
-
-Navigate to `perf` and build the desired tool:
-
-```bash
-cd perf
-make coverage   # Options: coverage, counter, heap, cpu
-```
-
-### 2. Setup Environment
-
-Source the environment script to link the instrumented library. These scripts set the correct `RUSTFLAGS` and output paths.
+## Manual flow (single crate, by hand)
 
 ```bash
-# From workspace root:
-source pipeline/env/coverage.sh   # For coverage
-# OR
-source pipeline/env/cpu.sh        # For CPU cycle
-# OR
-source pipeline/env/heap.sh       # For Heap usage
-# OR
-source pipeline/env/counter.sh    # For Unsafe counter
-```
+# 1. Select an instrumentation by sourcing its preset (sets RUSTFLAGS + toolchain):
+source experiment_env/env/cpu.sh        # or heap.sh / counter.sh / coverage.sh
 
-_Note: Make sure to source only one environment script at a time (start a fresh shell if switching)._
-
-### 3. Run Benchmark
-
-Navigate to a benchmark and run it using `cargo bench`. See [Benchmark Configurations](benchmark_configs.md) for specific flags or commands used for complex crates.
-
-```bash
+# 2. Build + run a benchmark:
 cd benchmarks/arrayvec-0.7.6
 cargo bench
-```
 
-### 4. View Results
-
-Results are written to `/tmp/` by default when running manually:
-
-```bash
+# 3. Inspect the per-binary stat dump:
 ls -l /tmp/*.stat
-cat /tmp/unsafe_coverage.stat
 ```
 
-## Building our compiler from Scratch (Non-Docker flow)
+The `cpu`, `heap`, and `counter` presets point directly at the prebuilt library,
+so no build is needed. `coverage.sh` expects
+`cd unsafe_perf_source && make coverage` first. Source only one preset per shell.
 
-To build our compiler from scratch and run our tools and experiments
+## Results and datasets
+
+- **`dynamic_analysis_results/`** holds one JSON per crate under
+  `rq{1..5}_<name>/{with_native,without_native}/<crate>.json`. `with_native`
+  also counts code reached through `std`/`core`/`alloc`; `without_native` counts
+  only the crate itself. See `dynamic_analysis_results/README.md` for the full
+  field glossary.
+- **`analyzed_crates.csv`** is the per-crate dataset; its `crate` column is the
+  join key for the result files.
+- **`generated_tests/`** are the enhanced coverage workloads that raise API
+  coverage before measurement; **`workload_descriptions/`** summarizes each.
+
+## Toolchain details
+
+`toolchain/` is a prebuilt stage1 `rustc 1.80.0-dev`. It is self-contained
+(relative rpath) and requires only glibc 2.34, so it runs as-is on the Ubuntu
+22.04 base image. The Dockerfile registers it with:
 
 ```bash
-cd rustc
-./x.py build && ./x.py install
+rustup toolchain link stage1 /workspace/toolchain
 ```
 
-After successfully building our compiler you should see a `build` folder inside the `rustc` folder.
+Scripts select it via `RUSTUP_TOOLCHAIN=stage1` (with `RUSTC_BOOTSTRAP=1` for the
+unstable instrumentation flags).
 
-You will now need to either add this to your path if you do not currently have rust on your system or use a toolchain like `rustup` to add our compiler so that it can be called.
-
-For `rustup`. While inside `rustc` after building the compiler
+## Rebuilding the instrumentation library from source (optional)
 
 ```bash
-rustup toolchain link stage1 build/host/stage1
-rustup toolchain link stage2 build/host/stage2
+cd unsafe_perf_source
+make cpu          # or: heap | counter | coverage   (one feature at a time)
+# produces target/release/libunsafe_perf.rlib (+ deps/)
 ```
 
-You should now verify that your `rustc`version is correct
+## FAQ
 
-```bash
-# should print out rustc 1.80.0-dev
-rustc --version
-```
+- **Files look tiny / are text pointers.** Git LFS was not active at clone time.
+  Run `git lfs install && git lfs pull`.
+- **Memory.** Give Docker at least 8 GB RAM.
+- **A crate shows no instrumentation data.** The crate's `Cargo.toml` must enable
+  debug info so the passes can attribute instructions:
 
-The instructions to build and change flags for our runtime tools inside the `perf` folder are the same as the docker flow. Build your choice of instrumentation singularly and then change the env to match the instrumentation. All outputs will be inside `/tmp/*.stat` where each tool will have its own named file, e.g for `make coverage` `cargo bench` will produce `unsafe_coverage.stat` as a file.
+  ```toml
+  [profile.release]
+  debug = 2
+  [profile.bench]
+  debug = 2
+  ```
 
-```bash
-cd ../perf
-make coverage
-cd pipeline/env
-source coverage.sh
-
-cd ../../benchmarks/arrayvec-0.7.6
-cargo bench
-nano /tmp/unsafe_coverage.stat
-```
-
-## FAQ + Error Handling
-
-### Compiler build failures
-
-If at any point the compiler fails in its build process please retry using `./x.py build` or `./x.py build --stage 1` followed by `./x.py build --stage 2`.
-
-Remember to only use one instrumentation at a time.
-
-### New crate is not showing instrumentation data
-
-We require certain flags in the `Cargo.toml` of the crate to be active, depending on the benchmark suite these should be added to the `Cargo.toml` of the crate being tested. Our selection already have these set for you.
-
-```bash
-...
-[profile.bench]
-debug = true # Or 2
-
-[profile.release]
-debug = true # Or 2
-```
-
-### Build Time
-
-Building the Docker image involves compiling LLVM and `rustc`, which can take 1-2 hours.
-
-### Memory
-
-Ensure Docker has at least 8GB of RAM allocated.
-
-### Output Paths
-
-The automated pipeline stores results in `pipeline/results/`, while manual runs typically output to `/tmp/` (controlled by `UNSAFE_BENCH_OUTPUT_DIR`).
+  The bundled benchmark crates already have this set.
+- **Output paths.** The automated pipeline writes to `results/<timestamp>/`;
+  the manual flow writes `/tmp/*.stat` (controlled by `UNSAFE_BENCH_OUTPUT_DIR`).

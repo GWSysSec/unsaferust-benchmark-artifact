@@ -3,63 +3,60 @@ FROM ubuntu:22.04
 # Avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install build dependencies
+# Runtime/build dependencies for the benchmark suite.
+# NOTE: the instrumented Rust compiler is shipped PREBUILT under toolchain/, so
+# none of the heavy rustc/LLVM build tooling (cmake, ninja, ~8.7 GB, hours of
+# build time) is needed anymore. default-jdk is for the JNI benchmark, clang for
+# ring.
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     build-essential \
-    cmake \
-    ninja-build \
-    python3 \
-    python3-pip \
     pkg-config \
     libssl-dev \
+    python3 \
+    python3-pip \
+    default-jdk \
+    clang \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /workspace
 
-# Copy ONLY rustc first to cache the heavy build
-COPY rustc /workspace/rustc
+# --- Prebuilt instrumented compiler (stage1, rustc 1.80.0-dev) ---------------
+# Shipped via Git LFS under toolchain/ (rustc + sysroot, ~674 MB). Requires only
+# glibc 2.34, so it runs as-is on this base image. Copied first so it stays in
+# the build cache across script changes.
+COPY toolchain /workspace/toolchain
 
-# Configure rustc build for Docker
-# The config.toml in rustc/config.toml is already configured for this environment:
-# - prefix = "/workspace/rust-root"
-# - extended = true
-# - tools = ["cargo"]
+# --- Prebuilt per-feature instrumentation libraries -------------------------
+# libunsafe_perf.rlib is built once per instrumentation feature; the three
+# feature builds live under unsafe_perf_prebuilt/<feature>/ (rlib + deps).
+COPY unsafe_perf_prebuilt /workspace/unsafe_perf_prebuilt
 
+# Stock cargo (build driver). The instrumented compiler is selected via the
+# rustup toolchain link below; run_pipeline.py sets RUSTUP_TOOLCHAIN=stage1 so
+# every `cargo` invocation compiles with the prebuilt rustc.
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+      | sh -s -- -y --default-toolchain stable --profile minimal
+ENV PATH="/root/.cargo/bin:${PATH}"
 
-# Build rustc and LLVM
-# Fix: Increase stack size to prevent SIGSEGV (needs 32MB for some crates)
-ENV RUST_MIN_STACK=67108864
-RUN cd rustc && \
-    python3 x.py build -j 4 && \
-    python3 x.py build src/tools/cargo -j 4 && \
-    python3 x.py install -j 4
+# Register the prebuilt compiler as the `stage1` toolchain, and complete it with
+# a cargo binary (the prebuilt sysroot ships rustc/rustdoc only) so that
+# `cargo +stage1` / RUSTUP_TOOLCHAIN=stage1 resolves both cargo and rustc.
+RUN rustup toolchain link stage1 /workspace/toolchain \
+ && cp "$(rustup which --toolchain stable cargo)" /workspace/toolchain/bin/cargo
 
-# Set up environment variables for the instrumentation
-# We need these set BEFORE building perf so it uses the correct compiler
-# 1. /workspace/rust-root/bin: The 'install' step puts the stable binaries here (rustc, cargo)
-# 2. /workspace/rustc/build/.../stage1/bin: The stage1 compiler (if needed directly)
-# 3. llvm/bin: For llvm-config
-ENV RUSTC_PATH=/workspace/rust-root/bin/rustc
-ENV RUSTC=/workspace/rust-root/bin/rustc
-ENV PATH="/workspace/rust-root/bin:/workspace/rustc/build/x86_64-unknown-linux-gnu/stage1/bin:/workspace/rustc/build/x86_64-unknown-linux-gnu/llvm/bin:${PATH}"
-
-# Copy the rest of the repository (scripts, benchmarks, perf)
-# This way, changes to scripts don't invalidate the rustc build
+# Copy the rest of the artifact (benchmarks, unsafe_perf_source, experiment_env,
+# scripts, generated_tests, dynamic_analysis_results, analyzed_crates.csv).
+# unsafe_perf_source/target is excluded by .dockerignore.
 COPY . /workspace/
 
-# Install JDK for JNI benchmark and Clang for Ring (Placed here to preserve rustc build cache)
-RUN apt-get update && apt-get install -y default-jdk clang && rm -rf /var/lib/apt/lists/*
-
-# Build the Instrumentation Library
-# We build 'coverage' by default so the library is present.
-# Note: The 'run_all_docker_tests.sh' script will strictly clean and rebuild this
-# for specific experiments (cpu, heap, etc.), but this ensures a valid state out-of-the-box.
-RUN cd perf && make coverage
-
-# Set the default working directory to perf
-# WORKDIR /workspace/perf
+# Stage a ready-to-use instrumentation library into the path run_pipeline.py
+# expects (unsafe_perf_source/target/release). Switch instrumentation by copying
+# a different unsafe_perf_prebuilt/<feature>/ into place, or by `make <feature>`
+# in unsafe_perf_source/ (which rebuilds with the prebuilt stage1 compiler).
+RUN mkdir -p /workspace/unsafe_perf_source/target/release \
+ && cp -a /workspace/unsafe_perf_prebuilt/unsafe_counter/libunsafe_perf.rlib /workspace/unsafe_perf_source/target/release/ \
+ && cp -a /workspace/unsafe_perf_prebuilt/unsafe_counter/deps /workspace/unsafe_perf_source/target/release/deps
 
 CMD ["/bin/bash"]

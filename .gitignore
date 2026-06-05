@@ -6,3 +6,6 @@
 **/pipeline_*.env
 **/pipeline_*.log
 **/target/
+# Python bytecode
+__pycache__/
+*.pyc

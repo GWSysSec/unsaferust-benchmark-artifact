@@ -1,0 +1,10 @@
+# Prebuilt instrumented toolchain + per-feature instrumentation libraries are
+# shipped via Git LFS.
+toolchain/**/*.so   filter=lfs diff=lfs merge=lfs -text
+toolchain/**/*.rlib filter=lfs diff=lfs merge=lfs -text
+toolchain/**/*.a    filter=lfs diff=lfs merge=lfs -text
+toolchain/bin/**            filter=lfs diff=lfs merge=lfs -text
+toolchain/lib/rustlib/**/bin/** filter=lfs diff=lfs merge=lfs -text
+unsafe_perf_prebuilt/**/*.rlib filter=lfs diff=lfs merge=lfs -text
+unsafe_perf_prebuilt/**/*.so   filter=lfs diff=lfs merge=lfs -text
+unsafe_perf_prebuilt/**/*.a    filter=lfs diff=lfs merge=lfs -text

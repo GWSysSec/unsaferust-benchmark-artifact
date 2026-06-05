@@ -12,7 +12,7 @@ services:
       - ./results:/workspace/results
       # Mount benchmarks if you want to modify them
       - ./benchmarks:/workspace/benchmarks
-    working_dir: /workspace/perf
+    working_dir: /workspace
     stdin_open: true
     tty: true
     # Increase shared memory for better performance

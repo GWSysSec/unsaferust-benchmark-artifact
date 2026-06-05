@@ -1,10 +1,7 @@
 # Ignore build artifacts to speed up Docker build context
-unsafe-rust-benchmark/build
-# .git (Required for x.py)
-# .git
 *.tar
 *.tar.gz
-perf/target
+unsafe_perf_source/target
 .vscode
 *.swp
 *.swo
