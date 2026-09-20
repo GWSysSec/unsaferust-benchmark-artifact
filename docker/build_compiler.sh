@@ -26,12 +26,16 @@ elapsed=$(( $(date +%s) - started ))
 # corpus crates.
 cp "$(rustup which --toolchain stable cargo)" "$ARTIFACT_STAGE1/bin/cargo"
 
-printf '%s seconds (%s hours) on %s cores\n' \
+# Appended, not overwritten. Running this script again on a volume that already
+# holds a finished build takes a few seconds, and that number would otherwise
+# replace the one that says how long the build really took.
+printf '%s  %s seconds (%s hours) on %s cores\n' \
+  "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
   "$elapsed" "$(awk -v s="$elapsed" 'BEGIN{printf "%.1f", s/3600}')" "$(nproc)" \
-  > "$BUILD/BUILD_TIME"
+  >> "$BUILD/BUILD_TIME"
 
 echo
-echo "compiler built in $(cat "$BUILD/BUILD_TIME")"
+echo "compiler built in $elapsed seconds; every run of this step is in $BUILD/BUILD_TIME"
 "$ARTIFACT_STAGE1/bin/rustc" --version --verbose
 echo
 echo "next: docker/run.sh opens a shell with this compiler mounted"
