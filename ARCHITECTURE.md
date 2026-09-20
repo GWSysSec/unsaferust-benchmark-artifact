@@ -83,8 +83,10 @@ to whatever is newest today and measures a different program.
 
 ## The compiler is built into a volume, not into an image layer
 
-`docker/build.sh` builds the image first, in about six minutes, and then runs
-`docker/build_compiler.sh` inside it with a Docker volume mounted where the
+`docker/build.sh` builds the image first, in about six minutes, and then fills
+a Docker volume with the compiler: by default by unpacking the toolchain we
+built, which takes about a minute, and with `--from-source` by running
+`docker/build_compiler.sh` inside the image with that volume mounted where the
 build output goes. On our 32-core machine the compiler step took 876 seconds and
 produced 7.0 GB. Making it resumable still matters on slower machines: an
 interrupted build continues when the script is run again, instead of starting
