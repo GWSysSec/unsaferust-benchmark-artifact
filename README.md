@@ -98,7 +98,9 @@ run/measure.sh --tier full      # all 100 crates, 121.7 hours
 ```
 
 Add `--scope alldeps` to instrument every crate in the dependency graph rather
-than only the crate under study.
+than only the crate under study. `--crate tokio,bytes` measures a named list
+instead of a tier, which is what to use when you want to look at one crate
+again without redoing a whole tier.
 
 The tiers exist because the full corpus really does take that long. The median
 crate finishes in 2.7 minutes, but ten take over four hours each and tokio alone
@@ -138,6 +140,7 @@ belong to four crates — petgraph, zopfli, portable-atomic and http — whose t
 drive randomly generated input; petgraph's unsafe instruction count moved 73%
 between our own two runs. The comparison grades against that spread rather than
 demanding equality, and a handful of crates outside 10% is the expected outcome.
+slotmap belongs on that list too, found later: its tests run under `quickcheck`.
 
 **Everything is compared as a share, never as a raw count.** Our published
 instruction-counter run is not one measurement pass: 1,082 of its 1,271 test
