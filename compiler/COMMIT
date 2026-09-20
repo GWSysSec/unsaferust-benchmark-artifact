@@ -1,5 +1,5 @@
-rustc   d0657aa199184193fe6e3a0e390c4204c30d26bb  branch feat/instrument-all-deps
-llvm    6277bbba7148d32c74b4cef9af1e85f60cfb63e0  branch feat/instrument-all-deps
+rustc   75458c4519035033786bc4a079fe60799ee9c4a7  branch feat/instrument-all-deps
+llvm    3f54088511079db574d18e4441699570a6efa5b9  branch feat/instrument-all-deps
 runtime 5b129922508c32741016ee936107b20c2e82861b
 
 submodules:
@@ -12,6 +12,6 @@ submodules:
    6019b76f5b28938565b251bbba0bf5cc5c43d863 src/doc/reference (6019b76f)
    4840dca06cadf48b305d3ce0aeafde7f80933f80 src/doc/rust-by-example (4840dca)
    6a7374bd87cbac0f8be4fd4877d8186d9c313985 src/doc/rustc-dev-guide (6a7374bd)
-   6277bbba7148d32c74b4cef9af1e85f60cfb63e0 src/llvm-project (heads/feat/instrument-all-deps)
+   3f54088511079db574d18e4441699570a6efa5b9 src/llvm-project (heads/feat/instrument-all-deps)
    37629051518c3df9ac2c1744589362a02ecafa99 src/tools/cargo (0.81.0)
    72daa50ce2350f5a9b5ae6dc3ad6babccd14ec0a src/tools/rustc-perf (72daa50ce)
