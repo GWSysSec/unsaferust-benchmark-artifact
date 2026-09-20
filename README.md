@@ -11,8 +11,8 @@ compare against, not as the input.
 
 ## In order
 
-    docker/build.sh                  build the compiler from source
-    docker/run.sh                    open a shell in the image
+    docker/build.sh                  build the image, then the compiler
+    docker/run.sh                    open a shell with the compiler mounted
     run/fetch_corpus.sh              obtain the 100 crates at the exact versions
     run/measure.sh --tier smoke      measure
     tables/rq3_unsafe_inst_frequency.sh    build that table from what you measured
@@ -25,18 +25,27 @@ Each step is described below with the time it takes.
 docker/build.sh
 ```
 
-Builds LLVM 18 with assertions and then rustc 1.80 from
-`compiler/compiler-src.tar.zst`. Assertions are on because that is what the
-measurements were taken with; turning them off would be a different compiler.
+Two steps in one script. The first builds the image: apt packages, the compiler
+source, and a current cargo, in a few minutes. The second builds LLVM 18 with
+assertions and then rustc 1.80 from `compiler/compiler-src.tar.zst`, which takes
+hours. Assertions are on because that is what the measurements were taken with;
+turning them off would be a different compiler.
+
+The compiler goes into a Docker volume named `unsaferust-compiler`, not into an
+image layer. Two consequences worth knowing. The build is resumable: if it is
+interrupted, run `docker/build.sh` again and it continues from where it stopped.
+And the 40 GB it needs is in the volume, so `docker volume rm
+unsaferust-compiler` is how you reclaim the space when you are done.
 
 Budget about 40 GB of disk. The build caps its own parallelism by available
-memory, roughly 2 GB per compile job, because an uncapped build on a machine
-with less memory than cores gets its tablegen steps killed by the kernel and
-reports only `FAILED` with nothing underneath. Override with
-`--build-arg COMPILE_JOBS=n --build-arg LINK_JOBS=m`.
+memory, roughly 2 GB per compile job and 8 GB per link job, because LLVM at one
+job per core needs more memory than a typical machine has. Override with
+`docker build --build-arg COMPILE_JOBS=n --build-arg LINK_JOBS=m`.
 
 Then `docker/run.sh` gives you a shell at `/workspace/artifact` with the
-compiler linked as the `stage1` toolchain.
+compiler mounted and linked as the `stage1` toolchain. It also mounts two host
+directories into the container, so that `corpus/sources/` and `results/` survive
+after the shell exits.
 
 ## 2. Get the crate sources
 
@@ -44,18 +53,24 @@ compiler linked as the `stage1` toolchain.
 run/fetch_corpus.sh
 ```
 
-Clones or downloads each of the 100 crates at the exact commit or released
-version in `corpus/corpus_lock.csv`, then applies `corpus/corpus_overlay/`,
-which carries every difference between that upstream tree and the tree we
-measured — including the 113 `Cargo.lock` files that pin the dependency
-versions. Without those a rebuild resolves different dependencies and measures
-a different program.
+Unpacks `corpus/corpus-sources.tar.zst` into `corpus/sources/`: the 100 trees
+exactly as measured, 75 MB compressed and about 1.7 GB on disk, in about a
+minute and with no network. This is what the measurement steps read.
 
-A few minutes and about 1.7 GB. `corpus/corpus-sources.tar.zst` is the same
-thing packaged for evaluation without network access.
+There is a second way, which answers a different question:
 
-To confirm you got what we measured, pass `--verify-against` a reference copy.
-Run against our own trees, all 100 crates rebuild and verify file by file.
+```bash
+run/fetch_corpus.sh --from-upstream
+```
+
+This clones or downloads each crate from its original home at the commit or
+released version in `corpus/corpus_lock.csv`, then applies
+`corpus/corpus_overlay/`, which carries every difference between that upstream
+tree and the tree we measured — including the 113 `Cargo.lock` files that pin
+the dependency versions. Without those a rebuild resolves different dependencies
+and measures a different program. Add `--verify DIR` to compare the rebuilt
+corpus against an unpacked copy, file by file; run against our own trees, all
+100 crates rebuild and verify.
 
 ## 3. Measure
 

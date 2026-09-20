@@ -38,7 +38,7 @@ silently.
 
     README.md              what to run, in order, with the time each step takes
     ARCHITECTURE.md        this file
-    docker/                the image: builds the compiler from source
+    docker/                the image, and the script that builds the compiler
     compiler/              the compiler source (rustc 1.80 + LLVM 18 + passes)
     corpus/                how to obtain the 100 crates at the exact versions used
     benchmark_suite/       the 19-crate suite, which is a different thing (below)

@@ -1,25 +1,31 @@
-# The image builds the instrumented compiler from source.
+# The image holds everything the measurements need except the compiler itself:
+# the build dependencies, the compiler source, a current cargo, and the artifact
+# scripts. It takes a few minutes to build.
 #
-# That build is the long step: roughly two to four hours on a machine with a
-# dozen cores, and about 40 GB of disk while it runs. It is a full LLVM 18 build
-# with assertions enabled, which is what the paper's measurements were taken
-# with, followed by stage-0 and stage-1 rustc. Nothing about it needs
-# supervision; start it and come back.
-#
-# Everything after that step is fast, so the image is ordered to keep the
-# compiler layer cached: change a script and only the last layers rebuild.
+# The compiler is built separately, by `docker/build.sh`, into a Docker volume.
+# See the comment above the STAGE1 lines below for why it is not built here.
 
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# cmake and ninja build LLVM; g++ is the bootstrap compiler the measurements
-# used; default-jdk is needed by the jni crate and clang by ring; zstd unpacks
-# the compiler source.
+# ninja builds LLVM; g++ is the bootstrap compiler the measurements used;
+# default-jdk is needed by the jni crate and clang by ring; zstd unpacks the
+# compiler source.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential cmake ninja-build python3 python3-pip git curl \
+      build-essential ninja-build python3 python3-pip git curl \
       pkg-config libssl-dev zstd ca-certificates default-jdk clang file \
     && rm -rf /var/lib/apt/lists/*
+
+# CMake comes from PyPI, not from apt, and the version matters. Ubuntu 22.04
+# ships CMake 3.22.1, which cannot read the dependency file that LLVM 18's
+# TableGen writes for GenVT.inc. That file names an output and then lists no
+# dependencies at all, and 3.22's depfile reader treats that as a parse error.
+# The build stops at "Building GenVT.inc..." with a bare FAILED line and no
+# error message underneath it, which is easy to mistake for the kernel killing
+# the process. CMake 3.31 reads the same file without complaint.
+RUN pip3 install --no-cache-dir "cmake==3.31.6" \
+ && cmake --version
 
 WORKDIR /workspace
 
@@ -33,12 +39,12 @@ RUN mkdir -p /workspace/compiler-src \
 # the measurements used. Assertions stay on: they are slower, but turning them
 # off would be a different compiler from the one that produced the data.
 #
-# Parallelism is capped by memory, not by core count. Compiling LLVM and the
-# vendored Z3 at one job per core needs far more memory than a typical machine
-# has: on a 32-core host with 19 GB free, an uncapped build had tablegen killed
-# by the kernel at step 337 of 3374, which surfaces only as "FAILED" with no
-# error message underneath it. Roughly 2 GB per compile job and 8 GB per link
-# job keeps it alive. Override with --build-arg COMPILE_JOBS=n LINK_JOBS=m.
+# Parallelism is capped by memory rather than by core count, as a precaution.
+# Compiling LLVM and the vendored Z3 at one job per core needs more memory than
+# a typical machine has, and an LLVM link job can need several gigabytes on its
+# own. The image budgets roughly 2 GB per compile job and 8 GB per link job, so
+# a 32-core machine with 30 GB of memory builds with 15 compile jobs and 3 link
+# jobs. Override with --build-arg COMPILE_JOBS=n LINK_JOBS=m.
 ARG COMPILE_JOBS=
 ARG LINK_JOBS=
 RUN set -eu; \
@@ -68,12 +74,6 @@ RUN set -eu; \
     echo "$cj" > /workspace/jobs; \
     cat /workspace/compiler-src/config.toml
 
-# The rustc side takes its job count on the command line. `jobs` is not a key
-# bootstrap 1.80 accepts under [build]; putting it there stops the build before
-# it starts.
-RUN cd /workspace/compiler-src \
- && python3 x.py build library --stage 1 -j "$(cat /workspace/jobs)"
-
 # --- cargo -------------------------------------------------------------------
 # A current cargo drives the build. The stage-0 cargo that ships with a 1.80
 # bootstrap cannot parse registry manifests that require edition 2024, which
@@ -83,9 +83,20 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
       | sh -s -- -y --default-toolchain stable --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+# The compiler itself is not built here. `docker/build.sh` builds it in a
+# container, into a Docker volume mounted at /workspace/compiler-src/build, for
+# three reasons. The build takes hours, and a volume makes it resumable: if it
+# is interrupted, running the step again continues from where it stopped rather
+# than starting over. The 40 GB it needs stays out of the image, so the image
+# remains small enough to rebuild in minutes when a script changes. And the
+# progress of a `docker run` is easier to watch than the progress of a layer.
+#
+# The stage-1 directory is created here so the toolchain link below resolves and
+# so the volume inherits the path on its first mount.
 ENV STAGE1=/workspace/compiler-src/build/x86_64-unknown-linux-gnu/stage1
-RUN rustup toolchain link stage1 "$STAGE1" \
- && cp "$(rustup which --toolchain stable cargo)" "$STAGE1/bin/cargo"
+ENV ARTIFACT_STAGE1="$STAGE1"
+RUN mkdir -p "$STAGE1/bin" "$STAGE1/lib" \
+ && rustup toolchain link stage1 "$STAGE1"
 
 # --- everything else ---------------------------------------------------------
 COPY . /workspace/artifact
@@ -95,6 +106,5 @@ RUN python3 -c "import sys; assert sys.version_info >= (3,10)" \
  && pip3 install --no-cache-dir matplotlib numpy pyyaml toml >/dev/null
 
 ENV RUSTC_BOOTSTRAP=1
-ENV ARTIFACT_STAGE1="$STAGE1"
 
 CMD ["/bin/bash"]

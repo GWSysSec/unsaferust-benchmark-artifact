@@ -72,11 +72,18 @@ bench_runtime:
   min_api_pct: 0.0
 YAML
 
+# The harness owns this switch. Setting UNSAFE_INSTRUMENT_ALL_PACKAGES here
+# instead would instrument the dependency graph but leave two things wrong: the
+# build scripts and proc-macro crates would be instrumented too, and the run
+# summary would still claim the measurement was primary-package-only.
+SCOPE_ARG=()
 if [ "$SCOPE" = alldeps ]; then
-  export UNSAFE_INSTRUMENT_ALL_PACKAGES=1
+  SCOPE_ARG=(--instrument-all-deps)
   echo "scope: every crate in the dependency graph"
-else
+elif [ "$SCOPE" = primary ]; then
   echo "scope: only the crate under study"
+else
+  echo "unknown scope: $SCOPE (primary|alldeps)" >&2; exit 2
 fi
 
 echo "tier:    $TIER"
@@ -86,4 +93,5 @@ echo
 
 cd "$OUT"
 exec python3 "$HERE/tools/harness/scripts/rebench.py" \
-     "${SEL[@]}" --no-coverage --out-dir "$OUT" --tmp-rebench "$OUT/tmp" "$@"
+     "${SEL[@]}" "${SCOPE_ARG[@]}" \
+     --no-coverage --out-dir "$OUT" --tmp-rebench "$OUT/tmp"

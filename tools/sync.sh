@@ -55,6 +55,9 @@ cp "$BENCH/rebench_100crates.csv" "$HERE/tools/harness/rebench_100crates.csv"
 
 mkdir -p "$HERE/tools/harness/scripts" "$HERE/tools/harness/pipeline"
 cp "$BENCH/scripts/rebench.py" "$HERE/tools/harness/scripts/"
+# The all-deps mode needs its rustc wrapper next to rebench.py: the wrapper is
+# what keeps build scripts and proc-macro crates out of the instrumented set.
+cp "$BENCH/scripts/rustc-wrapper-alldeps.sh" "$HERE/tools/harness/scripts/"
 cp -r "$BENCH/pipeline/"* "$HERE/tools/harness/pipeline/"
 find "$HERE/tools/harness" -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
 
