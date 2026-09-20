@@ -82,7 +82,18 @@ def share(d: dict, numerator: str, denominator: str) -> float:
     return (d.get(numerator, 0) or 0) / den if den else 0.0
 
 
-def rel_diff(fresh: float, ours: float) -> float:
+def rel_diff(fresh: float, ours: float, floor: float = 0.0) -> float:
+    """How far apart two shares are, relative to ours.
+
+    `floor` is the size below which a difference is not worth reporting, in the
+    same unit as the two values. Every caller passes a tenth of a percentage
+    point. Without it a share that is near zero produces enormous relative
+    differences out of nothing: deranged's published heap share is 0.0258% and
+    a fresh run read 22.3%, which is a relative difference of 86,433% and tells
+    the reader far less than "22 percentage points apart" would.
+    """
+    if abs(fresh - ours) <= floor:
+        return 0.0
     if ours == 0:
         return 0.0 if fresh == 0 else float("inf")
     return abs(fresh - ours) / abs(ours)
@@ -159,7 +170,8 @@ def main() -> int:
             if not o or not d or d.get(den_f, 0) <= 0:
                 continue
             pct = d[num_f] / d[den_f] * 100.0
-            res.append((crate, variant, rel_diff(pct, o["unsafe_percentage"])))
+            res.append((crate, variant,
+                        rel_diff(pct, o["unsafe_percentage"], floor=0.1)))
     out += report("RQ1  share of CPU cycles spent in unsafe code", res)
 
     # RQ2: heap bytes reached by unsafe code.
@@ -175,7 +187,8 @@ def main() -> int:
                 continue
             res.append((crate, variant,
                         rel_diff(share(d, "unsafe_heap_memory", "total_heap_usage"),
-                                 share(o, "unsafe_heap_memory", "total_heap_usage"))))
+                                 share(o, "unsafe_heap_memory", "total_heap_usage"),
+                                 floor=1e-3)))
     out += report("RQ2  share of heap bytes reached by unsafe code", res)
 
     # RQ3 to RQ5: the instruction and function counters.
@@ -200,7 +213,8 @@ def main() -> int:
                 if not o or not d:
                     continue
                 res.append((crate, variant,
-                            rel_diff(share(d, num, den), share(o, num, den))))
+                            rel_diff(share(d, num, den), share(o, num, den),
+                                     floor=1e-3)))
         out += report(label, res)
 
     print("\n".join(out))

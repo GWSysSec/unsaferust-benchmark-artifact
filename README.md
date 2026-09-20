@@ -90,6 +90,14 @@ its `Cargo.lock` pins, and the instrumentation runtime in `unsafe_perf_source/`
 is built the same way. The corpus tarball removes the need to fetch the 100
 crates themselves, not the need to fetch what they depend on.
 
+The lockfiles are respected but not enforced. If the first build fails because
+a transitive dependency needs a newer edition or Rust version than this 1.80
+toolchain understands, the harness deletes that crate's `Cargo.lock` and lets
+cargo re-resolve to older compatible versions, then retries. It prints
+`retrying after lockfile regen` when it does, so the log tells you which crates
+were not measured on the pinned dependency set. In our smoke run this happened
+to one crate, borsh-rs, whose unsafe share came out identical to ours anyway.
+
 
 ```bash
 run/measure.sh --tier smoke     # 12 crates, about 32 minutes
@@ -153,14 +161,25 @@ reports. `tools/analysis/audit_duplicate_stats.py` measures the effect and has
 a validation gate that reproduces the published aggregation first.
 
 **Some crates will still differ, because their tests do a different amount of
-work.** In our own smoke run the median difference was about 1% for RQ3 and
-under 1% for RQ5, with the outliers being individual test binaries rather than
-whole crates. slotmap's tests are driven by `quickcheck`, so its main test
-binary executes different input on every run. In ron and deranged most test
-binaries agree to three decimal places in share while a few executed a
-different amount; ron's `129_indexmap` binary did essentially nothing in our
-run and real work in the fresh one. A crate-level share is dominated by its
-largest binary, so one such binary moves the crate.
+work.** Running the smoke tier here, against our own published data, the median
+difference was 0.21% for RQ3 and 0.00% for RQ4 and RQ5, with 12, 16 and 14 of
+the 24 crate-and-variant pairs agreeing to one part in ten thousand. RQ1 and RQ2
+are looser: 6.83% and 8.14%. Cycle shares depend on the machine, which is why
+RQ1 is expected to be. slotmap's tests are driven by `quickcheck`, so its main
+test binary executes different input on every run. In ron and deranged most test
+binaries agree to three decimal places in share while a few executed a different
+amount; ron's `129_indexmap` binary did essentially nothing in our run and real
+work in the fresh one. A crate-level share is dominated by its largest binary,
+so one such binary moves the crate.
+
+A difference smaller than a tenth of a percentage point counts as agreement,
+because a share near zero otherwise produces enormous relative differences out
+of nothing. One genuine disagreement survives that and is worth naming:
+deranged's published heap share is 0.0258% for both `with_native` and
+`without_native`, which are the same number, while a fresh run reads 22.3% and
+0.028%. Eight of the 100 crates report the same unsafe heap bytes in both
+variants and three of those eight are nonzero, so this is worth checking before
+quoting a per-crate heap figure.
 
 ## 5. If your numbers and the paper's disagree
 

@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -96,6 +97,22 @@ def scope_of(run: Path) -> str:
     return "alldeps" if seen == {True} else "primary"
 
 
+def keep(built: Path, run_dir: Path | None) -> None:
+    """Copy a generated table or figure next to the run it was built from.
+
+    Everything the generators write lands under tools/analysis/Latex/, which is
+    inside the image when this runs in Docker and is therefore gone when the
+    container exits. The run directory is on the host, so a copy there is what
+    the evaluator still has afterwards.
+    """
+    if run_dir is None or not built.is_file():
+        return
+    out = run_dir / "tables"
+    out.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(built, out / built.name)
+    print(f"kept a copy at {out / built.name}")
+
+
 def crates_in(run: Path) -> list[str]:
     return sorted(p.name for p in run.iterdir()
                   if p.is_dir() and (p / "rebench_summary.json").is_file())
@@ -125,7 +142,7 @@ def main() -> int:
     print(f"{args.target}: {what}\n")
 
     if args.our_data:
-        dataset, env, suffix = "published", {}, ""
+        dataset, env, suffix, run_dir = "published", {}, "", None
         print("source: the measurement data this artifact ships")
         print("        (use this to confirm our data is what the paper reports;")
         print("         the artifact's main path is to measure it yourself)\n")
@@ -148,7 +165,8 @@ def main() -> int:
         scope = args.scope or scope_of(run)
         print(f"        scope: {SCOPE_WORDS[scope]}\n")
         dataset, suffix = "yourrun", "_yourrun"
-        env = {"ARTIFACT_RUN_DIR": str(run.resolve()),
+        run_dir = run.resolve()
+        env = {"ARTIFACT_RUN_DIR": str(run_dir),
                "ARTIFACT_RUN_SCOPE": scope}
         code, out = sh([sys.executable, str(ANALYSIS / "export_dataset.py"),
                         "--dataset", "yourrun"], env)
@@ -169,9 +187,12 @@ def main() -> int:
     if kind == "figure":
         built = BUILT_FIG / f"{stem}{suffix}.png"
         print(f"\nfigure written to {built}")
+        for ext in (".png", ".pdf"):
+            keep(BUILT_FIG / f"{stem}{suffix}{ext}", run_dir)
         return 0
 
     built = BUILT / f"{stem}{suffix}.tex"
+    keep(built, run_dir)
     paper = PAPER_TABLES / f"{stem}.tex"
     print(f"\n{'-'*70}\nyour table\n{'-'*70}")
     print(built.read_text())
@@ -189,8 +210,8 @@ def main() -> int:
         print("\nper-crate comparison against our measurement:")
         sys.stdout.flush()   # the child writes straight to the terminal
         subprocess.run([sys.executable, str(ANALYSIS / "verify_reproduction.py"),
-                        str((args.run or newest_run()).resolve()),
-                        "--dataset", "published" if args.scope == "primary" else "alldeps"],
+                        str(run_dir),
+                        "--dataset", "published" if scope == "primary" else "alldeps"],
                        cwd=str(ANALYSIS))
     elif paper.is_file():
         same = built.read_text() == paper.read_text()
