@@ -23,9 +23,26 @@ So this tool grades each crate against a tolerance and reports the distribution,
 rather than demanding equality. A crate outside tolerance is worth looking at;
 a handful of them, especially the four named above, is the expected outcome.
 
-CPU cycles are judged differently again. Cycle counts depend on the machine, so
-comparing them against ours means nothing. What should carry over is the ratio:
-the share of cycles spent in unsafe code. That is what this tool compares.
+Every question is compared as a SHARE, never as a raw count, for two reasons.
+
+The first is the machine. Cycle counts depend on the processor, so comparing
+them against ours means nothing; the share of cycles spent in unsafe code is
+what should carry over.
+
+The second is our own data. The published instruction-counter run is not one
+measurement pass. Its stat files span 2026-05-18 to 2026-05-30; 1,082 of its
+1,271 test binaries were measured twice and three were measured four times, and
+the aggregator sums every stat file it finds. Our published totals are therefore
+1.596 times what a single pass executes. A crate like libsecp256k1, every one of
+whose binaries was measured twice, has published counts that are exactly double.
+A fresh run measures each binary once, so raw counts would show it a hundred
+percent away from us while every share agreed to three decimal places.
+`audit_duplicate_stats.py` in this directory measures that, and gates itself by
+first reproducing the published aggregation exactly.
+
+A share still moves when a test binary does a different amount of work between
+runs, and a crate's share is dominated by its largest binary. Examine the
+binaries before concluding a crate failed to reproduce.
 """
 
 from __future__ import annotations
@@ -46,7 +63,10 @@ VARIANTS = [("without_native", "nativefalse"), ("with_native", "nativetrue")]
 
 # Grades, from the repeated-run measurement described above.
 GRADES = [("exact", 1e-4), ("tight", 1e-2), ("loose", 1e-1)]
-KNOWN_VARIABLE = {"petgraph", "zopfli", "portable-atomic", "http"}
+# Crates whose tests generate their input, so each run does different work.
+# slotmap was added after a fresh run put its main test binary at 3.41% unsafe
+# against our 10.99%: its tests are driven by quickcheck.
+KNOWN_VARIABLE = {"petgraph", "zopfli", "portable-atomic", "http", "slotmap"}
 
 
 def grade(rel: float) -> str:
@@ -54,6 +74,12 @@ def grade(rel: float) -> str:
         if rel < bound:
             return name
     return "outside"
+
+
+def share(d: dict, numerator: str, denominator: str) -> float:
+    """numerator/denominator out of one stat block, or 0 when it cannot be had."""
+    den = d.get(denominator, 0) or 0
+    return (d.get(numerator, 0) or 0) / den if den else 0.0
 
 
 def rel_diff(fresh: float, ours: float) -> float:
@@ -148,15 +174,22 @@ def main() -> int:
             if not o or not d:
                 continue
             res.append((crate, variant,
-                        rel_diff(d.get("unsafe_heap_memory", 0),
-                                 o.get("unsafe_heap_memory", 0))))
-    out += report("RQ2  heap bytes reached by unsafe code", res)
+                        rel_diff(share(d, "unsafe_heap_memory", "total_heap_usage"),
+                                 share(o, "unsafe_heap_memory", "total_heap_usage"))))
+    out += report("RQ2  share of heap bytes reached by unsafe code", res)
 
     # RQ3 to RQ5: the instruction and function counters.
-    for label, field in (("RQ3  unsafe instructions executed", "unsafe_instructions"),
-                         ("RQ4  unsafe pointer-arithmetic instructions", "unsafe_geps"),
-                         ("RQ5  calls into functions holding unsafe code",
-                          "unsafe_function_calls")):
+    # Each of these is a share of something the same stat files also count, so
+    # a run that executed a workload twice compares equal to one that ran it
+    # once. RQ4 asks what fraction of the unsafe instructions are pointer
+    # arithmetic, which is the question its table answers.
+    for label, num, den in (
+            ("RQ3  share of executed instructions that are unsafe",
+             "unsafe_instructions", "total_instructions"),
+            ("RQ4  share of unsafe instructions that are pointer arithmetic",
+             "unsafe_geps", "unsafe_instructions"),
+            ("RQ5  share of calls that enter a function holding unsafe code",
+             "unsafe_function_calls", "total_function_calls")):
         res = []
         for variant, suffix in VARIANTS:
             ours = load_ours(ds, "unsafeinstfrequency_rq3",
@@ -167,13 +200,15 @@ def main() -> int:
                 if not o or not d:
                     continue
                 res.append((crate, variant,
-                            rel_diff(d.get(field, 0), o.get(field, 0))))
+                            rel_diff(share(d, num, den), share(o, num, den))))
         out += report(label, res)
 
     print("\n".join(out))
     print("\nA handful of crates outside 10% is the expected outcome, not a")
-    print("failure. Compare the named crates against the list of randomised")
-    print("workloads in this script's header before concluding anything.")
+    print("failure. A crate's share is dominated by its largest test binary,")
+    print("so one binary that executed a different amount of work moves the")
+    print("whole crate. slotmap, petgraph, zopfli, portable-atomic and http")
+    print("drive randomly generated input and do so on every run.")
     return 0
 
 

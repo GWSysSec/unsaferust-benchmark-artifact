@@ -12,11 +12,16 @@
 #   full    all 100 crates, 121.7 hours. Ten crates take over four hours each
 #           and tokio alone takes 16.3.
 #
+# --crate names a comma-separated list instead of a tier, for re-measuring one
+# crate without redoing a whole tier.
+#
 # Usage:  run/measure.sh --tier smoke [--out DIR] [--scope primary|alldeps]
+#         run/measure.sh --crate tokio,bytes
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 TIER=smoke
+CRATES=
 OUT="$HERE/results/$(date +%Y%m%d_%H%M%S)"
 SCOPE=primary
 CORPUS="${CORPUS_DIR:-$HERE/corpus/sources}"
@@ -24,6 +29,7 @@ CORPUS="${CORPUS_DIR:-$HERE/corpus/sources}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --tier)  TIER="$2"; shift 2;;
+    --crate) CRATES="$2"; shift 2;;
     --out)   OUT="$2"; shift 2;;
     --scope) SCOPE="$2"; shift 2;;
     *) echo "unknown option: $1" >&2; exit 2;;
@@ -42,12 +48,17 @@ SMOKE=borsh-rs,ron,siphasher,libsecp256k1,nu-ansi-term,scroll,deranged,git2,cc-r
 # on every machine.
 FAST=arrayvec,async-lock,async-task,bimap,borsh-rs,bytemuck,byteorder,bytes,cc-rs,clru,colored,cssparser,curl,dashmap,deranged,dlv-list,ego-tree,filetime,fixedbitset,fragile,fs4,getrandom,git2,hashlink,headers,http-body,imgref,iri-string,lexical-core,log,memmap2,metrics,msgpack-rust,native-tls,nu-ansi-term,ordered-float,ordered-multimap,os_info,ouroboros,pin-project-lite,polling,postcard,rand,rgb,rmp,rust-openssl,rustc-demangle,scroll,semver,serde_yaml,simdutf8,siphasher,slotmap,smallvec,triomphe,unicode-normalization,uuid,value-bag
 
-case "$TIER" in
-  smoke) SEL=(--crate "$SMOKE");;
-  fast)  SEL=(--crate "$FAST");;
-  full)  SEL=(--from-corpus);;
-  *) echo "unknown tier: $TIER (smoke|fast|full)" >&2; exit 2;;
-esac
+if [ -n "$CRATES" ]; then
+  SEL=(--crate "$CRATES")
+  TIER="crates: $CRATES"
+else
+  case "$TIER" in
+    smoke) SEL=(--crate "$SMOKE");;
+    fast)  SEL=(--crate "$FAST");;
+    full)  SEL=(--from-corpus);;
+    *) echo "unknown tier: $TIER (smoke|fast|full)" >&2; exit 2;;
+  esac
+fi
 
 mkdir -p "$OUT"
 CONF="$OUT/config.yaml"

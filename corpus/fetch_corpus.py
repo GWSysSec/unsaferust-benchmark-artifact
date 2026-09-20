@@ -58,9 +58,14 @@ LOCK = ROOT / "corpus_lock.csv"
 OVERLAY = ROOT / "corpus_overlay"
 
 # Output a build or a test run leaves behind, never part of a source tree.
-# Checked on every path component: bytemuck keeps a second cargo target
-# directory at derive/target/.
-ARTEFACT_DIRS = {"target", ".git", ".fingerprint"}
+#
+# `target` is cargo's build directory, but only where cargo would put it: next
+# to a Cargo.toml. It is not enough to look at the top level, because bytemuck
+# keeps a second package, and so a second build directory, at derive/target/.
+# Nor is it enough to match the name anywhere in the path: cc-rs has a source
+# module at src/target/, and treating that as build output left the crate
+# missing four files and unable to compile.
+ARTEFACT_DIRS = {".git", ".fingerprint"}
 # Cargo.lock is deliberately NOT here. It is not build output: it pins the
 # exact version of every dependency that was compiled and measured. Upstream
 # commits one for only 14 of the corpus crates; for 81 more the lockfile was
@@ -68,15 +73,31 @@ ARTEFACT_DIRS = {"target", ".git", ".fingerprint"}
 # then. Drop it and a rebuild re-resolves dependencies to newer versions and
 # measures a different program.
 ARTEFACT_NAMES = {".cargo-ok", "Cargo.toml.orig", ".cargo_vcs_info.json"}
-ARTEFACT_SUFFIXES = (".log",)
+
+# Output a crate's own test run writes into its source tree. It is not source,
+# and it is large: cpp_demangle's is 17 MB of diagnostics from comparing its
+# demangler against libiberty's. Listed by name rather than matched by
+# extension, because excluding *.log would also throw away matrixmultiply's
+# seven committed benchmark logs under docs/.
+TEST_OUTPUT = {("cpp_demangle", "tests/libxul.log")}
 
 
-def is_artefact(rel: Path) -> bool:
-    if any(part in ARTEFACT_DIRS for part in rel.parts):
+def is_artefact(rel: Path, base: Path) -> bool:
+    """True when `rel`, relative to `base`, is build output rather than source.
+
+    Nothing is excluded by file extension. An earlier version dropped every
+    *.log file, which also threw away the seven benchmark logs that
+    matrixmultiply commits under docs/.
+    """
+    if (base.name, rel.as_posix()) in TEST_OUTPUT:
         return True
-    if rel.name in ARTEFACT_NAMES:
-        return True
-    return rel.name.endswith(ARTEFACT_SUFFIXES)
+    parts = rel.parts
+    for i, part in enumerate(parts):
+        if part in ARTEFACT_DIRS:
+            return True
+        if part == "target" and (base.joinpath(*parts[:i]) / "Cargo.toml").is_file():
+            return True
+    return rel.name in ARTEFACT_NAMES
 
 
 def run(cmd: list[str], cwd: Path | None = None) -> tuple[int, str]:
@@ -164,7 +185,7 @@ def tree_files(base: Path) -> dict[str, bytes]:
     out: dict[str, bytes] = {}
     for p in base.rglob("*"):
         rel = p.relative_to(base)
-        if is_artefact(rel):
+        if is_artefact(rel, base):
             continue
         try:
             if p.is_file():

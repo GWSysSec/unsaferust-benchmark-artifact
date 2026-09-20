@@ -27,8 +27,11 @@ done
 for d in cpucyclecount_rq1 heaptracker_rq2 unsafeinstfrequency_rq3 \
          unsafeinsttype_rq4 unsafefunction_rq5; do
   mkdir -p "$HERE/tools/analysis/$d"
-  # data and generators only; no caches
+  # Data and generators only. `*_yourrun.*` is skipped: those files are written
+  # when someone builds a table from their own measurement, so they are output
+  # of the artifact rather than part of it.
   find "$PAPER/$d" -maxdepth 1 -type f \( -name '*.py' -o -name '*.json' -o -name '*.csv' \) \
+      -not -name '*_yourrun.*' \
       -exec cp {} "$HERE/tools/analysis/$d/" \;
 done
 

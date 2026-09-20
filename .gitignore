@@ -4,3 +4,7 @@ results/
 *.pyc
 **/target/
 tools/analysis/Latex/
+# Written when an evaluator builds a table from their own measurement. They are
+# outputs of this artifact, not part of it.
+tools/analysis/**/*_yourrun.json
+tools/analysis/**/*_yourrun.csv

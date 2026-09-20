@@ -139,6 +139,26 @@ drive randomly generated input; petgraph's unsafe instruction count moved 73%
 between our own two runs. The comparison grades against that spread rather than
 demanding equality, and a handful of crates outside 10% is the expected outcome.
 
+**Everything is compared as a share, never as a raw count.** Our published
+instruction-counter run is not one measurement pass: 1,082 of its 1,271 test
+binaries were measured twice and three of them four times, and the aggregator
+sums every stat file it finds, so our absolute totals are 1.596 times what one
+pass executes. Your run measures each binary once. Raw counts would therefore
+put libsecp256k1 a factor of two away from us while every share agreed to three
+decimal places. The comparison uses shares, which is also what the paper
+reports. `tools/analysis/audit_duplicate_stats.py` measures the effect and has
+a validation gate that reproduces the published aggregation first.
+
+**Some crates will still differ, because their tests do a different amount of
+work.** In our own smoke run the median difference was about 1% for RQ3 and
+under 1% for RQ5, with the outliers being individual test binaries rather than
+whole crates. slotmap's tests are driven by `quickcheck`, so its main test
+binary executes different input on every run. In ron and deranged most test
+binaries agree to three decimal places in share while a few executed a
+different amount; ron's `129_indexmap` binary did essentially nothing in our
+run and real work in the fresh one. A crate-level share is dominated by its
+largest binary, so one such binary moves the crate.
+
 ## 5. If your numbers and the paper's disagree
 
 ```bash
