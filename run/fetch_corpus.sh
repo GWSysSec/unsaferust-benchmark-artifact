@@ -5,8 +5,8 @@
 # Two ways to get them, and they answer different questions.
 #
 #   (default)        unpack corpus/corpus-sources.tar.zst, which is the trees
-#                    we measured, packaged. No network, about a minute, 1.7 GB
-#                    on disk. This is what the measurement steps need.
+#                    we measured, packaged. No network, a couple of seconds,
+#                    419 MB on disk. This is what the measurement steps need.
 #
 #   --from-upstream  clone or download each crate from its original home at the
 #                    commit or released version in corpus/corpus_lock.csv, then

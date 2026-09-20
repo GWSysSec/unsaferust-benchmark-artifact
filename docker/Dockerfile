@@ -90,13 +90,8 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 # than starting over. The 40 GB it needs stays out of the image, so the image
 # remains small enough to rebuild in minutes when a script changes. And the
 # progress of a `docker run` is easier to watch than the progress of a layer.
-#
-# The stage-1 directory is created here so the toolchain link below resolves and
-# so the volume inherits the path on its first mount.
 ENV STAGE1=/workspace/compiler-src/build/x86_64-unknown-linux-gnu/stage1
 ENV ARTIFACT_STAGE1="$STAGE1"
-RUN mkdir -p "$STAGE1/bin" "$STAGE1/lib" \
- && rustup toolchain link stage1 "$STAGE1"
 
 # --- everything else ---------------------------------------------------------
 COPY . /workspace/artifact
@@ -107,4 +102,9 @@ RUN python3 -c "import sys; assert sys.version_info >= (3,10)" \
 
 ENV RUSTC_BOOTSTRAP=1
 
+# The entrypoint links the stage-1 compiler as a rustup toolchain, but only
+# once it exists. The link cannot be made here: rustup refuses to link a
+# toolchain whose rustc is not already a file, and the compiler is built later,
+# into a volume.
+ENTRYPOINT ["/workspace/artifact/docker/entrypoint.sh"]
 CMD ["/bin/bash"]

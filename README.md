@@ -54,8 +54,11 @@ run/fetch_corpus.sh
 ```
 
 Unpacks `corpus/corpus-sources.tar.zst` into `corpus/sources/`: the 100 trees
-exactly as measured, 75 MB compressed and about 1.7 GB on disk, in about a
-minute and with no network. This is what the measurement steps read.
+exactly as measured, 75 MB compressed and 419 MB unpacked, in a couple of
+seconds and with no network. This is what the measurement steps read. The
+sources stay read-only during measurement — each crate is copied into
+`results/<run>/` and built there — so budget the disk for `results/`, not for
+`corpus/sources/`.
 
 There is a second way, which answers a different question:
 

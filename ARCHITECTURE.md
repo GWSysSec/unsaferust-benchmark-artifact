@@ -42,7 +42,7 @@ silently.
     compiler/              the compiler source (rustc 1.80 + LLVM 18 + passes)
     corpus/                how to obtain the 100 crates at the exact versions used
     benchmark_suite/       the 19-crate suite, which is a different thing (below)
-    run/                   fetch, measure in three sizes, check the shipped data
+    run/                   get the corpus, measure in three sizes, check our data
     tables/                one script per table and figure in the paper
     data/                  the measurement data the paper reports
     tools/                 aggregation and comparison code
@@ -60,14 +60,20 @@ The suite is shipped as source rather than fetched from a lock: unlike the
 corpus crates, those trees carry no repository or release marker, so there is
 nothing to reconstruct them from.
 
-## Why the corpus is fetched rather than shipped whole
+## Two ways to get the corpus, answering two questions
 
-The 100 crate source trees are 436 MB, or 76 MB compressed. What is shipped
-instead is `corpus/corpus_lock.csv`, which records for each crate the exact
-commit or released version it was measured on, and `corpus/corpus_overlay/`,
-2.3 MB holding every difference between that upstream tree and the tree we
-measured. `corpus/fetch_corpus.py` rebuilds all 100 trees from those two, and
-verifies file by file against a reference copy when given one.
+`run/fetch_corpus.sh` unpacks `corpus/corpus-sources.tar.zst` — the 100 trees as
+measured, 75 MB compressed and 419 MB on disk — in a couple of seconds and with
+no network. That is the default because it is what the measurement steps need,
+and because it still works on the day a repository disappears or is force-pushed.
+
+`run/fetch_corpus.sh --from-upstream` answers the other question: can the corpus
+be rebuilt from its published sources? It reads `corpus/corpus_lock.csv`, which
+records for each crate the exact commit or released version it was measured on,
+clones or downloads each one, and then applies `corpus/corpus_overlay/`, 2.3 MB
+holding every difference between that upstream tree and the tree we measured.
+With `--verify DIR` it compares the result against an unpacked copy, file by
+file; against our own trees all 100 crates rebuild and verify.
 
 The overlay carries 113 `Cargo.lock` files, and that is the part that matters.
 Upstream commits a lockfile for only 14 of these crates; for 81 more the
@@ -75,5 +81,20 @@ lockfile was generated on our machine at measurement time from whatever
 crates.io served that day. Without them a rebuild re-resolves every dependency
 to whatever is newest today and measures a different program.
 
-A source tarball is included as well, for evaluation without network access and
-against the day a repository disappears or is force-pushed.
+## The compiler is built into a volume, not into an image layer
+
+`docker/build.sh` builds the image first, in a few minutes, and then runs
+`docker/build_compiler.sh` inside it with a Docker volume mounted where the
+build output goes. The compiler build is hours of work and about 40 GB, so
+making it resumable matters: an interrupted build continues when the script is
+run again, instead of starting over inside a layer that has to be rebuilt from
+the beginning. It also keeps the image small enough to rebuild when a script
+changes, and leaves the 40 GB somewhere the evaluator can reclaim with a single
+`docker volume rm`.
+
+One trap, recorded because it cost a day. Ubuntu 22.04's CMake is 3.22.1, and it
+cannot read the dependency file LLVM 18's TableGen writes for `GenVT.inc`: that
+file names an output and lists no dependencies, which 3.22 treats as a parse
+error. The build stops with a bare `FAILED` line and nothing underneath it, at a
+step number that moves between runs, which looks exactly like the kernel killing
+a process. The image installs CMake 3.31.6 from PyPI instead.
