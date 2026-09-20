@@ -45,7 +45,15 @@ import tarfile
 import urllib.request
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+# The lock and the overlay sit beside this script in the artifact and one level
+# up in the working repository, so look in both rather than assuming a layout.
+_HERE = Path(__file__).resolve().parent
+for _base in (_HERE, _HERE.parent):
+    if (_base / "corpus_lock.csv").is_file():
+        ROOT = _base
+        break
+else:
+    ROOT = _HERE.parent
 LOCK = ROOT / "corpus_lock.csv"
 OVERLAY = ROOT / "corpus_overlay"
 
