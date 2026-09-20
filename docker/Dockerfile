@@ -1,6 +1,6 @@
 # The image holds everything the measurements need except the compiler itself:
 # the build dependencies, the compiler source, a current cargo, and the artifact
-# scripts. It takes a few minutes to build.
+# scripts. It takes about six minutes to build.
 #
 # The compiler is built separately, by `docker/build.sh`, into a Docker volume.
 # See the comment above the STAGE1 lines below for why it is not built here.

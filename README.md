@@ -26,21 +26,28 @@ docker/build.sh
 ```
 
 Two steps in one script. The first builds the image: apt packages, the compiler
-source, and a current cargo, in a few minutes. The second builds LLVM 18 with
-assertions and then rustc 1.80 from `compiler/compiler-src.tar.zst`, which takes
-hours. Assertions are on because that is what the measurements were taken with;
+source, and a current cargo, in about six minutes. The second builds LLVM 18
+with assertions and then rustc 1.80 from `compiler/compiler-src.tar.zst`.
+Assertions are on because that is what the measurements were taken with;
 turning them off would be a different compiler.
+
+Our own run of the second step took 876 seconds — about 15 minutes — on a 32-core machine building with 15
+compile jobs, and it produced 7.0 GB of build output. It builds only the
+X86 target and only what the standard library needs, which is why it is far
+smaller and faster than a full rustc build. A machine with fewer cores takes
+roughly proportionally longer.
 
 The compiler goes into a Docker volume named `unsaferust-compiler`, not into an
 image layer. Two consequences worth knowing. The build is resumable: if it is
 interrupted, run `docker/build.sh` again and it continues from where it stopped.
-And the 40 GB it needs is in the volume, so `docker volume rm
+And the 7 GB it produces is in the volume, so `docker volume rm
 unsaferust-compiler` is how you reclaim the space when you are done.
 
-Budget about 40 GB of disk. The build caps its own parallelism by the memory it
-sees, roughly 2 GB per compile job and 8 GB per link job, because LLVM at one
-job per core needs more memory than a typical machine has. Override either
-number from the environment: `COMPILE_JOBS=8 LINK_JOBS=2 docker/build.sh`.
+Budget about 10 GB of disk for the volume. The build caps its own parallelism by
+the memory it sees, roughly 2 GB per compile job and 8 GB per link job, because
+LLVM at one job per core needs more memory than a typical machine has. Override
+either number from the environment:
+`COMPILE_JOBS=8 LINK_JOBS=2 docker/build.sh`.
 
 Then `docker/run.sh` gives you a shell at `/workspace/artifact` with the
 compiler mounted and linked as the `stage1` toolchain. It also mounts two host

@@ -83,13 +83,14 @@ to whatever is newest today and measures a different program.
 
 ## The compiler is built into a volume, not into an image layer
 
-`docker/build.sh` builds the image first, in a few minutes, and then runs
+`docker/build.sh` builds the image first, in about six minutes, and then runs
 `docker/build_compiler.sh` inside it with a Docker volume mounted where the
-build output goes. The compiler build is hours of work and about 40 GB, so
-making it resumable matters: an interrupted build continues when the script is
-run again, instead of starting over inside a layer that has to be rebuilt from
-the beginning. It also keeps the image small enough to rebuild when a script
-changes, and leaves the 40 GB somewhere the evaluator can reclaim with a single
+build output goes. On our 32-core machine the compiler step took 876 seconds and
+produced 7.0 GB. Making it resumable still matters on slower machines: an
+interrupted build continues when the script is run again, instead of starting
+over inside a layer that has to be rebuilt from the beginning. Keeping it out of
+the image also lets the image be rebuilt in seconds when a script changes, and
+leaves the build output somewhere the evaluator can reclaim with a single
 `docker volume rm`.
 
 One trap, recorded because it cost a day. Ubuntu 22.04's CMake is 3.22.1, and it
