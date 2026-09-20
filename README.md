@@ -74,6 +74,13 @@ corpus against an unpacked copy, file by file; run against our own trees, all
 
 ## 3. Measure
 
+Measuring needs network access, even though step 2 does not. Each crate's own
+dependencies are still resolved and downloaded from crates.io at the versions
+its `Cargo.lock` pins, and the instrumentation runtime in `unsafe_perf_source/`
+is built the same way. The corpus tarball removes the need to fetch the 100
+crates themselves, not the need to fetch what they depend on.
+
+
 ```bash
 run/measure.sh --tier smoke     # 12 crates, about 32 minutes
 run/measure.sh --tier fast      # 58 crates, about 1.5 hours
@@ -102,8 +109,9 @@ tables/figure_heap_cdf.sh            # the RQ2 distribution figure
 
 Each uses your most recent run under `results/`, builds the table from it,
 prints it beside the same table in the paper, and then compares crate by crate
-against our measurement. `--run DIR` picks a different run; `--scope alldeps`
-says what the run instrumented.
+against our measurement. `--run DIR` picks a different run. Whether the run
+instrumented only the crate under study or its whole dependency graph is read
+out of the run itself, so there is nothing to remember; `--scope` overrides it.
 
 Two things to expect.
 

@@ -10,7 +10,8 @@ It excludes only `.git`, the rustc test suite, and previous build output. The
 two commit hashes it was made from are in `COMMIT`: the rustc tree first, then
 its LLVM submodule.
 
-`docker/Dockerfile` unpacks and builds it. Nothing else here needs to be run by
+`docker/Dockerfile` unpacks it into the image and `docker/build_compiler.sh`
+builds it, both driven by `docker/build.sh`. Nothing here needs to be run by
 hand.
 
 ## What is in it that a stock rustc 1.80 does not have

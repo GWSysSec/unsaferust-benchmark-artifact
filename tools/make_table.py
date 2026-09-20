@@ -70,6 +70,32 @@ def newest_run() -> Path | None:
     return max(runs, key=lambda p: p.stat().st_mtime) if runs else None
 
 
+SCOPE_WORDS = {
+    "primary": "only the crate under study",
+    "alldeps": "every crate in the dependency graph",
+}
+
+
+def scope_of(run: Path) -> str:
+    """Read what the run instrumented out of the run itself.
+
+    The harness writes `instrument_all_deps` into every crate's
+    rebench_summary.json, so the measurement says which of the two scopes it
+    used and the evaluator does not have to remember. A run whose crates
+    disagree is not a single measurement, so say so rather than pick one.
+    """
+    seen = set()
+    for s in run.glob("*/rebench_summary.json"):
+        try:
+            seen.add(bool(json.loads(s.read_text()).get("instrument_all_deps")))
+        except (OSError, ValueError):
+            continue
+    if len(seen) > 1:
+        print("warning: this run mixes both scopes; treating it as primary-only")
+        return "primary"
+    return "alldeps" if seen == {True} else "primary"
+
+
 def crates_in(run: Path) -> list[str]:
     return sorted(p.name for p in run.iterdir()
                   if p.is_dir() and (p / "rebench_summary.json").is_file())
@@ -88,8 +114,9 @@ def main() -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("target", choices=sorted(TARGETS))
     ap.add_argument("--run", type=Path, help="a measurement directory of your own")
-    ap.add_argument("--scope", default="primary", choices=["primary", "alldeps"],
-                    help="what the run instrumented (default: primary)")
+    ap.add_argument("--scope", default=None, choices=["primary", "alldeps"],
+                    help="what the run instrumented; read from the run itself "
+                         "unless you say otherwise")
     ap.add_argument("--our-data", action="store_true",
                     help="build from the data this artifact ships instead")
     args = ap.parse_args()
@@ -118,9 +145,11 @@ def main() -> int:
         print(f"source: your measurement at {run}")
         print(f"        {n_crates} crates: {', '.join(crates[:8])}"
               f"{' ...' if n_crates > 8 else ''}\n")
+        scope = args.scope or scope_of(run)
+        print(f"        scope: {SCOPE_WORDS[scope]}\n")
         dataset, suffix = "yourrun", "_yourrun"
         env = {"ARTIFACT_RUN_DIR": str(run.resolve()),
-               "ARTIFACT_RUN_SCOPE": args.scope}
+               "ARTIFACT_RUN_SCOPE": scope}
         code, out = sh([sys.executable, str(ANALYSIS / "export_dataset.py"),
                         "--dataset", "yourrun"], env)
         if code != 0:
