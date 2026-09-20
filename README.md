@@ -37,10 +37,10 @@ interrupted, run `docker/build.sh` again and it continues from where it stopped.
 And the 40 GB it needs is in the volume, so `docker volume rm
 unsaferust-compiler` is how you reclaim the space when you are done.
 
-Budget about 40 GB of disk. The build caps its own parallelism by available
-memory, roughly 2 GB per compile job and 8 GB per link job, because LLVM at one
-job per core needs more memory than a typical machine has. Override with
-`docker build --build-arg COMPILE_JOBS=n --build-arg LINK_JOBS=m`.
+Budget about 40 GB of disk. The build caps its own parallelism by the memory it
+sees, roughly 2 GB per compile job and 8 GB per link job, because LLVM at one
+job per core needs more memory than a typical machine has. Override either
+number from the environment: `COMPILE_JOBS=8 LINK_JOBS=2 docker/build.sh`.
 
 Then `docker/run.sh` gives you a shell at `/workspace/artifact` with the
 compiler mounted and linked as the `stage1` toolchain. It also mounts two host

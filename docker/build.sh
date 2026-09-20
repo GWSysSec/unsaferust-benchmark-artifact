@@ -18,8 +18,15 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 IMAGE="${IMAGE:-unsaferust-artifact:local}"
 VOLUME="${VOLUME:-unsaferust-compiler}"
 
+# The image decides the compiler build's parallelism from the memory it sees.
+# Override either number from the environment, for example
+#   COMPILE_JOBS=8 LINK_JOBS=2 docker/build.sh
+BUILD_ARGS=()
+[ -n "${COMPILE_JOBS:-}" ] && BUILD_ARGS+=(--build-arg "COMPILE_JOBS=$COMPILE_JOBS")
+[ -n "${LINK_JOBS:-}" ]    && BUILD_ARGS+=(--build-arg "LINK_JOBS=$LINK_JOBS")
+
 echo "step 1 of 2: image $IMAGE (a few minutes)"
-docker build -f "$HERE/docker/Dockerfile" -t "$IMAGE" "$HERE"
+docker build "${BUILD_ARGS[@]}" -f "$HERE/docker/Dockerfile" -t "$IMAGE" "$HERE"
 
 echo
 echo "step 2 of 2: compiler into volume $VOLUME (hours; progress is printed)"
