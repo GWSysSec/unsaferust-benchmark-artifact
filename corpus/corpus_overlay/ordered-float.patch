@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 61de11f..4b0bae8 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -42,3 +42,6 @@ rkyv_16  = ["dep:rkyv", "rkyv?/size_16"]
+ rkyv_32  = ["dep:rkyv", "rkyv?/size_32"]
+ rkyv_64  = ["dep:rkyv", "rkyv?/size_64"]
+ rkyv_ck  = ["rkyv?/validation"]
++
++
++[workspace]

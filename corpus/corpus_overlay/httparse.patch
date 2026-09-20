@@ -1,0 +1,20 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 4aee710..9a394e4 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -28,7 +28,7 @@ name = "parse"
+ harness = false
+ 
+ [profile.bench]
+-lto = true
++lto = false
+ codegen-units = 1
+ opt-level = 3
+ 
+@@ -39,3 +39,6 @@ unexpected_cfgs = { level = "warn", check-cfg = [
+     'cfg(httparse_simd_target_feature_sse42)',
+     'cfg(httparse_simd_neon_intrinsics)',
+ ] }
++
++
++[workspace]

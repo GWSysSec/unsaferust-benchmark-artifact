@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 456cd8f..c6f2fff 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -10,3 +10,6 @@ license = "MIT"
+ keywords = ["lru", "cache", "hashmap"]
+ 
+ [dependencies]
++
++
++[workspace]

@@ -1,168 +1,145 @@
-# Dynamic Analysis of Unsafe Rust: Behavior and Benchmarks
+# Dynamic Analysis of Unsafe Rust: Behaviors and Benchmarks — artifact
 
-This is the research artifact for our paper on the dynamic (runtime) behavior of
-unsafe Rust. It bundles everything needed to reproduce our measurements:
+This artifact contains everything needed to check the paper's numbers: the
+source of the instrumented compiler, the exact source of all 100 crates that
+were measured, the measurement data the paper reports, and one script per table
+and figure in the paper.
 
-- a **prebuilt instrumented Rust compiler** (`rustc 1.80.0-dev` with our LLVM
-  instrumentation passes),
-- the **instrumentation runtime library** (`unsafe_perf`), prebuilt per feature,
-- the **benchmark suite** and the **enhanced coverage workloads** (LLM-generated
-  integration tests) used to drive execution,
-- the **dynamic measurement results** for all 100 analyzed crates, and
-- the scripts to re-run any experiment.
+There are two different things you can check, and they take very different
+amounts of time.
 
-The compiler and instrumentation libraries are shipped **prebuilt**, so there is
-no multi-hour `rustc`/LLVM build. The Docker image builds in a few minutes.
+**Does the shipped data produce the paper's tables?** About twenty seconds, no
+Docker and no network. This is exact: each table is rebuilt from the data and
+compared character for character against the table in the paper.
 
-## Important: clone with Git LFS
+**Does a fresh measurement reproduce the shipped data?** Hours to days,
+depending on how much of the corpus you run. This one is approximate, because
+the corpus is not deterministic. Numbers are below.
 
-The prebuilt compiler and instrumentation libraries (~0.9 GB) are stored with
-**Git LFS**. Install LFS *before* cloning, or the large files arrive as small
-pointer text files:
+---
 
-```bash
-git lfs install
-git clone <repo-url>
+## 1. Check the tables (20 seconds)
 
-# If you already cloned without LFS:
-git lfs pull
-```
-
-Quick check that the real binaries are present (not pointers):
+Needs only Python 3.10+ with `matplotlib` and `numpy`.
 
 ```bash
-file toolchain/lib/librustc_driver-*.so   # should say "ELF ... shared object"
+run/check_all_tables.sh
 ```
 
-## Repository layout
+Expected output: seven lines reading `match`, then
+`All tables and figures reproduce from the shipped data.`
 
-| Path | Contents |
-|------|----------|
-| `toolchain/` | Prebuilt instrumented compiler (`rustc`/`rustdoc` + sysroot). Linked as the `stage1` rustup toolchain. |
-| `unsafe_perf_source/` | Source of the `unsafe_perf` instrumentation library (`Makefile`, `src/`). |
-| `unsafe_perf_prebuilt/` | Prebuilt `libunsafe_perf.rlib` (+ `deps/`) for each feature: `cpu_cycle_counter/`, `heap_tracker/`, `unsafe_counter/`. |
-| `benchmarks/` | The benchmark suite (real crates run under `cargo bench`/`cargo test`). |
-| `generated_tests/` | Enhanced coverage workloads: LLM-generated integration tests, per crate. |
-| `dynamic_analysis_results/` | Per-crate dynamic measurements, grouped by research question (`rq1`–`rq5`) and variant. See its own `README.md`. |
-| `analyzed_crates.csv` | The 100-crate dataset: version, LOC, static-unsafe %, and pre/post API coverage. |
-| `workload_descriptions/` | One-line workload summary per crate (`workload_descriptions.csv`). |
-| `experiment_env/` | Per-experiment environment presets for the manual flow (`env/*.sh`). |
-| `benchmark_configs.md` | Per-benchmark commands, flags, and static characteristics. |
-| `run_pipeline.py` | Automated experiment driver. |
-| `Dockerfile`, `docker-compose.yml`, `docker-build.sh` | Container build/run. |
-
-## Quick start (Docker, recommended)
+To see any single table, with its numbers and the comparison:
 
 ```bash
-git lfs pull                 # ensure prebuilt binaries are materialized
-./docker-build.sh            # builds image unsaferust-bench:local (a few minutes)
-docker run -it unsaferust-bench:local
+tables/rq1_cpu_cycles.sh            # CPU cycles spent in unsafe code (RQ1, RQ6)
+tables/rq2_heap.sh                  # heap memory reached by unsafe code (RQ2)
+tables/rq3_unsafe_inst_frequency.sh # how often executed instructions are unsafe (RQ3)
+tables/rq4_inst_types.sh            # what kind of instruction the unsafe ones are (RQ4)
+tables/rq5_unsafe_functions.sh      # how often functions holding unsafe code run (RQ5)
+tables/figure_cycles_cdf.sh         # the RQ1/RQ6 distribution figure
+tables/figure_heap_cdf.sh           # the RQ2 distribution figure
 ```
 
-Or with Compose:
+Add `--dataset alldeps` to any of them for the same measurement taken with every
+crate in the dependency graph instrumented, rather than only the crate under
+study. Those tables are new in the camera-ready, so there is nothing in the
+submitted paper to compare them against; the script prints them instead.
+
+## 2. Build the compiler (2 to 4 hours)
 
 ```bash
-docker compose build
-docker compose run --rm unsaferust-bench
+docker/build.sh
 ```
 
-The container links the prebuilt compiler as the `stage1` toolchain and stages a
-ready-to-use instrumentation library, so experiments run out of the box.
-
-## Running experiments
-
-Inside the container (working dir `/workspace`):
+This builds LLVM 18 with assertions and then rustc 1.80, from the source in
+`compiler/compiler-src.tar.zst`. Assertions are on because that is what the
+measurements were taken with; turning them off would be a different compiler.
+Budget about 40 GB of disk while it runs. Then:
 
 ```bash
-# Native baseline (compile + run, no instrumentation), all crates:
-python3 run_pipeline.py
-
-# A specific instrumentation experiment, all crates:
-python3 run_pipeline.py --experiment unsafe_counter --showstats
-
-# Everything:
-python3 run_pipeline.py --all --showstats
+docker/run.sh
 ```
 
-Options:
+which drops you in a shell at `/workspace/artifact` with the compiler linked as
+the `stage1` toolchain.
 
-- `--experiment <name>`: one of `native`, `coverage`, `cpu_cycle`,
-  `heap_tracker`, `unsafe_counter`.
-- `--crate <name>`: restrict to a single crate.
-- `--showstats`: print an aggregated summary table.
-- `--output <dir>`: results directory (default: `results/<timestamp>/`).
-
-For each feature the driver stages the matching prebuilt library from
-`unsafe_perf_prebuilt/` (no recompilation). `coverage` is the one feature that is
-not prebuilt; it is compiled from `unsafe_perf_source/` on demand with the
-prebuilt compiler.
-
-## Manual flow (single crate, by hand)
+## 3. Fetch the crate sources (a few minutes, needs network)
 
 ```bash
-# 1. Select an instrumentation by sourcing its preset (sets RUSTFLAGS + toolchain):
-source experiment_env/env/cpu.sh        # or heap.sh / counter.sh / coverage.sh
-
-# 2. Build + run a benchmark:
-cd benchmarks/arrayvec-0.7.6
-cargo bench
-
-# 3. Inspect the per-binary stat dump:
-ls -l /tmp/*.stat
+run/fetch_corpus.sh
 ```
 
-The `cpu`, `heap`, and `counter` presets point directly at the prebuilt library,
-so no build is needed. `coverage.sh` expects
-`cd unsafe_perf_source && make coverage` first. Source only one preset per shell.
+Clones or downloads each of the 100 crates at the exact commit or released
+version recorded in `corpus/corpus_lock.csv`, then applies
+`corpus/corpus_overlay/`. About 1.7 GB.
 
-## Results and datasets
-
-- **`dynamic_analysis_results/`** holds one JSON per crate under
-  `rq{1..5}_<name>/{with_native,without_native}/<crate>.json`. `with_native`
-  also counts code reached through `std`/`core`/`alloc`; `without_native` counts
-  only the crate itself. See `dynamic_analysis_results/README.md` for the full
-  field glossary.
-- **`analyzed_crates.csv`** is the per-crate dataset; its `crate` column is the
-  join key for the result files.
-- **`generated_tests/`** are the enhanced coverage workloads that raise API
-  coverage before measurement; **`workload_descriptions/`** summarizes each.
-
-## Toolchain details
-
-`toolchain/` is a prebuilt stage1 `rustc 1.80.0-dev`. It is self-contained
-(relative rpath) and requires only glibc 2.34, so it runs as-is on the Ubuntu
-22.04 base image. The Dockerfile registers it with:
+To confirm the result is what was measured, point it at a reference copy:
 
 ```bash
-rustup toolchain link stage1 /workspace/toolchain
+run/fetch_corpus.sh --verify-against /path/to/reference
 ```
 
-Scripts select it via `RUSTUP_TOOLCHAIN=stage1` (with `RUSTC_BOOTSTRAP=1` for the
-unstable instrumentation flags).
+We ran that against our own trees: all 100 crates rebuild and verify file by
+file.
 
-## Rebuilding the instrumentation library from source (optional)
+## 4. Measure (32 minutes to 121 hours)
 
 ```bash
-cd unsafe_perf_source
-make cpu          # or: heap | counter | coverage   (one feature at a time)
-# produces target/release/libunsafe_perf.rlib (+ deps/)
+run/measure.sh --tier smoke     # 12 crates, about 32 minutes
+run/measure.sh --tier fast      # 58 crates, about 1.5 hours
+run/measure.sh --tier full      # all 100 crates, 121.7 hours
 ```
 
-## FAQ
+Add `--scope alldeps` to instrument every crate in the dependency graph instead
+of only the crate under study.
 
-- **Files look tiny / are text pointers.** Git LFS was not active at clone time.
-  Run `git lfs install && git lfs pull`.
-- **Memory.** Give Docker at least 8 GB RAM.
-- **A crate shows no instrumentation data.** The crate's `Cargo.toml` must enable
-  debug info so the passes can attribute instructions:
+The tiers exist because the full corpus really does take that long: the median
+crate finishes in 2.7 minutes, but ten crates take more than four hours each and
+tokio alone takes 16.3. The smoke tier spans unsafe shares from 0.03% to 10.15%,
+so it exercises the range rather than a corner of it.
 
-  ```toml
-  [profile.release]
-  debug = 2
-  [profile.bench]
-  debug = 2
-  ```
+## 5. Compare your measurement against ours
 
-  The bundled benchmark crates already have this set.
-- **Output paths.** The automated pipeline writes to `results/<timestamp>/`;
-  the manual flow writes `/tmp/*.stat` (controlled by `UNSAFE_BENCH_OUTPUT_DIR`).
+```bash
+tables/rq3_unsafe_inst_frequency.sh --from-run results/<timestamp>
+```
+
+This grades each crate rather than demanding equality, and it should: rerunning
+this corpus does not give identical numbers. We measured the spread by running
+the whole instruction counter twice over all 100 crates. Of the 200
+crate-and-variant pairs, 112 agreed to better than one part in ten thousand, 59
+more to within 1%, 22 to within 10%, and 7 differed by more than 10%. Those 7
+belong to four crates — petgraph, zopfli, portable-atomic and http — whose tests
+drive randomly generated input; petgraph's unsafe instruction count moved by 73%
+between our own two runs.
+
+A handful of crates outside 10% is the expected outcome, not a failure.
+
+## What is where
+
+    README.md              this file
+    ARCHITECTURE.md        why the artifact is shaped this way
+    compiler/              the instrumented compiler, as source, with its commit hashes
+    corpus/                the crate lock, the overlay, the fetch script, the generated workloads
+    data/                  the measurement data the paper reports, and the tables as submitted
+    docker/                the image definition
+    run/                   check the tables, fetch the corpus, measure
+    tables/                one script per table and figure
+    tools/                 aggregation, comparison, and the measurement harness
+    unsafe_perf_source/    the instrumentation runtime library
+
+## Limits worth knowing before you start
+
+The corpus is not deterministic, as described above. Four crates drive random
+input and will not reproduce closely.
+
+The full measurement takes 121.7 hours sequentially. Nothing in this artifact
+runs it for you in less; the tiers are the honest way to spend less time.
+
+The crates are libraries, not applications, and most sit low in a dependency
+tree. The paper says so, and it bounds what the results generalise to.
+
+The workloads are each crate's own integration tests plus generated drivers that
+raise public-API coverage from 76.4% to 90.4%. High API coverage is not the same
+as representing how the API gets used in production.

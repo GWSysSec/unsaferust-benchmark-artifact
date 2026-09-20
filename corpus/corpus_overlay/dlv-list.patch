@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 5950ea1..ab6a763 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -28,3 +28,6 @@ unexpected_cfgs = { level = "warn", check-cfg = [
+     'cfg(coverage_nightly)',
+     'cfg(mutants)',
+ ] }
++
++
++[workspace]

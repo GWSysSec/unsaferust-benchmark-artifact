@@ -30,6 +30,7 @@
 
 use std::fs::OpenOptions;
 use std::io::{Result as IoResult, Write};
+use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::cell::Cell;
 
@@ -46,26 +47,6 @@ thread_local! {
 // SHARED UTILITIES
 // ================================================================================================
 
-// Re-export PathBuf for convenience if needed, but we'll use it internally
-use std::path::{PathBuf};
-use std::env;
-
-// ... imports ...
-
-// ================================================================================================
-// SHARED UTILITIES
-// ================================================================================================
-
-/// Get the directory where output files should be written.
-/// 
-/// Defaults to "UNSAFE_BENCH_OUTPUT_DIR" environment variable, or "/tmp" if not set.
-pub fn get_output_dir() -> PathBuf {
-    match env::var("UNSAFE_BENCH_OUTPUT_DIR") {
-        Ok(val) => PathBuf::from(val),
-        Err(_) => PathBuf::from("/tmp"),
-    }
-}
-
 /// Centralized output writer with error handling and atomic safety.
 /// 
 /// This function provides a thread-safe way to append content to output files.
@@ -73,12 +54,12 @@ pub fn get_output_dir() -> PathBuf {
 ///
 /// # Arguments
 /// * `content` - The content to write to the file
-/// * `filename` - The name of the file to write to (relative to output dir)
+/// * `file_path` - The path to the output file
 /// 
 /// # Returns
 /// * `Ok(())` if the write was successful
 /// * `Err(io::Error)` if there was an I/O error
-pub fn write_output(content: &str, filename: &str) -> IoResult<()> {
+pub fn write_output(content: &str, file_path: &str) -> IoResult<()> {
     // Use GLOBAL_SKIP_TRACKING to prevent any allocations during file I/O
     // from being tracked by our monitoring systems
     GLOBAL_SKIP_TRACKING.with(|flag| {
@@ -86,14 +67,6 @@ pub fn write_output(content: &str, filename: &str) -> IoResult<()> {
         flag.set(true);
         
         let result = (|| {
-            let dir = get_output_dir();
-            let file_path = dir.join(filename);
-
-            // Ensure directory exists (best effort, ignore error if it exists or fails)
-            if let Some(parent) = file_path.parent() {
-                 let _ = std::fs::create_dir_all(parent);
-            }
-
             let mut output_file = OpenOptions::new()
                 .create(true)
                 .append(true)
@@ -106,6 +79,75 @@ pub fn write_output(content: &str, filename: &str) -> IoResult<()> {
         result
     })
 }
+
+// ================================================================================================
+// STAT PATH + JSON OUTPUT (benchmarking pipeline)
+// ================================================================================================
+
+/// Return the basename of the current executable, or "unknown".
+fn current_exe_name() -> String {
+    std::env::current_exe()
+        .ok()
+        .and_then(|p| p.file_name().map(|s| s.to_string_lossy().into_owned()))
+        .unwrap_or_else(|| "unknown".into())
+}
+
+/// Build the output path for a given metric.
+///
+/// Format: `$UNSAFE_STAT_DIR/{pid}.{binary}.{metric}.json`
+/// Falls back to `/tmp` when `UNSAFE_STAT_DIR` is unset.
+pub fn stat_path(metric: &str) -> PathBuf {
+    let dir = std::env::var("UNSAFE_STAT_DIR").unwrap_or_else(|_| "/tmp".into());
+    let pid = std::process::id();
+    let bin = current_exe_name();
+    PathBuf::from(dir).join(format!("{}.{}.{}.json", pid, bin, metric))
+}
+
+/// Write a JSON stat file with the standard envelope.
+///
+/// The resulting file contains exactly one JSON object:
+/// ```json
+/// {"schema":1,"pid":N,"binary":"…","metric":"…","stats":{…}}
+/// ```
+///
+/// Uses `truncate(true)` so each `(pid, binary, metric)` tuple gets a clean
+/// file rather than appending to a shared one.
+pub fn write_stat_json(metric: &str, stats_json: &str) -> IoResult<()> {
+    let path = stat_path(metric);
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+
+    let pid = std::process::id();
+    let bin = current_exe_name();
+    let bin = bin.replace('\\', "\\\\").replace('"', "\\\"");
+
+    let json = format!(
+        "{{\"schema\":1,\"pid\":{},\"binary\":\"{}\",\"metric\":\"{}\",\"stats\":{}}}",
+        pid, bin, metric, stats_json
+    );
+
+    GLOBAL_SKIP_TRACKING.with(|flag| {
+        let was_tracking = flag.get();
+        flag.set(true);
+
+        let result = (|| {
+            let mut file = OpenOptions::new()
+                .create(true)
+                .write(true)
+                .truncate(true)
+                .open(&path)?;
+            file.write_all(json.as_bytes())
+        })();
+
+        flag.set(was_tracking);
+        result
+    })
+}
+
+// ================================================================================================
+// RUNTIME INITIALIZATION
+// ================================================================================================
 
 /// Initialize the runtime monitoring system.
 /// 
@@ -123,13 +165,17 @@ pub fn initialize_runtime() {
     }
     
     // Perform any global initialization needed across all modules
-    #[cfg(any(feature = "heap_tracker", feature = "cpu_cycle_counter", feature = "unsafe_coverage", feature = "unsafe_counter"))]
+    #[cfg(any(feature = "heap_tracker", feature = "cpu_cycle_counter", feature = "unsafe_coverage", feature = "unsafe_counter", feature = "stdlib_api_tracker"))]
     {
         // Initialize thread-local tracking state
         GLOBAL_SKIP_TRACKING.with(|flag| flag.set(false));
-        
-        // Set up signal handlers or other global state if needed in the future
-        // For now, this is primarily a coordination point
+
+        // Install panic-hook protection for the cpu_cycle_counter bracket
+        // counters so a panic inside an instrumented unsafe block does not
+        // leave IN_UNSAFE permanently > 0 and silently corrupt subsequent
+        // measurements on the same thread.
+        #[cfg(all(target_arch = "x86_64", feature = "cpu_cycle_counter"))]
+        cpu_cycle_counter::install_panic_hook();
     }
 }
 
@@ -155,6 +201,9 @@ pub mod unsafe_coverage;
 
 #[cfg(feature = "unsafe_counter")]
 pub mod unsafe_counter;
+
+#[cfg(feature = "stdlib_api_tracker")]
+pub mod stdlib_api_tracker;
 
 // ================================================================================================
 // PUBLIC API RE-EXPORTS
@@ -195,6 +244,12 @@ pub use unsafe_coverage::{
     get_registered_unsafe_lines_count,
     get_executed_unsafe_lines_count,
     reset_unsafe_coverage_stats,
+};
+
+#[cfg(feature = "stdlib_api_tracker")]
+pub use stdlib_api_tracker::{
+    __unsafe_record_stdlib_call,
+    __unsafe_dump_stdlib_stats,
 };
 
 #[cfg(feature = "unsafe_counter")]
@@ -387,19 +442,9 @@ fn test_unsafe_coverage_functions() {
     #[test]
     fn test_write_output() {
         // Test that write_output works without panicking
-        // This will write to /tmp/test_output.tmp or $UNSAFE_BENCH_OUTPUT_DIR/test_output.tmp
-        let result = write_output("test content", "test_output.tmp");
-        
-        // We don't assert success since /tmp might not exist on all systems (though likely on linux),
-        // but it should not panic.
+        let result = write_output("test content", "/tmp/test_output.tmp");
+        // We don't assert success since /tmp might not exist on all systems,
+        // but it should not panic
         let _ = result;
-        
-        // Verify path resolution
-        let dir = get_output_dir();
-        let path = dir.join("test_output.tmp");
-        if path.exists() {
-            // cleanup
-            let _ = std::fs::remove_file(path);
-        }
     }
 }

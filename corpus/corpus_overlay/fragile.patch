@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 9a074ae..1d0ab06 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -23,3 +23,6 @@ slab = { version = "0.4.5", optional = true }
+ [dev-dependencies]
+ futures-executor = "0.3.11"
+ futures-util = "0.3.11"
++
++
++[workspace]

@@ -1,11 +1,6 @@
-# Dockerfile
-*.tar
-*.gz
-# Pipeline artifacts
-**/results/
-**/pipeline_*.env
-**/pipeline_*.log
-**/target/
-# Python bytecode
-__pycache__/
+corpus/sources/
+results/
+**/__pycache__/
 *.pyc
+**/target/
+tools/analysis/Latex/

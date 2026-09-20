@@ -1,0 +1,27 @@
+\begin{table}[tb]
+\caption{The same measurements under two instrumentation scopes,
+without standard libraries. \textbf{Primary only} instruments the
+crate cargo marks as the primary package; \textbf{All dependencies}
+instruments every crate in the dependency graph. Each cell summarises
+the 100 per-crate percentages. The two runs also differ in compiler
+build, harness revision and per-crate feature selection, so the gap
+between the columns is not the effect of instrumenting dependencies
+alone.}
+\label{table:scope_comparison}
+\centering
+{\sffamily
+\begin{tabular}{@{}l|rr|rr@{}}
+\toprule
+& \multicolumn{2}{c|}{\textbf{Primary only}} & \multicolumn{2}{c}{\textbf{All dependencies}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+\textbf{Measurement} & \textbf{Geomean} & \textbf{Median} & \textbf{Geomean} & \textbf{Median} \\
+\midrule
+CPU cycles in unsafe code & 5.9\% & 12.2\% & 4.9\% & 9.8\% \\
+Heap bytes reached by unsafe code & 0.9\% & 0.6\% & 1.1\% & 1.0\% \\
+Instructions executed that are unsafe & 1.8\% & 1.6\% & 2.5\% & 2.9\% \\
+Functions executed holding unsafe code & 2.9\% & 4.4\% & 3.9\% & 4.9\% \\
+Calls into code holding unsafe & 0.4\% & 2.0\% & 0.8\% & 4.0\% \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 5c371e5..7885062 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -50,3 +50,6 @@ zlib = ["dep:simd-adler32"]
+ # Generate full debug information for release builds anyway for ease of profiling.
+ # This does not affect packages that depend on the Zopfli library package
+ debug = true
++
++
++[workspace]

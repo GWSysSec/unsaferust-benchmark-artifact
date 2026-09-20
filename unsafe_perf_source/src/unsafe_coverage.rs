@@ -1,37 +1,54 @@
 //! Unsafe Line Coverage Runtime Library
-//! Track: total unsafe lines (compilation) vs executed unsafe lines (runtime)
-//! Simplified implementation using direct file:line tracking
+//!
+//! Reports per run:
+//!   unsafe_source_lines_pre_opt   — lines InstMarker found in unsafe blocks
+//!                                   BEFORE LLVM optimization ran (accumulated
+//!                                   across all CGUs via fetch_add in the
+//!                                   module ctor emitted by DynamicLineCount)
+//!   unsafe_source_lines_total     — subset of pre_opt whose IR SURVIVED
+//!                                   optimization (the coverage denominator)
+//!   unsafe_source_lines_eliminated — pre_opt - total
+//!   unsafe_source_lines_executed  — subset of total actually hit at runtime
+//!   unsafe_line_coverage_pct      — executed / total
+//!
+//! Storage is DashSet<String> (lock-free sharded set) rather than
+//! Mutex<HashSet>; the previous mutex became a contention hotspot in
+//! multi-threaded benchmarks that spent any time inside unsafe blocks.
 
-use std::collections::HashSet;
+use dashmap::DashSet;
 use std::ffi::CStr;
 use std::os::raw::c_char;
-use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use crate::write_stat_json;
 
-/// Simple coverage tracker - just track file:line strings
 struct UnsafeCoverageTracker {
-    // Simple HashSets for registered and executed lines
-    registered_lines: Mutex<HashSet<String>>,
-    executed_lines: Mutex<HashSet<String>>,
-
-    // Flag to ensure stats are written only once
+    registered_lines: DashSet<String>,
+    executed_lines: DashSet<String>,
+    // Pre-optimization unsafe source line count, summed across all CGUs.
+    // NOTE: this is a *sum* of per-module line counts, not a union, so lines
+    // that appear in multiple CGUs are counted once per CGU. It gives an
+    // upper-bound on elimination, which is what we want for the "lines
+    // eliminated by LLVM" diagnostic.
+    pre_opt_total: AtomicU64,
     stats_written: AtomicBool,
-
-    // Run counter for multiple main() executions
     run_counter: AtomicUsize,
 }
 
 impl UnsafeCoverageTracker {
     fn new() -> Self {
         Self {
-            registered_lines: Mutex::new(HashSet::new()),
-            executed_lines: Mutex::new(HashSet::new()),
+            registered_lines: DashSet::new(),
+            executed_lines: DashSet::new(),
+            pre_opt_total: AtomicU64::new(0),
             stats_written: AtomicBool::new(false),
             run_counter: AtomicUsize::new(0),
         }
     }
-    
-    /// Convert C string + line to a location string
+
+    fn add_pre_opt_count(&self, count: u64) {
+        self.pre_opt_total.fetch_add(count, Ordering::Relaxed);
+    }
+
     fn make_location(line: i64, file: *const c_char) -> String {
         unsafe {
             if file.is_null() {
@@ -44,171 +61,153 @@ impl UnsafeCoverageTracker {
             }
         }
     }
-    
-    /// Register an unsafe line found at compile time
+
     fn register_line(&self, line: i64, file: *const c_char) {
-        let location = Self::make_location(line, file);
-        self.registered_lines.lock().unwrap().insert(location);
+        self.registered_lines.insert(Self::make_location(line, file));
     }
-    
-    /// Track execution of an unsafe line at runtime
+
     fn track_execution(&self, line: i64, file: *const c_char) {
-        let location = Self::make_location(line, file);
-        self.executed_lines.lock().unwrap().insert(location);
+        self.executed_lines.insert(Self::make_location(line, file));
     }
-    
-    /// Get coverage percentage
+
     fn get_coverage_percentage(&self) -> f64 {
-        let registered = self.registered_lines.lock().unwrap();
-        let executed = self.executed_lines.lock().unwrap();
-        
-        let registered_count = registered.len();
-        let executed_count = executed.len();
-        
-        if registered_count > 0 {
-            (executed_count as f64 / registered_count as f64) * 100.0
+        let total = self.registered_lines.len();
+        let executed = self.executed_lines.len();
+        if total > 0 {
+            (executed as f64 / total as f64) * 100.0
         } else {
             0.0
         }
     }
-    
-    /// Get number of registered lines
+
     fn get_registered_count(&self) -> usize {
-        self.registered_lines.lock().unwrap().len()
+        self.registered_lines.len()
     }
-    
-    /// Get number of executed lines
+
     fn get_executed_count(&self) -> usize {
-        self.executed_lines.lock().unwrap().len()
+        self.executed_lines.len()
     }
-    
-    /// Reset all statistics
+
     fn reset(&self) {
-        self.registered_lines.lock().unwrap().clear();
-        self.executed_lines.lock().unwrap().clear();
+        self.registered_lines.clear();
+        self.executed_lines.clear();
+        self.pre_opt_total.store(0, Ordering::Release);
         self.stats_written.store(false, Ordering::Release);
         self.run_counter.store(0, Ordering::Release);
     }
-    
-    /// Write statistics to file and stderr
+
     fn write_stats(&self) {
-        // Ensure single execution
         if self.stats_written.swap(true, Ordering::AcqRel) {
             return;
         }
 
-        let registered = self.registered_lines.lock().unwrap();
-        let executed = self.executed_lines.lock().unwrap();
-
-        let registered_count = registered.len();
-        let executed_count = executed.len();
-        let coverage = if registered_count > 0 {
-            (executed_count as f64 / registered_count as f64) * 100.0
+        let pre_opt = self.pre_opt_total.load(Ordering::Acquire);
+        let total = self.registered_lines.len() as u64;
+        let executed = self.executed_lines.len() as u64;
+        // `pre_opt` is a cross-CGU sum and `total` is a cross-CGU union, so
+        // `pre_opt >= total` holds in the common single-CGU case but may not
+        // with multiple CGUs (same line counted N times pre-opt, deduped to 1
+        // in the survived set). `saturating_sub` gives 0 instead of wrapping.
+        let eliminated = pre_opt.saturating_sub(total);
+        let coverage = if total > 0 {
+            (executed as f64 / total as f64) * 100.0
         } else {
             0.0
         };
 
-        // Increment run counter
-        let run_num = self.run_counter.fetch_add(1, Ordering::AcqRel) + 1;
+        eprintln!(
+            "unsafe_source_lines_pre_opt: {}\n\
+             unsafe_source_lines_total: {}\n\
+             unsafe_source_lines_eliminated: {}\n\
+             unsafe_source_lines_executed: {}\n\
+             unsafe_line_coverage_pct: {:.2}",
+            pre_opt, total, eliminated, executed, coverage
+        );
 
-        // Print to stderr (simple coverage percentage only)
-        eprintln!("Coverage: {:.2}%", coverage);
+        let mut registered_vec: Vec<String> =
+            self.registered_lines.iter().map(|e| e.clone()).collect();
+        registered_vec.sort();
+        let mut executed_vec: Vec<String> =
+            self.executed_lines.iter().map(|e| e.clone()).collect();
+        executed_vec.sort();
 
-        // Append to file with new format
-        self.write_detailed_stats(run_num, &registered, &executed, registered_count, executed_count, coverage);
+        let registered_json = Self::lines_to_json_array(&registered_vec);
+        let executed_json = Self::lines_to_json_array(&executed_vec);
+
+        let stats_json = format!(
+            concat!(
+                "{{",
+                "\"unsafe_source_lines_pre_opt\":{},",
+                "\"unsafe_source_lines_total\":{},",
+                "\"unsafe_source_lines_eliminated\":{},",
+                "\"unsafe_source_lines_executed\":{},",
+                "\"unsafe_line_coverage_pct\":{:.2},",
+                "\"registered_lines\":{},",
+                "\"executed_lines\":{}",
+                "}}"
+            ),
+            pre_opt, total, eliminated, executed, coverage,
+            registered_json, executed_json
+        );
+
+        let _ = write_stat_json("coverage", &stats_json);
     }
 
-    /// Write detailed statistics to file in new format
-    fn write_detailed_stats(&self, run_num: usize, registered: &HashSet<String>, executed: &HashSet<String>,
-                           registered_count: usize, executed_count: usize, coverage: f64) {
-        // Get current timestamp
-        let timestamp = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map(|d| d.as_secs())
-            .unwrap_or(0);
-
-        let mut output = format!("=== RUN_{} ===\n", run_num);
-
-        // Registered lines section
-        output.push_str("=== REGISTERED_LINES ===\n");
-        let mut registered_vec: Vec<_> = registered.iter().collect();
-        registered_vec.sort();
-        for line in registered_vec {
-            output.push_str(&format!("{}\n", line));
-        }
-        output.push_str("\n");
-
-        // Executed lines section
-        output.push_str("=== EXECUTED_LINES ===\n");
-        let mut executed_vec: Vec<_> = executed.iter().collect();
-        executed_vec.sort();
-        for line in executed_vec {
-            output.push_str(&format!("{}\n", line));
-        }
-        output.push_str("\n");
-
-        // Summary section
-        output.push_str("=== SUMMARY ===\n");
-        output.push_str(&format!("registered_count={}\n", registered_count));
-        output.push_str(&format!("executed_count={}\n", executed_count));
-        output.push_str(&format!("coverage_percentage={:.2}\n", coverage));
-        output.push_str(&format!("run_timestamp={}\n", timestamp));
-        output.push_str("\n");
-
-        use crate::write_output;
-        let _ = write_output(&output, "unsafe_coverage.stat");
+    fn lines_to_json_array(lines: &[String]) -> String {
+        let escaped: Vec<String> = lines.iter()
+            .map(|l| format!("\"{}\"", l.replace('\\', "\\\\").replace('"', "\\\"")))
+            .collect();
+        format!("[{}]", escaped.join(","))
     }
 }
 
-// Global tracker instance
-static COVERAGE_TRACKER: once_cell::sync::Lazy<UnsafeCoverageTracker> = 
-    once_cell::sync::Lazy::new(|| UnsafeCoverageTracker::new());
+static COVERAGE_TRACKER: once_cell::sync::Lazy<UnsafeCoverageTracker> =
+    once_cell::sync::Lazy::new(UnsafeCoverageTracker::new);
 
 // ===== C-ABI Public Interface =====
 
-/// Register an unsafe line found at compile time
 #[no_mangle]
 pub extern "C" fn register_unsafe_line(line: i64, file: *const c_char) {
     COVERAGE_TRACKER.register_line(line, file);
 }
 
-/// Track execution of an unsafe line at runtime
+/// Record this module's pre-optimization unsafe source line count.
+/// Called once per CGU from the module constructor emitted by DynamicLineCount.
+#[no_mangle]
+pub extern "C" fn register_unsafe_lines_pre_opt_count(count: u64) {
+    COVERAGE_TRACKER.add_pre_opt_count(count);
+}
+
 #[no_mangle]
 pub extern "C" fn track_unsafe_line_execution(line: i64, file: *const c_char) {
     COVERAGE_TRACKER.track_execution(line, file);
 }
 
-/// Print coverage statistics
 #[no_mangle]
 pub extern "C" fn print_unsafe_coverage_stats() {
     COVERAGE_TRACKER.write_stats();
 }
 
-/// Get coverage percentage
 #[no_mangle]
 pub extern "C" fn get_unsafe_coverage_percentage() -> f64 {
     COVERAGE_TRACKER.get_coverage_percentage()
 }
 
-/// Get registered lines count
 #[no_mangle]
 pub extern "C" fn get_registered_unsafe_lines_count() -> usize {
     COVERAGE_TRACKER.get_registered_count()
 }
 
-/// Get executed lines count
 #[no_mangle]
 pub extern "C" fn get_executed_unsafe_lines_count() -> usize {
     COVERAGE_TRACKER.get_executed_count()
 }
 
-/// Reset coverage statistics
 #[no_mangle]
 pub extern "C" fn reset_unsafe_coverage_stats() {
     COVERAGE_TRACKER.reset();
 }
 
-/// Dump stats at program termination
 #[ctor::dtor]
 fn dump_coverage_at_exit() {
     COVERAGE_TRACKER.write_stats();

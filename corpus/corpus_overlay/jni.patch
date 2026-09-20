@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 5662d7a..20dc243 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -46,3 +46,6 @@ default = []
+ 
+ [package.metadata.docs.rs]
+ features = ["invocation"]
++
++
++[workspace]

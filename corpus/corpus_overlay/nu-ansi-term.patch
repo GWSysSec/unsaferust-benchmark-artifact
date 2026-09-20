@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 9705c47..196b828 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -36,3 +36,6 @@ features = [
+ [dev-dependencies]
+ doc-comment = "0.3.3"
+ serde_json = "1.0.94"
++
++
++[workspace]

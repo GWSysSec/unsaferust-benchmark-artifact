@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index ff91eb8..418bb26 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -29,3 +29,6 @@ rustdoc-args = [
+ 
+ [package.metadata.playground]
+ features = ["serde"]
++
++
++[workspace]

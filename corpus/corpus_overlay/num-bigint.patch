@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 720512a..d3846c1 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -73,3 +73,6 @@ default-features = false
+ optional = true
+ version = "1"
+ default-features = false
++
++
++[workspace]

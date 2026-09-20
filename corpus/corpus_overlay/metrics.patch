@@ -1,0 +1,231 @@
+diff --git a/metrics-benchmark/LICENSE b/metrics-benchmark/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/metrics-benchmark/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/metrics-benchmark/LICENSE b/metrics-benchmark/LICENSE
+new file mode 100644
+index 0000000..d4043d2
+--- /dev/null
++++ b/metrics-benchmark/LICENSE
+@@ -0,0 +1,19 @@
++Copyright (c) 2021 Metrics Contributors
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/metrics-exporter-prometheus/LICENSE b/metrics-exporter-prometheus/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/metrics-exporter-prometheus/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/metrics-exporter-prometheus/LICENSE b/metrics-exporter-prometheus/LICENSE
+new file mode 100644
+index 0000000..d4043d2
+--- /dev/null
++++ b/metrics-exporter-prometheus/LICENSE
+@@ -0,0 +1,19 @@
++Copyright (c) 2021 Metrics Contributors
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/metrics-exporter-tcp/LICENSE b/metrics-exporter-tcp/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/metrics-exporter-tcp/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/metrics-exporter-tcp/LICENSE b/metrics-exporter-tcp/LICENSE
+new file mode 100644
+index 0000000..d4043d2
+--- /dev/null
++++ b/metrics-exporter-tcp/LICENSE
+@@ -0,0 +1,19 @@
++Copyright (c) 2021 Metrics Contributors
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/metrics-observer/LICENSE b/metrics-observer/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/metrics-observer/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/metrics-observer/LICENSE b/metrics-observer/LICENSE
+new file mode 100644
+index 0000000..d4043d2
+--- /dev/null
++++ b/metrics-observer/LICENSE
+@@ -0,0 +1,19 @@
++Copyright (c) 2021 Metrics Contributors
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/metrics-tracing-context/LICENSE b/metrics-tracing-context/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/metrics-tracing-context/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/metrics-tracing-context/LICENSE b/metrics-tracing-context/LICENSE
+new file mode 100644
+index 0000000..d4043d2
+--- /dev/null
++++ b/metrics-tracing-context/LICENSE
+@@ -0,0 +1,19 @@
++Copyright (c) 2021 Metrics Contributors
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/metrics-util/LICENSE b/metrics-util/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/metrics-util/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/metrics-util/LICENSE b/metrics-util/LICENSE
+new file mode 100644
+index 0000000..d4043d2
+--- /dev/null
++++ b/metrics-util/LICENSE
+@@ -0,0 +1,19 @@
++Copyright (c) 2021 Metrics Contributors
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/metrics/LICENSE b/metrics/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/metrics/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/metrics/LICENSE b/metrics/LICENSE
+new file mode 100644
+index 0000000..d4043d2
+--- /dev/null
++++ b/metrics/LICENSE
+@@ -0,0 +1,19 @@
++Copyright (c) 2021 Metrics Contributors
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.

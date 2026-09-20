@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index c9ad16d..fd16ed0 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -72,3 +72,6 @@ debug = true
+ 
+ [profile.bench]
+ debug = true
++
++
++[workspace]

@@ -1,0 +1,25 @@
+\begin{table*}[tb]
+\caption{Summary of heap memory (by size) accessed by unsafe code
+and the percentages of unsafe memory instructions ({\tt load} and {\tt store})
+targeting the heap.}
+\label{table:heap}
+\centering
+% \resizebox{\textwidth}{!}{%
+{\sffamily
+\begin{tabular}{@{}lrrrr|r||rrrr|r@{}}
+\toprule
+& \multicolumn{5}{c||}{\textbf{Without standard libraries}} & \multicolumn{5}{c}{\textbf{With standard libraries}} \\
+\midrule
+& \multicolumn{4}{c|}{\textbf{Memory by Size}} & \textbf{Mem} & \multicolumn{4}{c|}{\textbf{Memory by Size}} & \textbf{Mem} \\
+\cmidrule(r){2-5} \cmidrule(l){7-10}
+& \textbf{Small} & \textbf{Medium} & \textbf{Large} & \textbf{Total} & \textbf{Inst} & \textbf{Small} & \textbf{Medium} & \textbf{Large} & \textbf{Total} & \textbf{Inst} \\
+\midrule
+\textbf{Min} & 0\% & 0\% & 0\% & 0\% & 0\% & 0\% & 0\% & 0\% & 0\% & 0\% \\
+\textbf{Geomean} & 0.8\% & 1.9\% & 11.7\% & 0.7\% & 0.8\% & 4.6\% & 5.0\% & 32.4\% & 4.9\% & 0.4\% \\
+\textbf{Median} & 0.1\% & 0.0\% & 0\% & 0.6\% & 1.0\% & 6.6\% & 1.1\% & 13.4\% & 5.2\% & 0.7\% \\
+\textbf{Max} & 81.1\% & 71.1\% & 100.0\% & 81.0\% & 27.8\% & 99.8\% & 76.9\% & 100.0\% & 99.8\% & 27.5\% \\
+\bottomrule
+\end{tabular}
+}
+% }%
+\end{table*}

@@ -1,0 +1,14 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 0e53c72..263f75e 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -108,5 +108,8 @@ name = "readme"
+ name = "ini"
+ 
+ [profile.bench]
+-lto = true
++lto = false
+ codegen-units = 1
++
++
++[workspace]

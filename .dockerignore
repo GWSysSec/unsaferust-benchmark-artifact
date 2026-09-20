@@ -1,8 +1,6 @@
-# Ignore build artifacts to speed up Docker build context
+.git
+corpus/sources
+results
+**/__pycache__
+**/target
 *.tar
-*.tar.gz
-unsafe_perf_source/target
-.vscode
-*.swp
-*.swo
-*~

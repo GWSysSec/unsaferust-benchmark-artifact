@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index e6a49eb..c8d3ac4 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -36,3 +36,6 @@ openssl-probe = "0.1"
+ [dev-dependencies]
+ tempfile = "3.0"
+ test-cert-gen = "0.9"
++
++
++[workspace]

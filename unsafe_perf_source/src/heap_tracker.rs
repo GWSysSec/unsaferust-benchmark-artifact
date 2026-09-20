@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Mutex;
 use std::cell::Cell;
-use crate::write_output;
+use crate::write_stat_json;
 
 thread_local! {
     /// Thread-local flag to skip tracking allocations made by the heap
@@ -180,14 +180,15 @@ impl HeapTracker {
         size_histogram[OBJ_SIZE_NUM - 1].fetch_add(1, Ordering::Relaxed);
     }
 
-    /// Convert an array of object size hisotgram to a string.
-    fn size_hisogram_to_str(size_histogram: &[AtomicUsize; OBJ_SIZE_NUM]) -> String {
-        size_histogram.iter()
-                      .map(|v| v.load(Ordering::Relaxed).to_string())
-                      .collect::<Vec<_>>().join("; ")
+    /// Convert an array of object size histogram to a JSON array string.
+    fn size_histogram_to_json(size_histogram: &[AtomicUsize; OBJ_SIZE_NUM]) -> String {
+        let vals: Vec<String> = size_histogram.iter()
+            .map(|v| v.load(Ordering::Relaxed).to_string())
+            .collect();
+        format!("[{}]", vals.join(","))
     }
 
-    /// Print out heap usage stats.
+    /// Dump heap usage stats as JSON via write_stat_json.
     pub fn dump_stats(&self) {
         let heap_usage = self.total_usage.load(Ordering::Relaxed);
         let heap_alloc = self.total_alloc.load(Ordering::Relaxed);
@@ -199,51 +200,43 @@ impl HeapTracker {
         let unsafe_load = self.unsafe_load.load(Ordering::Relaxed);
         let unsafe_store = self.unsafe_store.load(Ordering::Relaxed);
 
-        let size_histo = 
+        let (size_histo, unsafe_size_histo) =
             SKIP_TRACKING.with(|flag| {
-                // Skip tracking heap allocations invoked by the following code.
-                // Without this, the code below somehow causes size_histo[0] to
-                // be one greater total_alloc. It could be that (I'm not sure;
-                // this is really weird!) some code was delayed executing until
-                // the use of size_histo_str in the following format!(), and the
-                // delayed code invokes one more small heap allocation which
-                // increases historgram[0] by 1. However, this seems to be
-                // implausible, because, why the heck would there be a delay?
+                // Guard histogram reads so allocations from Vec/String
+                // formatting are not counted by the global allocator hook.
                 flag.set(true);
-
-            Self::size_hisogram_to_str(&self.size_histogram)
+                let histo = Self::size_histogram_to_json(&self.size_histogram);
+                let unsafe_histo = Self::size_histogram_to_json(&self.unsafe_size_histogram);
+                flag.set(false);
+                (histo, unsafe_histo)
         });
-        let unsafe_size_histo = Self::size_hisogram_to_str(&self.unsafe_size_histogram);
 
-        let output = format!(
+        let stats_json = format!(
             concat!(
-                "\n===== Heap Usage Statistics =====\n",
-                "Total heap usage: {} bytes\n",
-                "Total heap allocations: {}\n",
-                "Total heap re-allocations: {}\n",
-                "Total heap deallocations: {}\n",
-                "Unsafe heap memory: {}\n",
-                "Unsafe heap objects: {}\n",
-                "Unsafe memory instructions: {}\n",
-                "Unsafe load: {}\n",
-                "Unsafe store: {}\n",
-                "Size histogram: {}\n",
-                "Unsafe size histogram: {}\n",
+                "{{",
+                "\"total_heap_usage\":{},",
+                "\"total_heap_alloc\":{},",
+                "\"total_heap_realloc\":{},",
+                "\"total_heap_dealloc\":{},",
+                "\"unsafe_heap_memory\":{},",
+                "\"unsafe_heap_objects\":{},",
+                "\"total_memory_instructions\":{},",
+                "\"unsafe_load\":{},",
+                "\"unsafe_store\":{},",
+                "\"size_histogram\":{},",
+                "\"unsafe_size_histogram\":{}",
+                "}}"
             ),
-            heap_usage, heap_alloc, heap_realloc, heap_dealloc, unsafe_mem, unsafe_objs,
-            total_mem_insts, unsafe_load, unsafe_store, size_histo, unsafe_size_histo
+            heap_usage, heap_alloc, heap_realloc, heap_dealloc,
+            unsafe_mem, unsafe_objs, total_mem_insts,
+            unsafe_load, unsafe_store,
+            size_histo, unsafe_size_histo
         );
 
-        // Write the output to a tmp file.
-        // Note that we assume there is no output file in /tmp. This process will
-        // otherwise append to an existing output file.
-        //
-        // TODO: Consider changing the output file name to heap_stat-process_name_or_pid.txt
-        let _ = write_output(&output, "heap_stat.stat");
+        let _ = write_stat_json("heap", &stats_json);
 
-        // Only output to terminal for Debug build.
         if cfg!(debug_assertions) {
-            dbg!("{}", &output);
+            dbg!("{}", &stats_json);
         }
     }
 }
@@ -291,21 +284,21 @@ unsafe impl GlobalAlloc for HeapTracker {
         if new_ptr.is_null() { return new_ptr; }
 
         if !SKIP_TRACKING.with(|flag| flag.get()) {
+            self.total_realloc.fetch_add(1, Ordering::Relaxed);
+            self.classify_obj_by_size(new_size, false);
             if new_ptr != ptr {
-                // Reallocating to a new address. Remove the old entry and record
-                // the new entry.
                 self.remove_obj(ptr);
-                self.total_realloc.fetch_add(1, Ordering::Relaxed);
-                self.classify_obj_by_size(new_size, false);
             }
             self.insert_obj(new_ptr, new_size);
-        }
 
-        // Update total heap usage if new_size differs than the old size.
-        if new_size > layout.size() {
-            self.total_usage.fetch_add(new_size - layout.size(), Ordering::Relaxed);
-        } else {
-            self.total_usage.fetch_sub(layout.size() - new_size, Ordering::Relaxed);
+            // Update total heap usage if new_size differs from the old size.
+            // Must be inside the SKIP_TRACKING guard to avoid counting internal
+            // BTreeMap reallocations as user heap usage.
+            if new_size > layout.size() {
+                self.total_usage.fetch_add(new_size - layout.size(), Ordering::Relaxed);
+            } else {
+                self.total_usage.fetch_sub(layout.size() - new_size, Ordering::Relaxed);
+            }
         }
 
         new_ptr

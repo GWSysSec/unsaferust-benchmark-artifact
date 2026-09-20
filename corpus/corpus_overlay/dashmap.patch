@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index b29c8da..49b5737 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -32,3 +32,6 @@ typesize = { version = "0.1.8", default-features = false, optional = true }
+ 
+ [package.metadata.docs.rs]
+ features = ["rayon", "raw-api", "serde"]
++
++
++[workspace]

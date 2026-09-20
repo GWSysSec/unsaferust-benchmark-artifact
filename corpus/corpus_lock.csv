@@ -1,0 +1,101 @@
+crate,dir_name,source,repository,commit,submodules,feature_label,workspace_pathway,local_edits,source_present
+aho-corasick,aho-corasick,git,https://github.com/BurntSushi/aho-corasick,948d2e1f8e4b6b0aff13075176922e158c8bed46,,default,,patch+untracked,yes
+arbitrary,arbitrary,git,https://github.com/rust-fuzz/arbitrary,334351140a0dcea63bc28dd5c57fab19762f6b1d,,workspace/all-features,arbitrary/tests,untracked,yes
+arc-swap,arc-swap,git,https://github.com/vorner/arc-swap,b2b595506b36f31f622f545010774c756866742c,,default,,patch+untracked,yes
+arrayvec,arrayvec,git,https://github.com/bluss/arrayvec,0aede877fe0bfb1ba5e3c2024df8c0958d503a83,,all-features,,patch+untracked,yes
+async-lock,async-lock,git,https://github.com/smol-rs/async-lock,cc249b2d31590a6e97616a351032747f3e19bc87,,default,,patch+untracked,yes
+async-std,async-std,git,https://github.com/async-rs/async-std,96f564672a8588ac0516e86580c249009ad3e94f,,default,,patch+untracked,yes
+async-task,async-task,git,https://github.com/smol-rs/async-task,3065c372e1ef1611230195ad7f3aae80ffde8261,,default,,patch+untracked,yes
+bimap,bimap,git,https://github.com/billyrieger/bimap-rs/,3dca651620845a939ee9e5393c0a8fe9fe0a1656,,all-features,,patch+untracked,yes
+borsh,borsh-rs,git,https://github.com/near/borsh-rs,abb9582c70b2afd54eef302c23b6e6d3a0b2c1c4,,workspace/default,"borsh-rs/borsh, borsh-rs/borsh/tests",patch+untracked,yes
+brotli-decompressor,brotli-decompressor,git,https://github.com/dropbox/rust-brotli-decompressor,a91c112180789502cdb9bf9e87f9546dd9a970fd,,default,,patch+untracked,yes
+bstr,bstr,git,https://github.com/BurntSushi/bstr,8904072067fca9ca993f7234a2dacad1c362afa7,,workspace/default,bstr/tests,untracked,yes
+bytemuck,bytemuck,git,https://github.com/Lokathor/bytemuck,028ff3bec68ab9c123dc578b74a7af4a72a37609,,default,,patch+untracked,yes
+byteorder,byteorder,git,https://github.com/BurntSushi/byteorder,5a82625fae462e8ba64cec8146b24a372b4d75c6,,default,,patch+untracked,yes
+cc,cc-rs,git,https://github.com/rust-lang/cc-rs,0342d854e1823db9e903c93cea82adaf1e00af33,,workspace/default,cc-rs/tests,untracked,yes
+chrono,chrono,git,https://github.com/chronotope/chrono,d1de1d95ead4e59472622761ad545dc4a940992b,,default,,patch+untracked,yes
+clru,clru,git,https://github.com/marmeladema/clru-rs,95928ef41914403fb8e831deca904341fc579b61,,default,,patch+untracked,yes
+colored,colored,git,https://github.com/mackwic/colored,95b2de80ba35b6d2be2f876a746d27da58a73945,,default,,patch+untracked,yes
+combine,combine,git,https://github.com/Marwes/combine,c6eb5d32c89d1828bd3fdc503b1a776dc55b0173,,all-features,,patch+untracked,yes
+cpp_demangle,cpp_demangle,git,https://github.com/gimli-rs/cpp_demangle,15bbde1af70bdb588382fc38a24997575c7b28c9,,default,,patch+untracked,yes
+cssparser,cssparser,git,https://github.com/servo/rust-cssparser,3dd4f63639925438d9932dafc0d81395847f9be4,,workspace/default,cssparser/tests,patch+untracked,yes
+curl,curl,git,https://github.com/alexcrichton/curl-rust,055ef1b635d0c1aaf55f1a68fd7e1db9b6cd7e7b,curl-sys/curl,primary-only/default,curl/tests,patch+untracked,yes
+dashmap,dashmap,git,https://github.com/xacrimon/dashmap,f2d248eb59fe4a06decd8b54a4365ef41400b73c,,all-features,,patch+untracked,yes
+deranged,deranged,git,https://github.com/jhpratt/deranged,94631377ec404d14ed0f2b05a2ead06f31caac03,,workspace/all-features,"deranged/deranged, deranged/deranged/tests",patch+untracked,yes
+dlv-list,dlv-list,git,https://github.com/sgodwincs/dlv-list-rs,422548ddd5398399a19290cafccca23da0d6b3a7,,default,,patch+untracked,yes
+ego-tree,ego-tree,git,https://github.com/rust-scraper/ego-tree,a38b9c42cbf06049b2cc1859bfbf9d5895e4b018,,all-features,,patch+untracked,yes
+encoding_rs,encoding_rs,git,https://github.com/hsivonen/encoding_rs,d823a51a81c91ff9b1611cb70859464115bd7c1d,,default,,patch+untracked,yes
+filetime,filetime,git,https://github.com/alexcrichton/filetime,f5241bc462e2a605c9ef3cef40996431b67e79f5,,default,,patch+untracked,yes
+fixedbitset,fixedbitset,git,https://github.com/petgraph/fixedbitset,f1db5d17dabc4b8f3ba68c1228a3ee7601c7f33c,,default,,patch+untracked,yes
+flate2,flate2,git,https://github.com/rust-lang/flate2-rs,98c98c8a57586b37e6f93e94d993e4f038fd8d32,,all-features,,patch+untracked,yes
+fragile,fragile,git,https://github.com/mitsuhiko/fragile,7631a72b0a4a47fb8251cc2ad641f3db8fd1b565,,default,,patch+untracked,yes
+fs4,fs4,git,https://github.com/al8n/fs4-rs.git,5f81cf254d3e1db4a98a9a49723b7405a4d3e383,,all-features,,patch,yes
+getrandom,getrandom,git,https://github.com/rust-random/getrandom,f0ff6e257631fbe2b16d2a46ca02292acf83c9f4,,default,,patch+untracked,yes
+gimli,gimli,git,https://github.com/gimli-rs/gimli,dbe262929735791c16104da78808b04b13c13cb3,,workspace/default,gimli/tests,untracked,yes
+git2,git2,git,https://github.com/rust-lang/git2-rs,1fb5f64819a9f5b175e0fb09dc369d0a2ccd355a,libgit2-sys/libgit2,workspace/default,git2/tests,patch+untracked,yes
+h2,h2,git,https://github.com/hyperium/h2,e4ed3502f111302ba601799bf70b4aecd37466fd,,workspace/default,"h2/tests, h2/tests/h2-tests",untracked,yes
+hashbrown,hashbrown,git,https://github.com/rust-lang/hashbrown,631dfed6e9a4f0afd5de3f6799d02f2baa8e7050,,default,,patch+untracked,yes
+hashlink,hashlink,git,https://github.com/kyren/hashlink,11088cb368f93e1f61fc42e696b4ab89158ae70d,,all-features,,patch+untracked,yes
+headers,headers,git,https://github.com/hyperium/headers,d425d3ca90261683150eda8292c3f14f0d3db3ee,,workspace/default,headers/tests,patch+untracked,yes
+http,http,git,https://github.com/hyperium/http,8c1fb204b8594ce5cf198af8568453f9df4ed953,,workspace/default,http/tests,untracked,yes
+http-body,http-body,git,https://github.com/hyperium/http-body,69e80eb41cae652a1a38e1ce77690be1a0e7f356,,workspace/default,"http-body/http-body, http-body/http-body/tests",patch+untracked,yes
+httparse,httparse,git,https://github.com/seanmonstar/httparse,9f29e79f9832dbd0ae5220acb17c1866745bdecd,,default,,patch+untracked,yes
+imgref,imgref,git,https://github.com/kornelski/imgref,b7e9666eef0eac451f081688477bc14aaee7ebd8,,default,,patch+untracked,yes
+indexmap,indexmap,git,https://github.com/indexmap-rs/indexmap,1818d4140d86aeef18c515f1b060a3fa68da2708,,workspace/default,indexmap/tests,untracked,yes
+iri-string,iri-string,git,https://github.com/lo48576/iri-string,443da64c8954ad12a48020afc3e7663659f1d49e,,workspace/all-features,iri-string/tests,untracked,yes
+jni,jni,git,https://github.com/jni-rs/jni-rs,09a5911358ffa846b5c85451c050a0e64669e863,,all-features,,patch+untracked,yes
+jpeg-decoder,jpeg-decoder,git,https://github.com/image-rs/jpeg-decoder,95550d7eec747b94b5f9beba3be2c6fcb1f4f70e,,default,,patch+untracked,yes
+lexical-core,lexical-core,git,https://github.com/Alexhuszagh/rust-lexical,84c1c497edd80ef1f8256be58c44efcfe266fcb8,,workspace/default,"lexical-core/lexical-core, lexical-core/lexical-core/tests",patch+untracked,yes
+libsecp256k1,libsecp256k1,git,https://github.com/paritytech/libsecp256k1,f992b80dedc1da7791b74ac01591e3336c41d893,,workspace/default,libsecp256k1/tests,untracked,yes
+log,log,git,https://github.com/rust-lang/log,35161d0d25838a62d518dabe1e34e84b607446b3,,default,,patch+untracked,yes
+loom,loom,git,https://github.com/tokio-rs/loom,fd51ef8f9a21d6e4837225c3107393a4fed7b494,,default,,patch+untracked,yes
+matrixmultiply,matrixmultiply,git,https://github.com/bluss/matrixmultiply/,bb3dd0be9d8a9f592e567e4402950546bf710eba,,all-features,,patch+untracked,yes
+memchr,memchr,git,https://github.com/BurntSushi/memchr,ceef3c921b5685847ea39647b6361033dfe1aa36,,default,,patch+untracked,yes
+memmap2,memmap2,git,https://github.com/RazrFalcon/memmap2-rs,2bbb8831516045f68c15d08e432260ad78758c20,,all-features,,patch+untracked,yes
+metrics,metrics,git,https://github.com/metrics-rs/metrics,677eb64594588aaa95c4110974d7214be9e9f905,,workspace/default,"metrics/metrics, metrics/metrics/tests",patch+untracked,yes
+miette,miette,git,https://github.com/zkat/miette,a18a6444d92cd1ada40bfd7e39b86f672c8a6924,,workspace/all-features,miette/tests,untracked,yes
+rmp-serde,msgpack-rust,git,https://github.com/3Hren/msgpack-rust,00eeadfd60ae78cb0cbb0207c40efe9a2836697a,,ws+extras/default,"msgpack-rust/rmp, msgpack-rust/rmp/tests, msgpack-rust/rmpv-tests",patch+untracked,yes
+native-tls,native-tls,git,https://github.com/sfackler/rust-native-tls,485e4890e10cfbf30b9d6fd448abb8f515a7be4e,,all-features,,patch+untracked,yes
+ndarray,ndarray,git,https://github.com/rust-ndarray/ndarray,6f77377d7d508550bf516e54c142cee3ab243aeb,,primary-only/default,ndarray/tests,untracked,yes
+nom,nom,git,https://github.com/rust-bakery/nom,a44b52ed9052a66f5eb2add9aa5b314f034dc580,,workspace/default,nom/tests,patch+untracked,yes
+nu-ansi-term,nu-ansi-term,git,https://github.com/nushell/nu-ansi-term,0912f8f6a3b29a8409cf5cab25e8865f5766ea96,,default,,patch+untracked,yes
+num-bigint,num-bigint,git,https://github.com/rust-num/num-bigint,a25836ec6c341d1aa40c97335842f330b6a62911,,default,,patch+untracked,yes
+ordered-float,ordered-float,git,https://github.com/reem/rust-ordered-float,478e67d5c8ae3a853ccc1f9b09ad853b69e941bd,,default,,patch+untracked,yes
+ordered-multimap,ordered-multimap,git,https://github.com/sgodwincs/ordered-multimap-rs,4c939e479c01da195f4a4ca7d8a59c4da0f325b0,,all-features,,patch+untracked,yes
+os_info,os_info,git,https://github.com/stanislav-tkach/os_info,0554ec580dd4a4c1b180a09fe0f2a990c61ce112,,workspace/default,"os_info/os_info, os_info/os_info/tests",,yes
+ouroboros,ouroboros,git,https://github.com/someguynamedjosh/ouroboros,b75b9c16e6d79b6b8a678ac5bca602134473951d,,workspace/default,"ouroboros/ouroboros, ouroboros/examples",untracked,yes
+parity-scale-codec,parity-scale-codec,git,https://github.com/paritytech/parity-scale-codec,ff5a07091180b060e2a8b5b1bf5e80e501d9cd8a,,workspace/all-features,parity-scale-codec/tests,untracked,yes
+parking_lot,parking_lot,git,https://github.com/Amanieu/parking_lot,87ce756554e7a89808b22333563beb5d338bc572,,default,"parking-lot/core,",untracked,yes
+petgraph,petgraph,git,https://github.com/petgraph/petgraph,305a5b216cc152f101b96a0352efc4236cd6e696,,workspace/all-features,petgraph/tests,untracked,yes
+pin-project-lite,pin-project-lite,git,https://github.com/taiki-e/pin-project-lite,cca1e8ae094ceff53e74abbfec8c9f2221ebd202,,workspace/default,"pin-project-lite/tests, pin-project-lite/tests/no-core, pin-project-lite/tests/no-std, pin-project-lite/tests/lint",patch+untracked,yes
+polling,polling,git,https://github.com/smol-rs/polling,033e3a80e97810be25a20eaaa29e80c610201c7b,,default,,patch+untracked,yes
+portable-atomic,portable-atomic,git,https://github.com/taiki-e/portable-atomic,3350139a07713cbdf3d0e3f4efa41ac65d3332ab,,workspace/default,portable-atomic/tests,patch+untracked,yes
+postcard,postcard,git,https://github.com/jamesmunns/postcard,73b2ca00d004f0fecfb18a87653c49e775c95f23,,workspace/default,,,yes
+pulldown-cmark,pulldown-cmark,git,https://github.com/raphlinus/pulldown-cmark,f17d98ae9e7ef9c3be601fcb1c9fbd536d3cb873,,workspace/all-features,"pulldown-cmark/pulldown-cmark, pulldown-cmark/pulldown-cmark/tests",patch+untracked,yes
+rand,rand,git,https://github.com/rust-random/rand,db993ec12676119251eaf9f2cba8389a1b07abef,,workspace/default,rand/tests,untracked,yes
+rayon-core,rayon-core,crates.io,https://crates.io/crates/rayon-core,1.12.1,,default,,patch,yes
+rgb,rgb,git,https://github.com/kornelski/rust-rgb,ca5b03f3c2339c13ffcf7248c35f9194b0e7ab9a,,all-features,,patch+untracked,yes
+ring,ring,git,https://github.com/briansmith/ring,081fe57561f6aa0c3006c7ab41cf85d293163997,,workspace/all-features,ring/tests,patch+untracked,yes
+rmp,rmp,crates.io,https://crates.io/crates/rmp,0.8.9,,default,Run in Workspace,patch,yes
+ron,ron,git,https://github.com/ron-rs/ron,ce6b094b2f027fa83655cda80831b6515d5a882d,,all-features,,patch+untracked,yes
+openssl,rust-openssl,git,https://github.com/sfackler/rust-openssl,87085bd67896b7f92e6de35d081f607a334beae4,,workspace/default,"rust-openssl/openssl, rust-openssl/openssl/tests",patch+untracked,yes
+rustc-demangle,rustc-demangle,git,https://github.com/rust-lang/rustc-demangle,6cbe55cb044e96d4f3644d6745060f3eb19c5db0,,workspace/default,rustc-demangle/tests,,yes
+scroll,scroll,git,https://github.com/m4b/scroll,667f9e8c09c73f54b29ed005505aba99210e34ff,,default,,patch+untracked,yes
+semver,semver,git,https://github.com/dtolnay/semver,3e64fdbfce78bfbd2eb97bdbdc50ce4d62c9831b,,default,,patch+untracked,yes
+serde_with,serde_with,git,https://github.com/jonasbb/serde_with/,5de3400f9cd459abb91cd021ba29c5fd5716c520,,ws+extras/all-features,"serde_with/serde_with, serde_with/serde_with/tests, serde_with/serde_with_test",patch+untracked,yes
+serde_yaml,serde_yaml,git,https://github.com/dtolnay/serde-yaml,2009506d33767dfc88e979d6bc0d53d09f941c94,,default,,patch+untracked,yes
+sharded-slab,sharded-slab,git,https://github.com/hawkw/sharded-slab,40579b92debe2ef283a455eb379945e023080ff3,,default,,patch+untracked,yes
+signal-hook,signal-hook,git,https://github.com/vorner/signal-hook,dfdec819445a5a452b74524cd33e59c2a98faf29,,workspace/all-features,signal-hook/tests,patch+untracked,yes
+simdutf8,simdutf8,git,https://github.com/rusticstuff/simdutf8,87ee8d9d20b849eae1974a82b248ee6fe7491bcc,,default,,patch+untracked,yes
+siphasher,siphasher,git,https://github.com/jedisct1/rust-siphash,914adf99c7ca8fb98d33b671f1222a4ee4d791c6,,all-features,,patch+untracked,yes
+slotmap,slotmap,git,https://github.com/orlp/slotmap,c905b6ced490551476cb7c37778eb8128bdea7ba,,all-features,,patch+untracked,yes
+smallvec,smallvec,git,https://github.com/servo/rust-smallvec,7c4d350f5ec284fd05807f1a182387889a62af24,,default,,patch+untracked,yes
+tokio,tokio,git,https://github.com/tokio-rs/tokio,ec4b1d7215a3e1e91797ad3fb6ba0f7c7f3d2566,,workspace/all-features,"tokio/tokio, tokio/tokio/tests, tokio/tests-integration",untracked,yes
+triomphe,triomphe,git,https://github.com/Manishearth/triomphe,6ff0527036632be33a6ed45e5e8a0fb6243dee47,,default,,patch+untracked,yes
+unicode-normalization,unicode-normalization,git,https://github.com/unicode-rs/unicode-normalization,1598cfaff2d5e0661e2f506d77c931c01e1f23ea,,default,,patch+untracked,yes
+utf-8,utf8parse,git,https://github.com/SimonSapin/rust-utf8,218fea2b57b0e4c3de9fa17a376fcc4a4c0d08f3,,default,Run in Workspace,patch+untracked,yes
+uuid,uuid,git,https://github.com/uuid-rs/uuid,c36beb14d50f835c1f1220117ca51aae64860a3e,,workspace/all-features,uuid/tests,untracked,yes
+value-bag,value-bag,git,https://github.com/sval-rs/value-bag,2568bbd3f35f2eede520c38fc138eab22882d6b4,,workspace/all-features,Run in Workspace,patch+untracked,yes
+winnow,winnow,git,https://github.com/winnow-rs/winnow,3c63944160dda3e19e7ffa927797a7816a7ca45f,,workspace/all-features,winnow/tests,patch+untracked,yes
+zopfli,zopfli,git,https://github.com/zopfli-rs/zopfli,fb4fc036799fcaf7e4a563395a9b991d4fbb68c8,,default,,patch+untracked,yes
+bytes,bytes,crates.io,https://crates.io/crates/bytes,1.0.1,,default,,patch+untracked,yes

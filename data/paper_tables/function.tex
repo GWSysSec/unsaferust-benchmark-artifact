@@ -1,0 +1,19 @@
+\begin{table}[tb]
+    \centering
+    \caption{Execution frequency of functions with unsafe code.
+    {\bf Distinctive} counts each function only once;
+    {\bf Cumulative} counts function invocations cumulatively.}
+    \label{table:unsafe_function}
+    \begin{tabular}{@{}l|r|rr|rr@{}}
+    \toprule
+    & \textbf{Static} & \multicolumn{2}{c|}{\textbf{Distinctive}} & \multicolumn{2}{c}{\textbf{Cumulative}} \\
+    \cmidrule(lr){2-2} \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+    \textbf{ } & \textbf{w/o std} & \textbf{w/o std} & \textbf{w/ std} & \textbf{w/o std} & \textbf{w/ std} \\
+    \midrule
+    \textbf{Min} & 0.0\% & 0.0\% & 8.1\% & 0.0\% & 1.2\% \\
+    \textbf{Geomean} & 3.5\% & 2.9\% & 24.1\% & 0.4\% & 41.2\% \\
+    \textbf{Median} & 1.4\% & 4.4\% & 25.8\% & 2.0\% & 41.5\% \\
+    \textbf{Max} & 86.0\% & 26.0\% & 61.1\% & 30.0\% & 100.0\% \\
+    \bottomrule
+    \end{tabular}
+\end{table}

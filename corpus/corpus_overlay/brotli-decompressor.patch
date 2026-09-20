@@ -1,0 +1,33 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index a38b16c..ffd168b 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -19,7 +19,7 @@ name = "brotli-decompressor"
+ 
+ [profile.release]
+ incremental=false
+-lto=true
++lto = false
+ 
+ [dependencies]
+ "alloc-no-stdlib" = {version="2.0"}
+@@ -34,3 +34,6 @@ pass-through-ffi-panics = []
+ disable-timer = []
+ benchmark = []
+ ffi-api = []
++
++
++[workspace]
+diff --git a/c/Cargo.toml b/c/Cargo.toml
+index ccfa834..52759bd 100644
+--- a/c/Cargo.toml
++++ b/c/Cargo.toml
+@@ -17,7 +17,7 @@ crate-type=["cdylib", "rlib"]
+ path="../src/lib.rs"
+ 
+ [profile.release]
+-lto=true
++lto = false
+ 
+ [dependencies]
+ "alloc-no-stdlib" = {version="~2.0"}

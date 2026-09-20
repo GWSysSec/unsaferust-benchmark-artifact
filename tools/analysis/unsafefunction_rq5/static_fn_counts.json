@@ -1,0 +1,812 @@
+{
+  "summary": {
+    "n_crates": 100,
+    "min": 0.0,
+    "geomean": 3.4570629657613643,
+    "median": 1.397975458125834,
+    "max": 86.0
+  },
+  "per_crate_data": {
+    "aho-corasick": {
+      "crate": "aho-corasick",
+      "primary_crate_path": "aho-corasick/src",
+      "rs_files": 32,
+      "total_fns": 864,
+      "unsafe_fns": 169,
+      "unsafe_fn_pct": 19.560185185185187
+    },
+    "arbitrary": {
+      "crate": "arbitrary",
+      "primary_crate_path": "arbitrary/src",
+      "rs_files": 50,
+      "total_fns": 220,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "arc-swap": {
+      "crate": "arc-swap",
+      "primary_crate_path": "arc-swap/src",
+      "rs_files": 21,
+      "total_fns": 175,
+      "unsafe_fns": 14,
+      "unsafe_fn_pct": 8.0
+    },
+    "arrayvec": {
+      "crate": "arrayvec",
+      "primary_crate_path": "arrayvec/src",
+      "rs_files": 7,
+      "total_fns": 175,
+      "unsafe_fns": 11,
+      "unsafe_fn_pct": 6.2857142857142865
+    },
+    "async-lock": {
+      "crate": "async-lock",
+      "primary_crate_path": "async-lock/src",
+      "rs_files": 8,
+      "total_fns": 182,
+      "unsafe_fns": 17,
+      "unsafe_fn_pct": 9.340659340659341
+    },
+    "async-std": {
+      "crate": "async-std",
+      "primary_crate_path": "async-std/src",
+      "rs_files": 239,
+      "total_fns": 935,
+      "unsafe_fns": 17,
+      "unsafe_fn_pct": 1.8181818181818181
+    },
+    "async-task": {
+      "crate": "async-task",
+      "primary_crate_path": "async-task/src",
+      "rs_files": 7,
+      "total_fns": 75,
+      "unsafe_fns": 14,
+      "unsafe_fn_pct": 18.666666666666668
+    },
+    "bimap": {
+      "crate": "bimap",
+      "primary_crate_path": "bimap/src",
+      "rs_files": 5,
+      "total_fns": 153,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "borsh-rs": {
+      "crate": "borsh",
+      "primary_crate_path": "borsh-rs/borsh/src",
+      "rs_files": 13,
+      "total_fns": 244,
+      "unsafe_fns": 1,
+      "unsafe_fn_pct": 0.4098360655737705
+    },
+    "brotli-decompressor": {
+      "crate": "brotli-decompressor",
+      "primary_crate_path": "brotli-decompressor/src",
+      "rs_files": 23,
+      "total_fns": 385,
+      "unsafe_fns": 25,
+      "unsafe_fn_pct": 6.493506493506493
+    },
+    "bstr": {
+      "crate": "bstr",
+      "primary_crate_path": "bstr/src",
+      "rs_files": 27,
+      "total_fns": 429,
+      "unsafe_fns": 8,
+      "unsafe_fn_pct": 1.8648018648018647
+    },
+    "bytemuck": {
+      "crate": "bytemuck",
+      "primary_crate_path": "bytemuck/src",
+      "rs_files": 14,
+      "total_fns": 137,
+      "unsafe_fns": 19,
+      "unsafe_fn_pct": 13.86861313868613
+    },
+    "byteorder": {
+      "crate": "byteorder",
+      "primary_crate_path": "byteorder/src",
+      "rs_files": 2,
+      "total_fns": 236,
+      "unsafe_fns": 1,
+      "unsafe_fn_pct": 0.423728813559322
+    },
+    "cc-rs": {
+      "crate": "cc",
+      "primary_crate_path": "cc-rs/src",
+      "rs_files": 25,
+      "total_fns": 393,
+      "unsafe_fns": 7,
+      "unsafe_fn_pct": 1.7811704834605597
+    },
+    "chrono": {
+      "crate": "chrono",
+      "primary_crate_path": "chrono/src",
+      "rs_files": 40,
+      "total_fns": 1362,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "clru": {
+      "crate": "clru",
+      "primary_crate_path": "clru/src",
+      "rs_files": 4,
+      "total_fns": 142,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "colored": {
+      "crate": "colored",
+      "primary_crate_path": "colored/src",
+      "rs_files": 7,
+      "total_fns": 197,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "combine": {
+      "crate": "combine",
+      "primary_crate_path": "combine/src",
+      "rs_files": 24,
+      "total_fns": 916,
+      "unsafe_fns": 3,
+      "unsafe_fn_pct": 0.32751091703056767
+    },
+    "cpp_demangle": {
+      "crate": "cpp_demangle",
+      "primary_crate_path": "cpp_demangle/src",
+      "rs_files": 7,
+      "total_fns": 389,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "cssparser": {
+      "crate": "cssparser",
+      "primary_crate_path": "cssparser/src",
+      "rs_files": 13,
+      "total_fns": 282,
+      "unsafe_fns": 1,
+      "unsafe_fn_pct": 0.3546099290780142
+    },
+    "curl": {
+      "crate": "curl",
+      "primary_crate_path": "curl/src",
+      "rs_files": 11,
+      "total_fns": 687,
+      "unsafe_fns": 5,
+      "unsafe_fn_pct": 0.727802037845706
+    },
+    "dashmap": {
+      "crate": "dashmap",
+      "primary_crate_path": "dashmap/src",
+      "rs_files": 21,
+      "total_fns": 329,
+      "unsafe_fns": 19,
+      "unsafe_fn_pct": 5.775075987841945
+    },
+    "deranged": {
+      "crate": "deranged",
+      "primary_crate_path": "deranged/deranged/src",
+      "rs_files": 4,
+      "total_fns": 164,
+      "unsafe_fns": 16,
+      "unsafe_fn_pct": 9.75609756097561
+    },
+    "dlv-list": {
+      "crate": "dlv-list",
+      "primary_crate_path": "dlv-list/src",
+      "rs_files": 2,
+      "total_fns": 209,
+      "unsafe_fns": 3,
+      "unsafe_fn_pct": 1.4354066985645932
+    },
+    "ego-tree": {
+      "crate": "ego-tree",
+      "primary_crate_path": "ego-tree/src",
+      "rs_files": 5,
+      "total_fns": 124,
+      "unsafe_fns": 5,
+      "unsafe_fn_pct": 4.032258064516129
+    },
+    "encoding_rs": {
+      "crate": "encoding_rs",
+      "primary_crate_path": "encoding_rs/src",
+      "rs_files": 22,
+      "total_fns": 718,
+      "unsafe_fns": 23,
+      "unsafe_fn_pct": 3.203342618384401
+    },
+    "filetime": {
+      "crate": "filetime",
+      "primary_crate_path": "filetime/src",
+      "rs_files": 10,
+      "total_fns": 103,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "fixedbitset": {
+      "crate": "fixedbitset",
+      "primary_crate_path": "fixedbitset/src",
+      "rs_files": 9,
+      "total_fns": 185,
+      "unsafe_fns": 10,
+      "unsafe_fn_pct": 5.405405405405405
+    },
+    "flate2": {
+      "crate": "flate2",
+      "primary_crate_path": "flate2/src",
+      "rs_files": 20,
+      "total_fns": 458,
+      "unsafe_fns": 5,
+      "unsafe_fn_pct": 1.0917030567685588
+    },
+    "fragile": {
+      "crate": "fragile",
+      "primary_crate_path": "fragile/src",
+      "rs_files": 8,
+      "total_fns": 117,
+      "unsafe_fns": 2,
+      "unsafe_fn_pct": 1.7094017094017095
+    },
+    "fs4": {
+      "crate": "fs4",
+      "primary_crate_path": "fs4/src",
+      "rs_files": 36,
+      "total_fns": 156,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "getrandom": {
+      "crate": "getrandom",
+      "primary_crate_path": "getrandom/src",
+      "rs_files": 29,
+      "total_fns": 102,
+      "unsafe_fns": 14,
+      "unsafe_fn_pct": 13.725490196078432
+    },
+    "gimli": {
+      "crate": "gimli",
+      "primary_crate_path": "gimli/src",
+      "rs_files": 44,
+      "total_fns": 1801,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "git2": {
+      "crate": "git2",
+      "primary_crate_path": "git2/src",
+      "rs_files": 63,
+      "total_fns": 1792,
+      "unsafe_fns": 120,
+      "unsafe_fn_pct": 6.696428571428571
+    },
+    "h2": {
+      "crate": "h2",
+      "primary_crate_path": "h2/src",
+      "rs_files": 52,
+      "total_fns": 992,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "hashbrown": {
+      "crate": "hashbrown",
+      "primary_crate_path": "hashbrown/src",
+      "rs_files": 27,
+      "total_fns": 918,
+      "unsafe_fns": 91,
+      "unsafe_fn_pct": 9.912854030501089
+    },
+    "hashlink": {
+      "crate": "hashlink",
+      "primary_crate_path": "hashlink/src",
+      "rs_files": 5,
+      "total_fns": 309,
+      "unsafe_fns": 15,
+      "unsafe_fn_pct": 4.854368932038835
+    },
+    "headers": {
+      "crate": "headers",
+      "primary_crate_path": "headers/src",
+      "rs_files": 78,
+      "total_fns": 511,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "http": {
+      "crate": "http",
+      "primary_crate_path": "http/src",
+      "rs_files": 21,
+      "total_fns": 682,
+      "unsafe_fns": 3,
+      "unsafe_fn_pct": 0.43988269794721413
+    },
+    "http-body": {
+      "crate": "http-body",
+      "primary_crate_path": "http-body/http-body/src",
+      "rs_files": 3,
+      "total_fns": 42,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "httparse": {
+      "crate": "httparse",
+      "primary_crate_path": "httparse/src",
+      "rs_files": 9,
+      "total_fns": 176,
+      "unsafe_fns": 25,
+      "unsafe_fn_pct": 14.204545454545455
+    },
+    "imgref": {
+      "crate": "imgref",
+      "primary_crate_path": "imgref/src",
+      "rs_files": 4,
+      "total_fns": 104,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "indexmap": {
+      "crate": "indexmap",
+      "primary_crate_path": "indexmap/src",
+      "rs_files": 23,
+      "total_fns": 806,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "iri-string": {
+      "crate": "iri-string",
+      "primary_crate_path": "iri-string/src",
+      "rs_files": 49,
+      "total_fns": 634,
+      "unsafe_fns": 10,
+      "unsafe_fn_pct": 1.5772870662460567
+    },
+    "jni": {
+      "crate": "jni",
+      "primary_crate_path": "jni/src",
+      "rs_files": 43,
+      "total_fns": 392,
+      "unsafe_fns": 46,
+      "unsafe_fn_pct": 11.73469387755102
+    },
+    "jpeg-decoder": {
+      "crate": "jpeg-decoder",
+      "primary_crate_path": "jpeg-decoder/src",
+      "rs_files": 17,
+      "total_fns": 143,
+      "unsafe_fns": 8,
+      "unsafe_fn_pct": 5.594405594405594
+    },
+    "lexical-core": {
+      "crate": "lexical-core",
+      "primary_crate_path": "lexical-core/lexical-core/src",
+      "rs_files": 1,
+      "total_fns": 12,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "libsecp256k1": {
+      "crate": "libsecp256k1",
+      "primary_crate_path": "libsecp256k1/src",
+      "rs_files": 1,
+      "total_fns": 63,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "log": {
+      "crate": "log",
+      "primary_crate_path": "log/src",
+      "rs_files": 9,
+      "total_fns": 375,
+      "unsafe_fns": 2,
+      "unsafe_fn_pct": 0.5333333333333333
+    },
+    "loom": {
+      "crate": "loom",
+      "primary_crate_path": "loom/src",
+      "rs_files": 46,
+      "total_fns": 505,
+      "unsafe_fns": 25,
+      "unsafe_fn_pct": 4.9504950495049505
+    },
+    "matrixmultiply": {
+      "crate": "matrixmultiply",
+      "primary_crate_path": "matrixmultiply/src",
+      "rs_files": 23,
+      "total_fns": 252,
+      "unsafe_fns": 70,
+      "unsafe_fn_pct": 27.77777777777778
+    },
+    "memchr": {
+      "crate": "memchr",
+      "primary_crate_path": "memchr/src",
+      "rs_files": 45,
+      "total_fns": 694,
+      "unsafe_fns": 198,
+      "unsafe_fn_pct": 28.530259365994237
+    },
+    "memmap2": {
+      "crate": "memmap2",
+      "primary_crate_path": "memmap2/src",
+      "rs_files": 5,
+      "total_fns": 182,
+      "unsafe_fns": 17,
+      "unsafe_fn_pct": 9.340659340659341
+    },
+    "metrics": {
+      "crate": "metrics",
+      "primary_crate_path": "metrics/metrics/src",
+      "rs_files": 13,
+      "total_fns": 213,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "miette": {
+      "crate": "miette",
+      "primary_crate_path": "miette/src",
+      "rs_files": 29,
+      "total_fns": 457,
+      "unsafe_fns": 23,
+      "unsafe_fn_pct": 5.032822757111598
+    },
+    "msgpack-rust": {
+      "crate": "rmp-serde",
+      "primary_crate_path": "msgpack-rust/rmp/src",
+      "rs_files": 17,
+      "total_fns": 100,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "native-tls": {
+      "crate": "native-tls",
+      "primary_crate_path": "native-tls/src",
+      "rs_files": 5,
+      "total_fns": 182,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "ndarray": {
+      "crate": "ndarray",
+      "primary_crate_path": "ndarray/src",
+      "rs_files": 93,
+      "total_fns": 1316,
+      "unsafe_fns": 102,
+      "unsafe_fn_pct": 7.750759878419452
+    },
+    "nom": {
+      "crate": "nom",
+      "primary_crate_path": "nom/src",
+      "rs_files": 28,
+      "total_fns": 767,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "nu-ansi-term": {
+      "crate": "nu-ansi-term",
+      "primary_crate_path": "nu-ansi-term/src",
+      "rs_files": 11,
+      "total_fns": 122,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "num-bigint": {
+      "crate": "num-bigint",
+      "primary_crate_path": "num-bigint/src",
+      "rs_files": 27,
+      "total_fns": 651,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "ordered-float": {
+      "crate": "ordered-float",
+      "primary_crate_path": "ordered-float/src",
+      "rs_files": 1,
+      "total_fns": 317,
+      "unsafe_fns": 6,
+      "unsafe_fn_pct": 1.8927444794952681
+    },
+    "ordered-multimap": {
+      "crate": "ordered-multimap",
+      "primary_crate_path": "ordered-multimap/src",
+      "rs_files": 3,
+      "total_fns": 281,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "os_info": {
+      "crate": "os_info",
+      "primary_crate_path": "os_info/os_info/src",
+      "rs_files": 24,
+      "total_fns": 222,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "ouroboros": {
+      "crate": "ouroboros",
+      "primary_crate_path": "ouroboros/ouroboros/src",
+      "rs_files": 1,
+      "total_fns": 4,
+      "unsafe_fns": 2,
+      "unsafe_fn_pct": 50.0
+    },
+    "parity-scale-codec": {
+      "crate": "parity-scale-codec",
+      "primary_crate_path": "parity-scale-codec/src",
+      "rs_files": 18,
+      "total_fns": 327,
+      "unsafe_fns": 2,
+      "unsafe_fn_pct": 0.6116207951070336
+    },
+    "parking_lot": {
+      "crate": "parking_lot",
+      "primary_crate_path": "parking_lot/src",
+      "rs_files": 13,
+      "total_fns": 222,
+      "unsafe_fns": 27,
+      "unsafe_fn_pct": 12.162162162162163
+    },
+    "petgraph": {
+      "crate": "petgraph",
+      "primary_crate_path": "petgraph/src",
+      "rs_files": 56,
+      "total_fns": 1291,
+      "unsafe_fns": 3,
+      "unsafe_fn_pct": 0.23237800154918667
+    },
+    "pin-project-lite": {
+      "crate": "pin-project-lite",
+      "primary_crate_path": "pin-project-lite/src",
+      "rs_files": 1,
+      "total_fns": 10,
+      "unsafe_fns": 2,
+      "unsafe_fn_pct": 20.0
+    },
+    "polling": {
+      "crate": "polling",
+      "primary_crate_path": "polling/src",
+      "rs_files": 11,
+      "total_fns": 340,
+      "unsafe_fns": 20,
+      "unsafe_fn_pct": 5.88235294117647
+    },
+    "portable-atomic": {
+      "crate": "portable-atomic",
+      "primary_crate_path": "portable-atomic/src",
+      "rs_files": 49,
+      "total_fns": 905,
+      "unsafe_fns": 191,
+      "unsafe_fn_pct": 21.104972375690608
+    },
+    "postcard": {
+      "crate": "postcard",
+      "primary_crate_path": "postcard/source/postcard/src",
+      "rs_files": 13,
+      "total_fns": 282,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "pulldown-cmark": {
+      "crate": "pulldown-cmark",
+      "primary_crate_path": "pulldown-cmark/pulldown-cmark/src",
+      "rs_files": 12,
+      "total_fns": 345,
+      "unsafe_fns": 3,
+      "unsafe_fn_pct": 0.8695652173913043
+    },
+    "rand": {
+      "crate": "rand",
+      "primary_crate_path": "rand/src",
+      "rs_files": 31,
+      "total_fns": 387,
+      "unsafe_fns": 1,
+      "unsafe_fn_pct": 0.2583979328165375
+    },
+    "rayon-core": {
+      "crate": "rayon-core",
+      "primary_crate_path": "rayon-core/src",
+      "rs_files": 26,
+      "total_fns": 380,
+      "unsafe_fns": 39,
+      "unsafe_fn_pct": 10.263157894736842
+    },
+    "rgb": {
+      "crate": "rgb",
+      "primary_crate_path": "rgb/src",
+      "rs_files": 31,
+      "total_fns": 277,
+      "unsafe_fns": 2,
+      "unsafe_fn_pct": 0.7220216606498195
+    },
+    "ring": {
+      "crate": "ring",
+      "primary_crate_path": "ring/src",
+      "rs_files": 155,
+      "total_fns": 1121,
+      "unsafe_fns": 17,
+      "unsafe_fn_pct": 1.5165031222123104
+    },
+    "rmp": {
+      "crate": "rmp",
+      "primary_crate_path": "rmp/src",
+      "rs_files": 17,
+      "total_fns": 100,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "ron": {
+      "crate": "ron",
+      "primary_crate_path": "ron/src",
+      "rs_files": 19,
+      "total_fns": 582,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "rust-openssl": {
+      "crate": "openssl",
+      "primary_crate_path": "rust-openssl/openssl/src",
+      "rs_files": 57,
+      "total_fns": 2065,
+      "unsafe_fns": 124,
+      "unsafe_fn_pct": 6.004842615012106
+    },
+    "rustc-demangle": {
+      "crate": "rustc-demangle",
+      "primary_crate_path": "rustc-demangle/src",
+      "rs_files": 3,
+      "total_fns": 116,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "scroll": {
+      "crate": "scroll",
+      "primary_crate_path": "scroll/src",
+      "rs_files": 9,
+      "total_fns": 83,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "semver": {
+      "crate": "semver",
+      "primary_crate_path": "semver/src",
+      "rs_files": 9,
+      "total_fns": 94,
+      "unsafe_fns": 6,
+      "unsafe_fn_pct": 6.382978723404255
+    },
+    "serde_with": {
+      "crate": "serde_with",
+      "primary_crate_path": "serde_with/serde_with/src",
+      "rs_files": 33,
+      "total_fns": 966,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "serde_yaml": {
+      "crate": "serde_yaml",
+      "primary_crate_path": "serde_yaml/src",
+      "rs_files": 24,
+      "total_fns": 906,
+      "unsafe_fns": 8,
+      "unsafe_fn_pct": 0.8830022075055187
+    },
+    "sharded-slab": {
+      "crate": "sharded-slab",
+      "primary_crate_path": "sharded-slab/src",
+      "rs_files": 18,
+      "total_fns": 308,
+      "unsafe_fns": 8,
+      "unsafe_fn_pct": 2.5974025974025974
+    },
+    "signal-hook": {
+      "crate": "signal-hook",
+      "primary_crate_path": "signal-hook/src",
+      "rs_files": 12,
+      "total_fns": 104,
+      "unsafe_fns": 4,
+      "unsafe_fn_pct": 3.8461538461538463
+    },
+    "simdutf8": {
+      "crate": "simdutf8",
+      "primary_crate_path": "simdutf8/src",
+      "rs_files": 13,
+      "total_fns": 150,
+      "unsafe_fns": 129,
+      "unsafe_fn_pct": 86.0
+    },
+    "siphasher": {
+      "crate": "siphasher",
+      "primary_crate_path": "siphasher/src",
+      "rs_files": 5,
+      "total_fns": 147,
+      "unsafe_fns": 2,
+      "unsafe_fn_pct": 1.3605442176870748
+    },
+    "slotmap": {
+      "crate": "slotmap",
+      "primary_crate_path": "slotmap/src",
+      "rs_files": 7,
+      "total_fns": 380,
+      "unsafe_fns": 23,
+      "unsafe_fn_pct": 6.052631578947368
+    },
+    "smallvec": {
+      "crate": "smallvec",
+      "primary_crate_path": "smallvec/src",
+      "rs_files": 4,
+      "total_fns": 232,
+      "unsafe_fns": 15,
+      "unsafe_fn_pct": 6.4655172413793105
+    },
+    "tokio": {
+      "crate": "tokio",
+      "primary_crate_path": "tokio/tokio/src",
+      "rs_files": 365,
+      "total_fns": 4189,
+      "unsafe_fns": 172,
+      "unsafe_fn_pct": 4.105991883504417
+    },
+    "triomphe": {
+      "crate": "triomphe",
+      "primary_crate_path": "triomphe/src",
+      "rs_files": 10,
+      "total_fns": 229,
+      "unsafe_fns": 24,
+      "unsafe_fn_pct": 10.480349344978166
+    },
+    "unicode-normalization": {
+      "crate": "unicode-normalization",
+      "primary_crate_path": "unicode-normalization/src",
+      "rs_files": 12,
+      "total_fns": 97,
+      "unsafe_fns": 1,
+      "unsafe_fn_pct": 1.0309278350515463
+    },
+    "utf8parse": {
+      "crate": "utf-8",
+      "primary_crate_path": "utf8parse/src",
+      "rs_files": 3,
+      "total_fns": 18,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "uuid": {
+      "crate": "uuid",
+      "primary_crate_path": "uuid/src",
+      "rs_files": 23,
+      "total_fns": 392,
+      "unsafe_fns": 1,
+      "unsafe_fn_pct": 0.25510204081632654
+    },
+    "value-bag": {
+      "crate": "value-bag",
+      "primary_crate_path": "value-bag/src",
+      "rs_files": 18,
+      "total_fns": 720,
+      "unsafe_fns": 0,
+      "unsafe_fn_pct": 0.0
+    },
+    "winnow": {
+      "crate": "winnow",
+      "primary_crate_path": "winnow/src",
+      "rs_files": 59,
+      "total_fns": 1323,
+      "unsafe_fns": 20,
+      "unsafe_fn_pct": 1.5117157974300832
+    },
+    "zopfli": {
+      "crate": "zopfli",
+      "primary_crate_path": "zopfli/src",
+      "rs_files": 17,
+      "total_fns": 178,
+      "unsafe_fns": 1,
+      "unsafe_fn_pct": 0.5617977528089888
+    },
+    "bytes": {
+      "crate": "bytes",
+      "primary_crate_path": "bytes/src",
+      "rs_files": 19,
+      "total_fns": 381,
+      "unsafe_fns": 34,
+      "unsafe_fn_pct": 8.923884514435695
+    }
+  },
+  "missing": []
+}

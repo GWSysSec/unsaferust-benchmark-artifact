@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 7b581d6..9967e9b 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -57,3 +57,6 @@ debug = true
+ name = "simple"
+ path = "examples/simple.rs"
+ required-features = ["std"]
++
++
++[workspace]

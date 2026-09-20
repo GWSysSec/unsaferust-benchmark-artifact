@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index fd96ba7..a6532a8 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -50,3 +50,6 @@ miniz-sys = ["rust_backend"] # For backwards compatibility
+ [package.metadata.docs.rs]
+ all-features = true
+ rustdoc-args = ["--cfg", "docsrs"]
++
++
++[workspace]

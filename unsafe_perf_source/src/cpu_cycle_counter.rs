@@ -1,7 +1,48 @@
 //! Runtime library for CPU cycle tracking.
-//! This version uses pthread_create interposition for fully automatic
-//! and accurate tracking of the entire lifecycle of every thread, and
-//! it deducts time spent in external library calls.
+//!
+//! Tracks four time categories:
+//! - Total cycles:          Entire program execution
+//! - Unsafe cycles (total): Time spent in unsafe blocks — INCLUDING time
+//!                          spent in external calls made from unsafe code
+//! - Unsafe cycles (ext):   The subset of unsafe cycles spent inside
+//!                          external/FFI calls invoked from unsafe code
+//!                          (markers inserted by ExternalCallTracker into SESE
+//!                          regions via unsafe_external_call_start/end)
+//! - External cycles:       Time spent in external calls from SAFE code only
+//!
+//! Derived: unsafe_cycles_internal = unsafe_cycles_total - unsafe_cycles_external
+//!          (time unsafe blocks spent executing their *own* instructions
+//!           rather than dispatching to an external callee)
+//!
+//! INVARIANT (Fix A): unsafe_cycles_external <= unsafe_cycles_total, always.
+//! Earlier versions timed the two as independent rdtsc brackets that committed
+//! at different times: the external sub-interval committed as each inner call
+//! returned, while the parent unsafe interval committed only when the outermost
+//! unsafe block closed. A stats snapshot taken while a worker thread was parked
+//! INSIDE an open unsafe block (the park/futex being the instrumented external
+//! call) then saw the child committed but not the parent — so summed across a
+//! thread pool, unsafe_external could exceed unsafe_total. This appeared in
+//! every thread-pool crate (loom/rayon-core/tokio/ring/jpeg-decoder) and nowhere
+//! else. Now unsafe_external_call_end accumulates into a per-thread, per-frame
+//! cell (UNSAFE_FRAME_EXT_ACCUM); the outermost unsafe block commits BOTH
+//! counters from the SAME bracket at frame close — parent FIRST, then
+//! min(child_accum, parent_delta). The per-frame clamp bounds the child by its
+//! own parent, and committing parent-before-child means any concurrent snapshot
+//! sees unsafe_total >= unsafe_external. No downstream clamp is applied: if the
+//! invariant ever breaks again it must surface in the raw data, not be masked.
+//!
+//! Clock (Fix B): brackets open with `lfence; rdtsc; lfence` (read_tsc_start)
+//! and close with `rdtscp; lfence` (read_tsc_end). A bare rdtsc is not ordered
+//! w.r.t. surrounding code, and the LLVM-inserted SeqCst fence is only a *memory*
+//! fence — it does not pin the rdtsc instruction. The serializing variants stop
+//! the counter read from drifting into/out of the region, removing the
+//! small-region downward bias caused by silently dropped negative deltas.
+//!
+//! Callback handling: when an external call invokes a user callback containing
+//! unsafe code (e.g., qsort with an unsafe comparator), the callback's unsafe
+//! time is subtracted from external_cycles to prevent double-counting.
+//!
+//! Calculation: unsafe% = unsafe / (total - external)
 
 use ctor::dtor;
 use lazy_static::lazy_static;
@@ -9,7 +50,7 @@ use std::cell::Cell;
 use std::ffi::c_void;
 use std::os::raw::{c_char, c_int};
 use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
-use crate::write_output;
+use crate::write_stat_json;
 
 const MAX_THREADS: usize = 4096;
 
@@ -26,19 +67,19 @@ struct ThreadStats {
     thread_id: AtomicU64,
     state: AtomicUsize, // Stores ThreadState as usize
     start_tsc: AtomicU64,
-    last_known_tsc: AtomicU64,
 
-    // Time spent in each mutually exclusive state
-    normal_cycles: AtomicU64,
-    unsafe_cycles: AtomicU64,
-    external_safe_cycles: AtomicU64,
-    external_unsafe_cycles: AtomicU64,
+    // Four cycle counters
+    total_cycles: AtomicU64,            // Total program execution
+    unsafe_cycles: AtomicU64,           // Time in unsafe blocks (TOTAL)
+    unsafe_external_cycles: AtomicU64,  // Subset of unsafe_cycles spent in external calls
+    external_cycles: AtomicU64,         // External calls from safe code only
 
     // Block counts
     unsafe_blocks: AtomicU64,
     external_calls: AtomicU64,
+    unsafe_external_calls: AtomicU64,
 
-    _padding: [u64; 2],
+    _padding: [u64; 1],
 }
 
 impl ThreadStats {
@@ -47,14 +88,14 @@ impl ThreadStats {
             thread_id: AtomicU64::new(0),
             state: AtomicUsize::new(ThreadState::Uninitialized as usize),
             start_tsc: AtomicU64::new(0),
-            last_known_tsc: AtomicU64::new(0),
-            normal_cycles: AtomicU64::new(0),
+            total_cycles: AtomicU64::new(0),
             unsafe_cycles: AtomicU64::new(0),
-            external_safe_cycles: AtomicU64::new(0),
-            external_unsafe_cycles: AtomicU64::new(0),
+            unsafe_external_cycles: AtomicU64::new(0),
+            external_cycles: AtomicU64::new(0),
             unsafe_blocks: AtomicU64::new(0),
             external_calls: AtomicU64::new(0),
-            _padding: [0; 2],
+            unsafe_external_calls: AtomicU64::new(0),
+            _padding: [0; 1],
         }
     }
 }
@@ -94,13 +135,13 @@ impl ThreadRegistry {
                     // Successfully claimed a terminated slot for reuse, reset its statistics
                     stats.thread_id.store(0, Ordering::Relaxed);
                     stats.start_tsc.store(0, Ordering::Relaxed);
-                    stats.last_known_tsc.store(0, Ordering::Relaxed);
-                    stats.normal_cycles.store(0, Ordering::Relaxed);
+                    stats.total_cycles.store(0, Ordering::Relaxed);
                     stats.unsafe_cycles.store(0, Ordering::Relaxed);
-                    stats.external_safe_cycles.store(0, Ordering::Relaxed);
-                    stats.external_unsafe_cycles.store(0, Ordering::Relaxed);
+                    stats.unsafe_external_cycles.store(0, Ordering::Relaxed);
+                    stats.external_cycles.store(0, Ordering::Relaxed);
                     stats.unsafe_blocks.store(0, Ordering::Relaxed);
                     stats.external_calls.store(0, Ordering::Relaxed);
+                    stats.unsafe_external_calls.store(0, Ordering::Relaxed);
                     return Some(slot);
                 }
             }
@@ -119,35 +160,65 @@ impl ThreadRegistry {
 
 static REGISTRY: ThreadRegistry = ThreadRegistry::new();
 
-// Fixed: Use atomic operations and proper nesting context
-const MAX_CONTEXT_DEPTH: usize = 32;
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-#[repr(u8)]
-enum ExecutionState {
-    Normal = 0,           // Safe Rust code
-    Unsafe = 1,           // Unsafe Rust code (not in external call)
-    ExternalSafe = 2,     // External call from safe code
-    ExternalUnsafe = 3,   // External call from unsafe code
-}
-
-#[derive(Debug, Clone, Copy)]
-struct ContextFrame {
-    state: ExecutionState,
-    start_tsc: u64,
-}
-
+// Simple thread-local state tracking
 thread_local! {
     static THREAD_SLOT: Cell<Option<usize>> = Cell::new(None);
-    static CONTEXT_STACK: Cell<[ContextFrame; MAX_CONTEXT_DEPTH]> = Cell::new([ContextFrame { state: ExecutionState::Normal, start_tsc: 0 }; MAX_CONTEXT_DEPTH]);
-    static STACK_DEPTH: Cell<usize> = Cell::new(0);
+    static IN_UNSAFE: Cell<u32> = Cell::new(0);
+    static IN_EXTERNAL: Cell<u32> = Cell::new(0);
+    // Nesting depth for external calls that occurred inside an unsafe region.
+    // Incremented/decremented by unsafe_external_call_start/end. Needed so
+    // only the outermost such call is timed (nested calls share the same
+    // outer TSC interval).
+    static IN_UNSAFE_EXT: Cell<u32> = Cell::new(0);
+    // Accumulates unsafe cycles that occurred inside an external call (callback scenario).
+    // Subtracted from external_cycles at external_call_end to prevent double-counting.
+    static UNSAFE_IN_EXT_ACCUM: Cell<u64> = Cell::new(0);
+    // Fix A: cycles spent in external calls made inside the CURRENT outermost
+    // unsafe frame. unsafe_external_call_end adds here instead of committing to
+    // the global counter; cpu_cycle_end_measurement commits it (clamped to the
+    // frame's own delta) when the outermost unsafe block closes, so
+    // unsafe_external can never exceed unsafe_total.
+    static UNSAFE_FRAME_EXT_ACCUM: Cell<u64> = Cell::new(0);
 }
 
+/// Open a timing bracket. `lfence; rdtsc; lfence` keeps the counter read from
+/// floating above the start of the region (the leading lfence drains prior
+/// instructions; the trailing one stops the rdtsc from being reordered after
+/// the region's first instructions). See the module-level "Clock (Fix B)" note.
 #[inline(always)]
-fn read_tsc() -> u64 {
+fn read_tsc_start() -> u64 {
     #[cfg(target_arch = "x86_64")]
     unsafe {
-        core::arch::x86_64::_rdtsc()
+        use core::arch::x86_64::{_mm_lfence, _rdtsc};
+        _mm_lfence();
+        let t = _rdtsc();
+        _mm_lfence();
+        t
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos() as u64
+    }
+}
+
+/// Close a timing bracket. `rdtscp` is partially serializing — it waits for all
+/// prior instructions to retire before reading the counter — and the trailing
+/// `lfence` stops later instructions from racing the read backwards across the
+/// region end. `aux` (the CPU/socket signature) is read but unused; capturing
+/// it here leaves room to detect cross-core TSC migration later.
+#[inline(always)]
+fn read_tsc_end() -> u64 {
+    #[cfg(target_arch = "x86_64")]
+    unsafe {
+        use core::arch::x86_64::{_mm_lfence, __rdtscp};
+        let mut aux: u32 = 0;
+        let t = __rdtscp(&mut aux as *mut u32);
+        let _ = aux;
+        _mm_lfence();
+        t
     }
     #[cfg(not(target_arch = "x86_64"))]
     {
@@ -166,20 +237,18 @@ fn initialize_thread() -> Option<usize> {
         }
 
         if let Some(slot) = REGISTRY.allocate_slot() {
-            let tsc = read_tsc();
+            let tsc = read_tsc_start();
             let stats = &REGISTRY.threads[slot];
             stats.thread_id.store(get_thread_id(), Ordering::Relaxed);
-            stats.start_tsc.store(tsc, Ordering::Relaxed);
-            stats.last_known_tsc.store(tsc, Ordering::Release);
+            stats.start_tsc.store(tsc, Ordering::Release);
             stats.state.store(ThreadState::Active as usize, Ordering::Release);
 
-            // Initialize context stack with Normal state
-            CONTEXT_STACK.with(|stack_cell| {
-                let mut stack = stack_cell.get();
-                stack[0] = ContextFrame { state: ExecutionState::Normal, start_tsc: tsc };
-                stack_cell.set(stack);
-            });
-            STACK_DEPTH.with(|depth_cell| depth_cell.set(1));
+            // Initialize state
+            IN_UNSAFE.with(|in_unsafe| in_unsafe.set(0));
+            IN_EXTERNAL.with(|in_external| in_external.set(0));
+            IN_UNSAFE_EXT.with(|d| d.set(0));
+            UNSAFE_IN_EXT_ACCUM.with(|acc| acc.set(0));
+            UNSAFE_FRAME_EXT_ACCUM.with(|acc| acc.set(0));
 
             slot_cell.set(Some(slot));
             Some(slot)
@@ -202,164 +271,20 @@ fn get_thread_id() -> u64 {
     }
 }
 
-/// Atomic state transition with cycle accounting
-fn transition_state(new_state: ExecutionState) -> Result<(), &'static str> {
-    let slot = match THREAD_SLOT.with(|s| s.get()).or_else(initialize_thread) {
-        Some(slot) => slot,
-        None => return Err("Thread not initialized"),
-    };
-
-    let current_tsc = read_tsc();
-    let stats = &REGISTRY.threads[slot];
-
-    CONTEXT_STACK.with(|stack_cell| {
-        STACK_DEPTH.with(|depth_cell| {
-            let depth = depth_cell.get();
-            if depth == 0 || depth > MAX_CONTEXT_DEPTH {
-                return Err("Invalid stack depth");
-            }
-
-            let mut stack = stack_cell.get();
-            let current_frame = &mut stack[depth - 1];
-
-            // Account for time spent in current state
-            if current_frame.start_tsc > 0 && current_tsc > current_frame.start_tsc {
-                let duration = current_tsc - current_frame.start_tsc;
-
-                match current_frame.state {
-                    ExecutionState::Normal => stats.normal_cycles.fetch_add(duration, Ordering::Relaxed),
-                    ExecutionState::Unsafe => stats.unsafe_cycles.fetch_add(duration, Ordering::Relaxed),
-                    ExecutionState::ExternalSafe => stats.external_safe_cycles.fetch_add(duration, Ordering::Relaxed),
-                    ExecutionState::ExternalUnsafe => stats.external_unsafe_cycles.fetch_add(duration, Ordering::Relaxed),
-                };
-            }
-
-            // Update current frame to new state
-            current_frame.state = new_state;
-            current_frame.start_tsc = current_tsc;
-
-            stack_cell.set(stack);
-            Ok(())
-        })
-    })
-}
-
-/// Push new context onto stack (for external calls)
-fn push_context(new_state: ExecutionState) -> Result<(), &'static str> {
-    let slot = match THREAD_SLOT.with(|s| s.get()).or_else(initialize_thread) {
-        Some(slot) => slot,
-        None => return Err("Thread not initialized"),
-    };
-
-    let current_tsc = read_tsc();
-    let stats = &REGISTRY.threads[slot];
-
-    CONTEXT_STACK.with(|stack_cell| {
-        STACK_DEPTH.with(|depth_cell| {
-            let depth = depth_cell.get();
-            if depth >= MAX_CONTEXT_DEPTH {
-                return Err("Context stack overflow");
-            }
-
-            let mut stack = stack_cell.get();
-
-            // Account for time in current state
-            if depth > 0 {
-                let current_frame = &mut stack[depth - 1];
-                if current_frame.start_tsc > 0 && current_tsc > current_frame.start_tsc {
-                    let duration = current_tsc - current_frame.start_tsc;
-
-                    match current_frame.state {
-                        ExecutionState::Normal => stats.normal_cycles.fetch_add(duration, Ordering::Relaxed),
-                        ExecutionState::Unsafe => stats.unsafe_cycles.fetch_add(duration, Ordering::Relaxed),
-                        ExecutionState::ExternalSafe => stats.external_safe_cycles.fetch_add(duration, Ordering::Relaxed),
-                        ExecutionState::ExternalUnsafe => stats.external_unsafe_cycles.fetch_add(duration, Ordering::Relaxed),
-                    };
-                }
-            }
-
-            // Push new context
-            stack[depth] = ContextFrame { state: new_state, start_tsc: current_tsc };
-            depth_cell.set(depth + 1);
-            stack_cell.set(stack);
-            Ok(())
-        })
-    })
-}
-
-/// Pop context from stack (for external call returns)
-fn pop_context() -> Result<(), &'static str> {
-    let slot = match THREAD_SLOT.with(|s| s.get()) {
-        Some(slot) => slot,
-        None => return Err("Thread not initialized"),
-    };
-
-    let current_tsc = read_tsc();
-    let stats = &REGISTRY.threads[slot];
-
-    CONTEXT_STACK.with(|stack_cell| {
-        STACK_DEPTH.with(|depth_cell| {
-            let depth = depth_cell.get();
-            if depth <= 1 {
-                return Err("Cannot pop from empty context stack");
-            }
-
-            let mut stack = stack_cell.get();
-            let current_frame = &mut stack[depth - 1];
-
-            // Account for time in current state
-            if current_frame.start_tsc > 0 && current_tsc > current_frame.start_tsc {
-                let duration = current_tsc - current_frame.start_tsc;
-
-                match current_frame.state {
-                    ExecutionState::Normal => stats.normal_cycles.fetch_add(duration, Ordering::Relaxed),
-                    ExecutionState::Unsafe => stats.unsafe_cycles.fetch_add(duration, Ordering::Relaxed),
-                    ExecutionState::ExternalSafe => stats.external_safe_cycles.fetch_add(duration, Ordering::Relaxed),
-                    ExecutionState::ExternalUnsafe => stats.external_unsafe_cycles.fetch_add(duration, Ordering::Relaxed),
-                };
-            }
-
-            // Pop context and resume previous state
-            depth_cell.set(depth - 1);
-            let previous_frame = &mut stack[depth - 2];
-            previous_frame.start_tsc = current_tsc; // Reset timing for resumed context
-
-            stack_cell.set(stack);
-            Ok(())
-        })
-    })
-}
-
-/// Marks the current thread as terminated and records its final timestamp.
+/// Marks the current thread as terminated and records its final cycles.
 fn thread_cleanup() {
     if let Some(slot) = THREAD_SLOT.with(|s| s.get()) {
         if slot < MAX_THREADS {
-            let final_tsc = read_tsc();
+            let final_tsc = read_tsc_end();
             let stats = &REGISTRY.threads[slot];
 
-            // Account for any remaining time in current state
-            CONTEXT_STACK.with(|stack_cell| {
-                STACK_DEPTH.with(|depth_cell| {
-                    let depth = depth_cell.get();
-                    if depth > 0 {
-                        let stack = stack_cell.get();
-                        let current_frame = &stack[depth - 1];
+            // Calculate total cycles for this thread
+            let start_tsc = stats.start_tsc.load(Ordering::Acquire);
+            if final_tsc > start_tsc {
+                let total = final_tsc - start_tsc;
+                stats.total_cycles.store(total, Ordering::Release);
+            }
 
-                        if current_frame.start_tsc > 0 && final_tsc > current_frame.start_tsc {
-                            let duration = final_tsc - current_frame.start_tsc;
-
-                            match current_frame.state {
-                                ExecutionState::Normal => stats.normal_cycles.fetch_add(duration, Ordering::Relaxed),
-                                ExecutionState::Unsafe => stats.unsafe_cycles.fetch_add(duration, Ordering::Relaxed),
-                                ExecutionState::ExternalSafe => stats.external_safe_cycles.fetch_add(duration, Ordering::Relaxed),
-                                ExecutionState::ExternalUnsafe => stats.external_unsafe_cycles.fetch_add(duration, Ordering::Relaxed),
-                            };
-                        }
-                    }
-                });
-            });
-
-            stats.last_known_tsc.store(final_tsc, Ordering::Release);
             stats.state.store(ThreadState::Terminated as usize, Ordering::Release);
         }
     }
@@ -374,104 +299,284 @@ pub extern "C" fn record_program_start() {
     initialize_thread();
 }
 
+/// Install a panic hook that resets this thread's nesting-depth counters
+/// when a panic unwinds out of an instrumented unsafe / external-call block.
+///
+/// Without this, a `panic!` inside an unsafe block skips the matching
+/// `cpu_cycle_end_measurement`, leaving `IN_UNSAFE` permanently > 0;
+/// every subsequent measurement on that thread is then misclassified as
+/// nested and its rdtsc bracket is dropped, silently corrupting cycle
+/// counts across the rest of the test binary.
+///
+/// Idempotent: safe to call multiple times. The previous hook is chained
+/// so the default panic-printing behaviour (or any harness hook) still runs.
+pub fn install_panic_hook() {
+    use std::sync::Once;
+    static INSTALLED: Once = Once::new();
+    INSTALLED.call_once(|| {
+        let prior = std::panic::take_hook();
+        std::panic::set_hook(Box::new(move |info| {
+            // Reset on a best-effort basis; `.try_with` avoids re-panicking
+            // if TLS is being torn down during thread exit.
+            let _ = IN_UNSAFE.try_with(|d| d.set(0));
+            let _ = IN_EXTERNAL.try_with(|d| d.set(0));
+            let _ = IN_UNSAFE_EXT.try_with(|d| d.set(0));
+            // Drop in-flight accumulators too: the frames they belonged to are
+            // being torn down, so they must not leak into the next frame.
+            let _ = UNSAFE_IN_EXT_ACCUM.try_with(|d| d.set(0));
+            let _ = UNSAFE_FRAME_EXT_ACCUM.try_with(|d| d.set(0));
+            prior(info);
+        }));
+    });
+}
+
 #[no_mangle]
 #[inline(always)]
 pub extern "C" fn cpu_cycle_start_measurement() -> u64 {
+    // Note: we intentionally do NOT check IN_EXTERNAL here.
+    // Unsafe blocks must always be counted. The other direction
+    // (external_call_start skips when IN_UNSAFE > 0) prevents
+    // double-counting external calls made from within unsafe code.
+
+    // Increment depth counter and check if we were already in an unsafe block
+    let was_nested = IN_UNSAFE.with(|depth| {
+        let current = depth.get();
+        depth.set(current + 1);
+        current > 0  // true if we were already in an unsafe block
+    });
+
+    if was_nested {
+        return 0; // Skip nested unsafe blocks
+    }
+
+    // Only reach here for the outermost unsafe block.
+    // Fix A: open a fresh per-frame external accumulator. Reset before the slot
+    // lookup so the frame starts clean even if tracking init fails below.
+    UNSAFE_FRAME_EXT_ACCUM.with(|acc| acc.set(0));
+
     let slot = match THREAD_SLOT.with(|s| s.get()).or_else(initialize_thread) {
         Some(slot) => slot,
         None => return 0,
     };
 
-    // Transition from current state to Unsafe
-    let current_state = CONTEXT_STACK.with(|stack_cell| {
-        STACK_DEPTH.with(|depth_cell| {
-            let depth = depth_cell.get();
-            if depth > 0 {
-                let stack = stack_cell.get();
-                stack[depth - 1].state
-            } else {
-                ExecutionState::Normal
-            }
-        })
-    });
+    let stats = &REGISTRY.threads[slot];
+    stats.unsafe_blocks.fetch_add(1, Ordering::Relaxed);
 
-    let new_state = match current_state {
-        ExecutionState::Normal => ExecutionState::Unsafe,
-        ExecutionState::ExternalSafe => ExecutionState::ExternalUnsafe,
-        _ => current_state, // Already in unsafe or external_unsafe
-    };
-
-    if transition_state(new_state).is_ok() {
-        let stats = &REGISTRY.threads[slot];
-        stats.unsafe_blocks.fetch_add(1, Ordering::Relaxed);
-    }
-
-    read_tsc()
+    read_tsc_start()
 }
 
 #[no_mangle]
 #[inline(always)]
 pub extern "C" fn cpu_cycle_end_measurement(start_tsc: u64) {
-    let _start_tsc = start_tsc; // Parameter for compatibility, but we use state machine timing
-
-    // Transition from unsafe state back to safe state
-    let current_state = CONTEXT_STACK.with(|stack_cell| {
-        STACK_DEPTH.with(|depth_cell| {
-            let depth = depth_cell.get();
-            if depth > 0 {
-                let stack = stack_cell.get();
-                stack[depth - 1].state
-            } else {
-                ExecutionState::Normal
-            }
-        })
+    // Decrement depth counter and check if we're exiting the outermost unsafe block
+    let is_outermost = IN_UNSAFE.with(|depth| {
+        let current = depth.get();
+        if current > 0 {
+            depth.set(current - 1);
+            current == 1  // true if we're exiting the outermost unsafe block (1 -> 0)
+        } else {
+            false
+        }
     });
 
-    let new_state = match current_state {
-        ExecutionState::Unsafe => ExecutionState::Normal,
-        ExecutionState::ExternalUnsafe => ExecutionState::ExternalSafe,
-        _ => current_state, // Not in unsafe state
+    if start_tsc == 0 || !is_outermost {
+        return; // Was nested, in external, or not initialized
+    }
+
+    let slot = match THREAD_SLOT.with(|s| s.get()) {
+        Some(slot) => slot,
+        None => return,
     };
 
-    let _ = transition_state(new_state);
+    let end_tsc = read_tsc_end();
+    if end_tsc > start_tsc {
+        let cycles = end_tsc - start_tsc;
+        let stats = &REGISTRY.threads[slot];
+
+        // Fix A: commit the parent FIRST so any concurrent stats snapshot always
+        // observes unsafe_total >= unsafe_external.
+        stats.unsafe_cycles.fetch_add(cycles, Ordering::Relaxed);
+
+        // Carve the unsafe-external sub-interval out of the SAME bracket and clamp
+        // it to this frame's own delta, so unsafe_external can never exceed
+        // unsafe_total. The accumulator was filled by unsafe_external_call_end
+        // while this frame was open; drain it here.
+        let frame_ext = UNSAFE_FRAME_EXT_ACCUM.with(|acc| {
+            let v = acc.get();
+            acc.set(0);
+            v
+        });
+        let ext = frame_ext.min(cycles);
+        if ext > 0 {
+            stats.unsafe_external_cycles.fetch_add(ext, Ordering::Relaxed);
+        }
+
+        // If we're inside an external call (callback scenario), record the overlap
+        // so external_call_end can subtract it to avoid double-counting.
+        let in_ext = IN_EXTERNAL.with(|d| d.get());
+        if in_ext > 0 {
+            UNSAFE_IN_EXT_ACCUM.with(|acc| acc.set(acc.get() + cycles));
+        }
+    } else {
+        // TSC did not advance (skew / wrap): drop the frame accumulator so it
+        // cannot leak into a later frame on this thread.
+        UNSAFE_FRAME_EXT_ACCUM.with(|acc| acc.set(0));
+    }
 }
 
 #[no_mangle]
+#[inline(always)]
 pub extern "C" fn external_call_start() -> u64 {
+    // Only track external calls from safe code
+    let in_unsafe = IN_UNSAFE.with(|depth| depth.get());
+    if in_unsafe > 0 {
+        return 0; // Skip, this is part of unsafe time
+    }
+
+    // Increment depth counter and check if we were already in an external call
+    let was_nested = IN_EXTERNAL.with(|depth| {
+        let current = depth.get();
+        depth.set(current + 1);
+        current > 0  // true if we were already in an external call
+    });
+
+    if was_nested {
+        return 0; // Skip nested external calls
+    }
+
+    // Only reach here for the outermost external call
     let slot = match THREAD_SLOT.with(|s| s.get()).or_else(initialize_thread) {
         Some(slot) => slot,
         None => return 0,
     };
 
-    // Determine external call state based on current context
-    let new_state = CONTEXT_STACK.with(|stack_cell| {
-        STACK_DEPTH.with(|depth_cell| {
-            let depth = depth_cell.get();
-            if depth > 0 {
-                let stack = stack_cell.get();
-                match stack[depth - 1].state {
-                    ExecutionState::Normal => ExecutionState::ExternalSafe,
-                    ExecutionState::Unsafe => ExecutionState::ExternalUnsafe,
-                    _ => return ExecutionState::ExternalSafe, // Default
-                }
-            } else {
-                ExecutionState::ExternalSafe
-            }
-        })
-    });
+    let stats = &REGISTRY.threads[slot];
+    stats.external_calls.fetch_add(1, Ordering::Relaxed);
 
-    if push_context(new_state).is_ok() {
-        let stats = &REGISTRY.threads[slot];
-        stats.external_calls.fetch_add(1, Ordering::Relaxed);
-    }
-
-    read_tsc()
+    read_tsc_start()
 }
 
 #[no_mangle]
+#[inline(always)]
 pub extern "C" fn external_call_end(start_tsc: u64) {
-    let _start_tsc = start_tsc; // Parameter for compatibility
-    let _ = pop_context();
+    // Decrement depth counter and check if we're exiting the outermost call
+    let is_outermost = IN_EXTERNAL.with(|depth| {
+        let current = depth.get();
+        if current > 0 {
+            depth.set(current - 1);
+            current == 1  // true if we're exiting the outermost call (1 -> 0)
+        } else {
+            false
+        }
+    });
+
+    if start_tsc == 0 || !is_outermost {
+        return; // Was nested, in unsafe, or not initialized
+    }
+
+    let slot = match THREAD_SLOT.with(|s| s.get()) {
+        Some(slot) => slot,
+        None => return,
+    };
+
+    let end_tsc = read_tsc_end();
+    if end_tsc > start_tsc {
+        let total_ext_cycles = end_tsc - start_tsc;
+
+        // Subtract any unsafe cycles that occurred inside this external call
+        // (callback scenario: e.g., qsort calling a comparator with unsafe code).
+        // Those cycles are already counted as unsafe_cycles — don't also count as external.
+        let overlap = UNSAFE_IN_EXT_ACCUM.with(|acc| {
+            let v = acc.get();
+            acc.set(0);
+            v
+        });
+
+        let ext_only = total_ext_cycles.saturating_sub(overlap);
+        if ext_only > 0 {
+            let stats = &REGISTRY.threads[slot];
+            stats.external_cycles.fetch_add(ext_only, Ordering::Relaxed);
+        }
+    } else {
+        // Even if end_tsc <= start_tsc (TSC wrap), reset the accumulator
+        UNSAFE_IN_EXT_ACCUM.with(|acc| acc.set(0));
+    }
+}
+
+// ==========================================================================================
+// === Unsafe-context external call hooks (Phase 6.5)
+// ==========================================================================================
+// These hooks are inserted by ExternalCallTracker around external calls that
+// lie INSIDE an unsafe SESE region. Their TSC interval is a subset of the
+// surrounding unsafe block's TSC interval, so the cycles they observe are
+// already part of unsafe_cycles.
+//
+// Fix A: unsafe_external_call_end no longer commits to the global
+// unsafe_external_cycles counter directly. It adds into UNSAFE_FRAME_EXT_ACCUM,
+// a per-thread cell scoped to the current outermost unsafe frame. The frame's
+// enclosing cpu_cycle_end_measurement commits it (clamped to the frame's own
+// delta, parent committed first) when the outermost unsafe block closes. This
+// makes unsafe_external <= unsafe_total structurally true even when a stats
+// snapshot lands while a worker thread is parked inside an open unsafe block.
+//
+// These hooks must NOT touch IN_UNSAFE, IN_EXTERNAL, or UNSAFE_IN_EXT_ACCUM
+// — they run in parallel with cpu_cycle_start/end_measurement and
+// external_call_start/end and would corrupt the callback-subtraction logic
+// if they did.
+
+#[no_mangle]
+#[inline(always)]
+pub extern "C" fn unsafe_external_call_start() -> u64 {
+    if IN_UNSAFE.with(|d| d.get()) == 0 {
+        return 0;
+    }
+
+    let was_nested = IN_UNSAFE_EXT.with(|d| {
+        let c = d.get();
+        d.set(c + 1);
+        c > 0
+    });
+    if was_nested {
+        return 0;
+    }
+
+    let slot = match THREAD_SLOT.with(|s| s.get()).or_else(initialize_thread) {
+        Some(slot) => slot,
+        None => return 0,
+    };
+    REGISTRY.threads[slot]
+        .unsafe_external_calls
+        .fetch_add(1, Ordering::Relaxed);
+    read_tsc_start()
+}
+
+#[no_mangle]
+#[inline(always)]
+pub extern "C" fn unsafe_external_call_end(start_tsc: u64) {
+    let is_outermost = IN_UNSAFE_EXT.with(|d| {
+        let c = d.get();
+        if c > 0 {
+            d.set(c - 1);
+            c == 1
+        } else {
+            false
+        }
+    });
+
+    if start_tsc == 0 || !is_outermost {
+        return;
+    }
+
+    let end_tsc = read_tsc_end();
+    if end_tsc > start_tsc {
+        let cycles = end_tsc - start_tsc;
+        // Fix A: accumulate into the current outermost unsafe frame instead of
+        // committing to the global counter. The enclosing unsafe block commits it
+        // (clamped to the frame delta) at frame close in cpu_cycle_end_measurement,
+        // guaranteeing unsafe_external <= unsafe_total. No slot lookup is needed
+        // here — the accumulator is thread-local.
+        UNSAFE_FRAME_EXT_ACCUM.with(|acc| acc.set(acc.get() + cycles));
+    }
 }
 
 // ==========================================================================================
@@ -486,11 +591,11 @@ struct ThreadInfo {
 }
 
 extern "C" fn thread_start_wrapper(arg: *mut c_void) -> *mut c_void {
-    // 1. Automatic Initialization
+    // Automatic initialization
     initialize_thread();
     let info = unsafe { Box::from_raw(arg as *mut ThreadInfo) };
     let result = (info.routine)(info.arg);
-    // 2. Automatic Cleanup
+    // Automatic cleanup
     thread_cleanup();
     result
 }
@@ -522,7 +627,6 @@ pub extern "C" fn pthread_create(thread: *mut libc::pthread_t, attr: *const libc
         real_pthread_create(thread, attr, thread_start_wrapper, info_ptr)
     } else {
         // Fallback: if interposition is disabled, return an error
-        // This prevents infinite recursion and crashes
         eprintln!("[Runtime] Warning: pthread_create called but interposition is disabled - returning error");
         libc::ENOSYS
     }
@@ -546,61 +650,95 @@ fn final_cleanup() {
     print_cpu_cycle_stats();
 }
 
-fn calculate_total_stats() -> (u64, u64, u64, u64, u64, u64, u64) {
-    let mut total_normal = 0;
-    let mut total_unsafe = 0;
-    let mut total_external_safe = 0;
-    let mut total_external_unsafe = 0;
-    let mut total_unsafe_blocks = 0;
-    let mut total_external_calls = 0;
+struct Totals {
+    total_cycles: u64,
+    unsafe_cycles: u64,
+    unsafe_external_cycles: u64,
+    external_cycles: u64,
+    unsafe_blocks: u64,
+    external_calls: u64,
+    unsafe_external_calls: u64,
+}
+
+fn calculate_total_stats() -> Totals {
+    let mut t = Totals {
+        total_cycles: 0,
+        unsafe_cycles: 0,
+        unsafe_external_cycles: 0,
+        external_cycles: 0,
+        unsafe_blocks: 0,
+        external_calls: 0,
+        unsafe_external_calls: 0,
+    };
 
     let max_slot = REGISTRY.next_slot.load(Ordering::Acquire);
     for slot in 0..max_slot.min(MAX_THREADS) {
         let stats = &REGISTRY.threads[slot];
+
         let state = stats.state.load(Ordering::Acquire);
         if state == ThreadState::Uninitialized as usize {
             continue;
         }
 
-        total_normal += stats.normal_cycles.load(Ordering::Acquire);
-        total_unsafe += stats.unsafe_cycles.load(Ordering::Acquire);
-        total_external_safe += stats.external_safe_cycles.load(Ordering::Acquire);
-        total_external_unsafe += stats.external_unsafe_cycles.load(Ordering::Acquire);
-        total_unsafe_blocks += stats.unsafe_blocks.load(Ordering::Acquire);
-        total_external_calls += stats.external_calls.load(Ordering::Acquire);
+        let thread_unsafe = stats.unsafe_cycles.load(Ordering::Acquire);
+        let thread_unsafe_ext = stats.unsafe_external_cycles.load(Ordering::Acquire);
+        let thread_external = stats.external_cycles.load(Ordering::Acquire);
+        let thread_unsafe_blocks = stats.unsafe_blocks.load(Ordering::Acquire);
+        let thread_external_calls = stats.external_calls.load(Ordering::Acquire);
+        let thread_unsafe_ext_calls = stats.unsafe_external_calls.load(Ordering::Acquire);
+
+        let thread_total = if state == ThreadState::Active as usize {
+            let current_tsc = read_tsc_end();
+            let start_tsc = stats.start_tsc.load(Ordering::Acquire);
+            if current_tsc > start_tsc {
+                current_tsc - start_tsc
+            } else {
+                0
+            }
+        } else {
+            stats.total_cycles.load(Ordering::Acquire)
+        };
+
+        t.total_cycles += thread_total;
+        t.unsafe_cycles += thread_unsafe;
+        t.unsafe_external_cycles += thread_unsafe_ext;
+        t.external_cycles += thread_external;
+        t.unsafe_blocks += thread_unsafe_blocks;
+        t.external_calls += thread_external_calls;
+        t.unsafe_external_calls += thread_unsafe_ext_calls;
     }
 
-    let total_program_cycles = total_normal + total_unsafe + total_external_safe + total_external_unsafe;
-
-    (total_program_cycles, total_normal, total_unsafe, total_external_safe, total_external_unsafe, total_unsafe_blocks, total_external_calls)
+    t
 }
 
 fn dump_stats() {
-    let (total_cycles, normal_cycles, unsafe_cycles, external_safe_cycles, external_unsafe_cycles, _unsafe_blocks, _external_calls) = calculate_total_stats();
+    let t = calculate_total_stats();
 
-    // Clean accounting - no overlaps, no double counting
-    let internal_cycles = normal_cycles + unsafe_cycles;
-    let external_cycles = external_safe_cycles + external_unsafe_cycles;
-
-    let unsafe_percentage = if internal_cycles > 0 {
-        (unsafe_cycles as f64 / internal_cycles as f64) * 100.0
-    } else {
-        0.0
-    };
-
-    // Create structured output for script parsing
-    let output = format!(
+    // Raw counters only. Derived quantities (internal_cycles = total - external,
+    // unsafe_cycles_internal = unsafe_total - unsafe_external, percentages, etc.)
+    // are the digester's job. Emitting them here would bake assumptions about
+    // the invariants into the on-disk format, and silent clamping (saturating_sub)
+    // would hide runtime/pass bugs rather than surface them.
+    let stats_json = format!(
         concat!(
-            "\n===== CPU Cycle Statistics =====\n",
-            "Total cycles: {}\n",
-            "Unsafe cycles: {}\n",
-            "External cycles: {}\n",
-            "Internal cycles: {}\n",
-            "Unsafe percentage: {:.2}\n",
+            "{{",
+            "\"total_cycles\":{},",
+            "\"unsafe_cycles_total\":{},",
+            "\"unsafe_cycles_external\":{},",
+            "\"external_cycles\":{},",
+            "\"unsafe_blocks\":{},",
+            "\"external_calls\":{},",
+            "\"unsafe_external_calls\":{}",
+            "}}"
         ),
-        total_cycles, unsafe_cycles, external_cycles, internal_cycles, unsafe_percentage
+        t.total_cycles,
+        t.unsafe_cycles,
+        t.unsafe_external_cycles,
+        t.external_cycles,
+        t.unsafe_blocks,
+        t.external_calls,
+        t.unsafe_external_calls,
     );
 
-    // Write structured output to file for script parsing
-    let _ = write_output(&output, "cpu_cycle.stat");
+    let _ = write_stat_json("cpu_cycle", &stats_json);
 }

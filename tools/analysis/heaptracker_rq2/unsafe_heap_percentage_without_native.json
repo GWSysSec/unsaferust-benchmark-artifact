@@ -1,0 +1,613 @@
+{
+  "metadata": {
+    "dataset": "published",
+    "instrumentation_scope": "primary package only",
+    "generated": "2026-09-20T00:26:02",
+    "generator": "export_dataset.py",
+    "description": "Percentage of absolute unsafe heap memory",
+    "source_file": "heap_without_native.json",
+    "metric": "unsafe_heap_memory / total_heap_usage * 100"
+  },
+  "crates": [
+    {
+      "crate_name": "aho-corasick",
+      "total_heap_usage": 3238451704,
+      "unsafe_heap_memory": 470664555,
+      "unsafe_heap_percentage": 14.53
+    },
+    {
+      "crate_name": "arbitrary",
+      "total_heap_usage": 135371389,
+      "unsafe_heap_memory": 4640,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "arc-swap",
+      "total_heap_usage": 353896049,
+      "unsafe_heap_memory": 264264,
+      "unsafe_heap_percentage": 0.07
+    },
+    {
+      "crate_name": "arrayvec",
+      "total_heap_usage": 399393,
+      "unsafe_heap_memory": 116,
+      "unsafe_heap_percentage": 0.03
+    },
+    {
+      "crate_name": "async-lock",
+      "total_heap_usage": 2313331,
+      "unsafe_heap_memory": 361032,
+      "unsafe_heap_percentage": 15.61
+    },
+    {
+      "crate_name": "async-std",
+      "total_heap_usage": 39898894,
+      "unsafe_heap_memory": 18361912,
+      "unsafe_heap_percentage": 46.02
+    },
+    {
+      "crate_name": "async-task",
+      "total_heap_usage": 6443054,
+      "unsafe_heap_memory": 71664,
+      "unsafe_heap_percentage": 1.11
+    },
+    {
+      "crate_name": "bimap",
+      "total_heap_usage": 253018,
+      "unsafe_heap_memory": 14512,
+      "unsafe_heap_percentage": 5.74
+    },
+    {
+      "crate_name": "borsh-rs",
+      "total_heap_usage": 16336449,
+      "unsafe_heap_memory": 8816,
+      "unsafe_heap_percentage": 0.05
+    },
+    {
+      "crate_name": "brotli-decompressor",
+      "total_heap_usage": 333168554,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "bstr",
+      "total_heap_usage": 46489840,
+      "unsafe_heap_memory": 24331572,
+      "unsafe_heap_percentage": 52.34
+    },
+    {
+      "crate_name": "bytemuck",
+      "total_heap_usage": 892270,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "byteorder",
+      "total_heap_usage": 5156613,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "bytes",
+      "total_heap_usage": 6404022,
+      "unsafe_heap_memory": 374544,
+      "unsafe_heap_percentage": 5.85
+    },
+    {
+      "crate_name": "cc-rs",
+      "total_heap_usage": 9726669,
+      "unsafe_heap_memory": 266588,
+      "unsafe_heap_percentage": 2.74
+    },
+    {
+      "crate_name": "chrono",
+      "total_heap_usage": 35973454,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 0.18
+    },
+    {
+      "crate_name": "clru",
+      "total_heap_usage": 231080,
+      "unsafe_heap_memory": 33036,
+      "unsafe_heap_percentage": 14.3
+    },
+    {
+      "crate_name": "colored",
+      "total_heap_usage": 69925,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "combine",
+      "total_heap_usage": 1023104,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "cpp_demangle",
+      "total_heap_usage": 631995496,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 0.01
+    },
+    {
+      "crate_name": "cssparser",
+      "total_heap_usage": 8190729,
+      "unsafe_heap_memory": 2121148,
+      "unsafe_heap_percentage": 25.9
+    },
+    {
+      "crate_name": "curl",
+      "total_heap_usage": 6449192,
+      "unsafe_heap_memory": 41092,
+      "unsafe_heap_percentage": 0.64
+    },
+    {
+      "crate_name": "dashmap",
+      "total_heap_usage": 2863619,
+      "unsafe_heap_memory": 1408056,
+      "unsafe_heap_percentage": 49.17
+    },
+    {
+      "crate_name": "deranged",
+      "total_heap_usage": 294550,
+      "unsafe_heap_memory": 76,
+      "unsafe_heap_percentage": 0.03
+    },
+    {
+      "crate_name": "dlv-list",
+      "total_heap_usage": 244699,
+      "unsafe_heap_memory": 1676,
+      "unsafe_heap_percentage": 0.68
+    },
+    {
+      "crate_name": "ego-tree",
+      "total_heap_usage": 744110,
+      "unsafe_heap_memory": 15872,
+      "unsafe_heap_percentage": 2.13
+    },
+    {
+      "crate_name": "encoding_rs",
+      "total_heap_usage": 32266812,
+      "unsafe_heap_memory": 27788772,
+      "unsafe_heap_percentage": 86.12
+    },
+    {
+      "crate_name": "filetime",
+      "total_heap_usage": 163329,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "fixedbitset",
+      "total_heap_usage": 1100056,
+      "unsafe_heap_memory": 132576,
+      "unsafe_heap_percentage": 12.05
+    },
+    {
+      "crate_name": "flate2",
+      "total_heap_usage": 293297975,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 0.02
+    },
+    {
+      "crate_name": "fragile",
+      "total_heap_usage": 778414,
+      "unsafe_heap_memory": 4436,
+      "unsafe_heap_percentage": 0.57
+    },
+    {
+      "crate_name": "fs4",
+      "total_heap_usage": 105111,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "getrandom",
+      "total_heap_usage": 1966078,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "gimli",
+      "total_heap_usage": 86451789,
+      "unsafe_heap_memory": 13679056,
+      "unsafe_heap_percentage": 15.82
+    },
+    {
+      "crate_name": "git2",
+      "total_heap_usage": 1439274,
+      "unsafe_heap_memory": 1064,
+      "unsafe_heap_percentage": 0.07
+    },
+    {
+      "crate_name": "h2",
+      "total_heap_usage": 3381388873,
+      "unsafe_heap_memory": 24175456,
+      "unsafe_heap_percentage": 0.71
+    },
+    {
+      "crate_name": "hashbrown",
+      "total_heap_usage": 102731077,
+      "unsafe_heap_memory": 832772,
+      "unsafe_heap_percentage": 0.81
+    },
+    {
+      "crate_name": "hashlink",
+      "total_heap_usage": 441674,
+      "unsafe_heap_memory": 30136,
+      "unsafe_heap_percentage": 6.82
+    },
+    {
+      "crate_name": "headers",
+      "total_heap_usage": 757138,
+      "unsafe_heap_memory": 86472,
+      "unsafe_heap_percentage": 11.42
+    },
+    {
+      "crate_name": "http",
+      "total_heap_usage": 270117425,
+      "unsafe_heap_memory": 151983112,
+      "unsafe_heap_percentage": 56.27
+    },
+    {
+      "crate_name": "http-body",
+      "total_heap_usage": 1582139,
+      "unsafe_heap_memory": 7904,
+      "unsafe_heap_percentage": 0.5
+    },
+    {
+      "crate_name": "httparse",
+      "total_heap_usage": 766282133,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "imgref",
+      "total_heap_usage": 3871272,
+      "unsafe_heap_memory": 784,
+      "unsafe_heap_percentage": 0.02
+    },
+    {
+      "crate_name": "indexmap",
+      "total_heap_usage": 77874739,
+      "unsafe_heap_memory": 26216880,
+      "unsafe_heap_percentage": 33.67
+    },
+    {
+      "crate_name": "iri-string",
+      "total_heap_usage": 6739136,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 0.97
+    },
+    {
+      "crate_name": "jni",
+      "total_heap_usage": 3990747,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "jpeg-decoder",
+      "total_heap_usage": 6657184464,
+      "unsafe_heap_memory": 618120,
+      "unsafe_heap_percentage": 0.01
+    },
+    {
+      "crate_name": "lexical-core",
+      "total_heap_usage": 293408,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "libsecp256k1",
+      "total_heap_usage": 44589937,
+      "unsafe_heap_memory": 620,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "log",
+      "total_heap_usage": 5692598,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 1.15
+    },
+    {
+      "crate_name": "loom",
+      "total_heap_usage": 242064106,
+      "unsafe_heap_memory": 12334201,
+      "unsafe_heap_percentage": 5.1
+    },
+    {
+      "crate_name": "matrixmultiply",
+      "total_heap_usage": 363898464,
+      "unsafe_heap_memory": 82439744,
+      "unsafe_heap_percentage": 22.65
+    },
+    {
+      "crate_name": "memchr",
+      "total_heap_usage": 10594022397,
+      "unsafe_heap_memory": 7814660752,
+      "unsafe_heap_percentage": 73.76
+    },
+    {
+      "crate_name": "memmap2",
+      "total_heap_usage": 134762,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "metrics",
+      "total_heap_usage": 1929049,
+      "unsafe_heap_memory": 68584,
+      "unsafe_heap_percentage": 3.56
+    },
+    {
+      "crate_name": "miette",
+      "total_heap_usage": 2356265,
+      "unsafe_heap_memory": 7592,
+      "unsafe_heap_percentage": 0.32
+    },
+    {
+      "crate_name": "msgpack-rust",
+      "total_heap_usage": 6080793,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 1.08
+    },
+    {
+      "crate_name": "native-tls",
+      "total_heap_usage": 6373268,
+      "unsafe_heap_memory": 65928,
+      "unsafe_heap_percentage": 1.03
+    },
+    {
+      "crate_name": "ndarray",
+      "total_heap_usage": 696827275,
+      "unsafe_heap_memory": 112742244,
+      "unsafe_heap_percentage": 16.18
+    },
+    {
+      "crate_name": "nom",
+      "total_heap_usage": 43891891,
+      "unsafe_heap_memory": 7456,
+      "unsafe_heap_percentage": 0.02
+    },
+    {
+      "crate_name": "nu-ansi-term",
+      "total_heap_usage": 6318842,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 1.04
+    },
+    {
+      "crate_name": "num-bigint",
+      "total_heap_usage": 186926266,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 0.04
+    },
+    {
+      "crate_name": "ordered-float",
+      "total_heap_usage": 797274,
+      "unsafe_heap_memory": 294944,
+      "unsafe_heap_percentage": 36.99
+    },
+    {
+      "crate_name": "ordered-multimap",
+      "total_heap_usage": 347045,
+      "unsafe_heap_memory": 25404,
+      "unsafe_heap_percentage": 7.32
+    },
+    {
+      "crate_name": "os_info",
+      "total_heap_usage": 5876085,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 1.12
+    },
+    {
+      "crate_name": "ouroboros",
+      "total_heap_usage": 5578699,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 1.17
+    },
+    {
+      "crate_name": "parity-scale-codec",
+      "total_heap_usage": 593703140,
+      "unsafe_heap_memory": 64,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "parking_lot",
+      "total_heap_usage": 47261409,
+      "unsafe_heap_memory": 133376,
+      "unsafe_heap_percentage": 0.28
+    },
+    {
+      "crate_name": "petgraph",
+      "total_heap_usage": 11853940,
+      "unsafe_heap_memory": 696084,
+      "unsafe_heap_percentage": 5.87
+    },
+    {
+      "crate_name": "pin-project-lite",
+      "total_heap_usage": 20740534,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 0.32
+    },
+    {
+      "crate_name": "polling",
+      "total_heap_usage": 1889500,
+      "unsafe_heap_memory": 2096,
+      "unsafe_heap_percentage": 0.11
+    },
+    {
+      "crate_name": "portable-atomic",
+      "total_heap_usage": 447223876,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "postcard",
+      "total_heap_usage": 390786,
+      "unsafe_heap_memory": 223,
+      "unsafe_heap_percentage": 0.06
+    },
+    {
+      "crate_name": "pulldown-cmark",
+      "total_heap_usage": 26124900,
+      "unsafe_heap_memory": 87580,
+      "unsafe_heap_percentage": 0.34
+    },
+    {
+      "crate_name": "rand",
+      "total_heap_usage": 2542427,
+      "unsafe_heap_memory": 12912,
+      "unsafe_heap_percentage": 0.51
+    },
+    {
+      "crate_name": "rayon-core",
+      "total_heap_usage": 41843343,
+      "unsafe_heap_memory": 16816512,
+      "unsafe_heap_percentage": 40.19
+    },
+    {
+      "crate_name": "rgb",
+      "total_heap_usage": 1579399,
+      "unsafe_heap_memory": 68,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "ring",
+      "total_heap_usage": 36554357,
+      "unsafe_heap_memory": 38960,
+      "unsafe_heap_percentage": 0.11
+    },
+    {
+      "crate_name": "rmp",
+      "total_heap_usage": 5955528,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 1.1
+    },
+    {
+      "crate_name": "ron",
+      "total_heap_usage": 5597853,
+      "unsafe_heap_memory": 10368,
+      "unsafe_heap_percentage": 0.19
+    },
+    {
+      "crate_name": "rust-openssl",
+      "total_heap_usage": 1671252,
+      "unsafe_heap_memory": 6120,
+      "unsafe_heap_percentage": 0.37
+    },
+    {
+      "crate_name": "rustc-demangle",
+      "total_heap_usage": 5242221,
+      "unsafe_heap_memory": 65536,
+      "unsafe_heap_percentage": 1.25
+    },
+    {
+      "crate_name": "scroll",
+      "total_heap_usage": 450219,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "semver",
+      "total_heap_usage": 17261925,
+      "unsafe_heap_memory": 11271645,
+      "unsafe_heap_percentage": 65.3
+    },
+    {
+      "crate_name": "serde_with",
+      "total_heap_usage": 9555122,
+      "unsafe_heap_memory": 6212,
+      "unsafe_heap_percentage": 0.07
+    },
+    {
+      "crate_name": "serde_yaml",
+      "total_heap_usage": 34138498,
+      "unsafe_heap_memory": 251824,
+      "unsafe_heap_percentage": 0.74
+    },
+    {
+      "crate_name": "sharded-slab",
+      "total_heap_usage": 1258333344,
+      "unsafe_heap_memory": 3365028,
+      "unsafe_heap_percentage": 0.27
+    },
+    {
+      "crate_name": "signal-hook",
+      "total_heap_usage": 337971,
+      "unsafe_heap_memory": 2632,
+      "unsafe_heap_percentage": 0.78
+    },
+    {
+      "crate_name": "simdutf8",
+      "total_heap_usage": 5359530,
+      "unsafe_heap_memory": 4442584,
+      "unsafe_heap_percentage": 82.89
+    },
+    {
+      "crate_name": "siphasher",
+      "total_heap_usage": 1990662,
+      "unsafe_heap_memory": 112,
+      "unsafe_heap_percentage": 0.01
+    },
+    {
+      "crate_name": "slotmap",
+      "total_heap_usage": 3210179,
+      "unsafe_heap_memory": 1195764,
+      "unsafe_heap_percentage": 37.25
+    },
+    {
+      "crate_name": "smallvec",
+      "total_heap_usage": 240894,
+      "unsafe_heap_memory": 846,
+      "unsafe_heap_percentage": 0.35
+    },
+    {
+      "crate_name": "tokio",
+      "total_heap_usage": 6591612464,
+      "unsafe_heap_memory": 5430305088,
+      "unsafe_heap_percentage": 82.38
+    },
+    {
+      "crate_name": "triomphe",
+      "total_heap_usage": 379288,
+      "unsafe_heap_memory": 2184,
+      "unsafe_heap_percentage": 0.58
+    },
+    {
+      "crate_name": "unicode-normalization",
+      "total_heap_usage": 11361258,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "utf8parse",
+      "total_heap_usage": 37267348,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "uuid",
+      "total_heap_usage": 5767967,
+      "unsafe_heap_memory": 65620,
+      "unsafe_heap_percentage": 1.14
+    },
+    {
+      "crate_name": "value-bag",
+      "total_heap_usage": 98426,
+      "unsafe_heap_memory": 0,
+      "unsafe_heap_percentage": 0.0
+    },
+    {
+      "crate_name": "winnow",
+      "total_heap_usage": 10324663,
+      "unsafe_heap_memory": 22884,
+      "unsafe_heap_percentage": 0.22
+    },
+    {
+      "crate_name": "zopfli",
+      "total_heap_usage": 5727533127,
+      "unsafe_heap_memory": 4153893768,
+      "unsafe_heap_percentage": 72.53
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index f862dce..926ac56 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -43,7 +43,10 @@ bincode = "1.0"
+ serde_json = "1.0"
+ 
+ [profile.release]
+-lto = true
++lto = false
+ 
+ [lints.rust]
+ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
++
++
++[workspace]

@@ -1,0 +1,140 @@
+diff --git a/rmp-serde/LICENSE b/rmp-serde/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/rmp-serde/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/rmp-serde/LICENSE b/rmp-serde/LICENSE
+new file mode 100644
+index 0000000..a0710ed
+--- /dev/null
++++ b/rmp-serde/LICENSE
+@@ -0,0 +1,21 @@
++MIT License
++
++Copyright (c) 2017 Evgeny Safronov
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/rmp/LICENSE b/rmp/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/rmp/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/rmp/LICENSE b/rmp/LICENSE
+new file mode 100644
+index 0000000..a0710ed
+--- /dev/null
++++ b/rmp/LICENSE
+@@ -0,0 +1,21 @@
++MIT License
++
++Copyright (c) 2017 Evgeny Safronov
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/rmpv-tests/LICENSE b/rmpv-tests/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/rmpv-tests/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/rmpv-tests/LICENSE b/rmpv-tests/LICENSE
+new file mode 100644
+index 0000000..a0710ed
+--- /dev/null
++++ b/rmpv-tests/LICENSE
+@@ -0,0 +1,21 @@
++MIT License
++
++Copyright (c) 2017 Evgeny Safronov
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/rmpv/LICENSE b/rmpv/LICENSE
+deleted file mode 120000
+index ea5b606..0000000
+--- a/rmpv/LICENSE
++++ /dev/null
+@@ -1 +0,0 @@
+-../LICENSE
+\ No newline at end of file
+diff --git a/rmpv/LICENSE b/rmpv/LICENSE
+new file mode 100644
+index 0000000..a0710ed
+--- /dev/null
++++ b/rmpv/LICENSE
+@@ -0,0 +1,21 @@
++MIT License
++
++Copyright (c) 2017 Evgeny Safronov
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.

@@ -1,0 +1,915 @@
+{
+  "metadata": {
+    "dataset": "published",
+    "instrumentation_scope": "primary package only",
+    "generated": "2026-09-20T00:26:02",
+    "generator": "export_dataset.py",
+    "source": "/home/oscar/Projects/unsafebench/rusttest-gen/rebench_v3",
+    "variant": "with_native",
+    "cycle_metric": "internal",
+    "metric": "internal_unsafe_cycles / internal_total_cycles",
+    "note": "unsafe_percentage uses the pair named in `metric`; both pairs are present in every record."
+  },
+  "crates": {
+    "aho-corasick": {
+      "total_cycles": 324307222201.6667,
+      "external_cycles": 44758153156.666664,
+      "internal_cycles": 279549069045.0,
+      "unsafe_cycles": 177661628431.66666,
+      "whole_program_total_cycles": 324307222201.6667,
+      "whole_program_unsafe_cycles": 199426372126.0,
+      "unsafe_percentage": 63.55293152597401
+    },
+    "arbitrary": {
+      "total_cycles": 80072012525.33333,
+      "external_cycles": 58888165658.33334,
+      "internal_cycles": 21183846866.999985,
+      "unsafe_cycles": 19621162752.333332,
+      "whole_program_total_cycles": 80072012525.33333,
+      "whole_program_unsafe_cycles": 19918175117.0,
+      "unsafe_percentage": 92.62322785621629
+    },
+    "arc-swap": {
+      "total_cycles": 107566996876.66667,
+      "external_cycles": 41283206647.66667,
+      "internal_cycles": 66283790229.0,
+      "unsafe_cycles": 25442098053.33333,
+      "whole_program_total_cycles": 107566996876.66667,
+      "whole_program_unsafe_cycles": 63710213588.33333,
+      "unsafe_percentage": 38.38358966111459
+    },
+    "arrayvec": {
+      "total_cycles": 37300573721.666664,
+      "external_cycles": 18740579250.666664,
+      "internal_cycles": 18559994471.0,
+      "unsafe_cycles": 9438114212.333332,
+      "whole_program_total_cycles": 37300573721.666664,
+      "whole_program_unsafe_cycles": 9438163153.666666,
+      "unsafe_percentage": 50.85192362034585
+    },
+    "async-lock": {
+      "total_cycles": 65326011636.0,
+      "external_cycles": 2601347806.0000005,
+      "internal_cycles": 62724663830.0,
+      "unsafe_cycles": 62446620681.0,
+      "whole_program_total_cycles": 65326011636.0,
+      "whole_program_unsafe_cycles": 62546318872.333336,
+      "unsafe_percentage": 99.55672436961389
+    },
+    "async-std": {
+      "total_cycles": 205544464098.99997,
+      "external_cycles": 5858056530.333333,
+      "internal_cycles": 199686407568.66663,
+      "unsafe_cycles": 333520855.3333359,
+      "whole_program_total_cycles": 205544464098.99997,
+      "whole_program_unsafe_cycles": 19420400786.666664,
+      "unsafe_percentage": 0.16702231233172307
+    },
+    "async-task": {
+      "total_cycles": 72531157505.33333,
+      "external_cycles": 23497465438.0,
+      "internal_cycles": 49033692067.33333,
+      "unsafe_cycles": 36870800036.0,
+      "whole_program_total_cycles": 72531157505.33333,
+      "whole_program_unsafe_cycles": 36873392676.333336,
+      "unsafe_percentage": 75.19482723301525
+    },
+    "bimap": {
+      "total_cycles": 16238588.0,
+      "external_cycles": 7735543.0,
+      "internal_cycles": 8503045.0,
+      "unsafe_cycles": 2088385.6666666667,
+      "whole_program_total_cycles": 16238588.0,
+      "whole_program_unsafe_cycles": 2256216.3333333335,
+      "unsafe_percentage": 24.56044471911729
+    },
+    "borsh-rs": {
+      "total_cycles": 2270264562.9999995,
+      "external_cycles": 1381498093.0,
+      "internal_cycles": 888766469.9999995,
+      "unsafe_cycles": 534849932.0,
+      "whole_program_total_cycles": 2270264562.9999995,
+      "whole_program_unsafe_cycles": 558505566.0,
+      "unsafe_percentage": 60.178905264056624
+    },
+    "brotli-decompressor": {
+      "total_cycles": 145990740308.66666,
+      "external_cycles": 62984866637.0,
+      "internal_cycles": 83005873671.66666,
+      "unsafe_cycles": 43621336505.666664,
+      "whole_program_total_cycles": 145990740308.66666,
+      "whole_program_unsafe_cycles": 43653517931.666664,
+      "unsafe_percentage": 52.55210815346967
+    },
+    "bstr": {
+      "total_cycles": 41586074410.33333,
+      "external_cycles": 20267980799.333332,
+      "internal_cycles": 21318093610.999996,
+      "unsafe_cycles": 11602904479.333334,
+      "whole_program_total_cycles": 41586074410.33333,
+      "whole_program_unsafe_cycles": 11687826393.0,
+      "unsafe_percentage": 54.42749568069404
+    },
+    "bytemuck": {
+      "total_cycles": 28168403.66666667,
+      "external_cycles": 17895406.333333336,
+      "internal_cycles": 10272997.333333336,
+      "unsafe_cycles": 671526.3333333333,
+      "whole_program_total_cycles": 28168403.66666667,
+      "whole_program_unsafe_cycles": 681710.9999999999,
+      "unsafe_percentage": 6.536810159138233
+    },
+    "byteorder": {
+      "total_cycles": 89497972.0,
+      "external_cycles": 65178872.0,
+      "internal_cycles": 24319100.0,
+      "unsafe_cycles": 14023296.000000002,
+      "whole_program_total_cycles": 89497972.0,
+      "whole_program_unsafe_cycles": 14554865.666666668,
+      "unsafe_percentage": 57.663712884111675
+    },
+    "bytes": {
+      "total_cycles": 1155791638.3333333,
+      "external_cycles": 584658400.3333333,
+      "internal_cycles": 571133238.0,
+      "unsafe_cycles": 301813112.3333334,
+      "whole_program_total_cycles": 1155791638.3333333,
+      "whole_program_unsafe_cycles": 330049854.3333334,
+      "unsafe_percentage": 52.84460652127786
+    },
+    "cc-rs": {
+      "total_cycles": 6980268551.257515,
+      "external_cycles": 2942588430.125609,
+      "internal_cycles": 4037680121.131906,
+      "unsafe_cycles": 200172157.79589903,
+      "whole_program_total_cycles": 6980268551.257515,
+      "whole_program_unsafe_cycles": 648136419.1536863,
+      "unsafe_percentage": 4.957603172877985
+    },
+    "chrono": {
+      "total_cycles": 180641830869.66666,
+      "external_cycles": 19075820228.333332,
+      "internal_cycles": 161566010641.3333,
+      "unsafe_cycles": 143375292478.33334,
+      "whole_program_total_cycles": 180641830869.66666,
+      "whole_program_unsafe_cycles": 143604103138.0,
+      "unsafe_percentage": 88.74099936565108
+    },
+    "clru": {
+      "total_cycles": 321438772.0,
+      "external_cycles": 159291687.66666666,
+      "internal_cycles": 162147084.33333334,
+      "unsafe_cycles": 93602315.0,
+      "whole_program_total_cycles": 321438772.0,
+      "whole_program_unsafe_cycles": 112104237.33333333,
+      "unsafe_percentage": 57.72679501752701
+    },
+    "colored": {
+      "total_cycles": 2380981306.0000005,
+      "external_cycles": 2432930.333333333,
+      "internal_cycles": 2378548375.666667,
+      "unsafe_cycles": 2550520.333333334,
+      "whole_program_total_cycles": 2380981306.0000005,
+      "whole_program_unsafe_cycles": 3801877.666666667,
+      "unsafe_percentage": 0.1072301223479832
+    },
+    "combine": {
+      "total_cycles": 58619667413.33333,
+      "external_cycles": 1876566057.0,
+      "internal_cycles": 56743101356.33333,
+      "unsafe_cycles": 5236757951.333334,
+      "whole_program_total_cycles": 58619667413.33333,
+      "whole_program_unsafe_cycles": 5855047949.000001,
+      "unsafe_percentage": 9.228889197380534
+    },
+    "cpp_demangle": {
+      "total_cycles": 372192642642.6666,
+      "external_cycles": 200172420526.6667,
+      "internal_cycles": 172020222115.99994,
+      "unsafe_cycles": 94085245242.33333,
+      "whole_program_total_cycles": 372192642642.6666,
+      "whole_program_unsafe_cycles": 96559404078.33333,
+      "unsafe_percentage": 54.69429354584137
+    },
+    "cssparser": {
+      "total_cycles": 4987280154.999999,
+      "external_cycles": 2389438979.666667,
+      "internal_cycles": 2597841175.333332,
+      "unsafe_cycles": 1138717209.0,
+      "whole_program_total_cycles": 4987280154.999999,
+      "whole_program_unsafe_cycles": 1150814965.6666667,
+      "unsafe_percentage": 43.833211199059924
+    },
+    "curl": {
+      "total_cycles": 3083326686.0,
+      "external_cycles": 1098248252.333333,
+      "internal_cycles": 1985078433.666667,
+      "unsafe_cycles": 1290968545.3333328,
+      "whole_program_total_cycles": 3083326686.0,
+      "whole_program_unsafe_cycles": 1595832553.9999995,
+      "unsafe_percentage": 65.03362907171211
+    },
+    "dashmap": {
+      "total_cycles": 411853748.3333333,
+      "external_cycles": 114675799.33333334,
+      "internal_cycles": 297177949.0,
+      "unsafe_cycles": 87615844.66666666,
+      "whole_program_total_cycles": 411853748.3333333,
+      "whole_program_unsafe_cycles": 103190927.99999999,
+      "unsafe_percentage": 29.482619743992732
+    },
+    "deranged": {
+      "total_cycles": 59397402.66666667,
+      "external_cycles": 27662157.666666668,
+      "internal_cycles": 31735245.000000004,
+      "unsafe_cycles": 10040832.0,
+      "whole_program_total_cycles": 59397402.66666667,
+      "whole_program_unsafe_cycles": 10838744.333333334,
+      "unsafe_percentage": 31.63937130468033
+    },
+    "dlv-list": {
+      "total_cycles": 18788524.333333332,
+      "external_cycles": 7178654.0,
+      "internal_cycles": 11609870.333333332,
+      "unsafe_cycles": 156867.6666666667,
+      "whole_program_total_cycles": 18788524.333333332,
+      "whole_program_unsafe_cycles": 175755.33333333334,
+      "unsafe_percentage": 1.3511577835308013
+    },
+    "ego-tree": {
+      "total_cycles": 32877241.33333333,
+      "external_cycles": 20597957.33333333,
+      "internal_cycles": 12279284.0,
+      "unsafe_cycles": 2272331.0,
+      "whole_program_total_cycles": 32877241.33333333,
+      "whole_program_unsafe_cycles": 2563873.6666666665,
+      "unsafe_percentage": 18.505403083762864
+    },
+    "encoding_rs": {
+      "total_cycles": 206494995633.66666,
+      "external_cycles": 64553599342.333336,
+      "internal_cycles": 141941396291.3333,
+      "unsafe_cycles": 138565485750.0,
+      "whole_program_total_cycles": 206494995633.66666,
+      "whole_program_unsafe_cycles": 138608236112.0,
+      "unsafe_percentage": 97.62161664634868
+    },
+    "filetime": {
+      "total_cycles": 19791417.333333332,
+      "external_cycles": 12614135.0,
+      "internal_cycles": 7177282.333333332,
+      "unsafe_cycles": 210360.33333333334,
+      "whole_program_total_cycles": 19791417.333333332,
+      "whole_program_unsafe_cycles": 393661.0,
+      "unsafe_percentage": 2.930919024271351
+    },
+    "fixedbitset": {
+      "total_cycles": 597935385.3333334,
+      "external_cycles": 248978122.0,
+      "internal_cycles": 348957263.3333334,
+      "unsafe_cycles": 140719771.6666667,
+      "whole_program_total_cycles": 597935385.3333334,
+      "whole_program_unsafe_cycles": 142181091.33333334,
+      "unsafe_percentage": 40.325789560152344
+    },
+    "flate2": {
+      "total_cycles": 81332394683.66666,
+      "external_cycles": 26651207502.666664,
+      "internal_cycles": 54681187180.99999,
+      "unsafe_cycles": 35244889309.33333,
+      "whole_program_total_cycles": 81332394683.66666,
+      "whole_program_unsafe_cycles": 36049912139.666664,
+      "unsafe_percentage": 64.45523794622335
+    },
+    "fragile": {
+      "total_cycles": 52128066.66666667,
+      "external_cycles": 24770075.0,
+      "internal_cycles": 27357991.66666667,
+      "unsafe_cycles": 5859549.0,
+      "whole_program_total_cycles": 52128066.66666667,
+      "whole_program_unsafe_cycles": 7409552.666666667,
+      "unsafe_percentage": 21.41805243379524
+    },
+    "fs4": {
+      "total_cycles": 2484016554.0,
+      "external_cycles": 189081119.0,
+      "internal_cycles": 2294935435.0,
+      "unsafe_cycles": 71582602.66666666,
+      "whole_program_total_cycles": 2484016554.0,
+      "whole_program_unsafe_cycles": 287788222.0,
+      "unsafe_percentage": 3.119155405200611
+    },
+    "getrandom": {
+      "total_cycles": 565733439.6666666,
+      "external_cycles": 332497975.0,
+      "internal_cycles": 233235464.66666663,
+      "unsafe_cycles": 181319461.00000003,
+      "whole_program_total_cycles": 565733439.6666666,
+      "whole_program_unsafe_cycles": 182320640.6666667,
+      "unsafe_percentage": 77.7409478696289
+    },
+    "gimli": {
+      "total_cycles": 19779617174.0,
+      "external_cycles": 11747707202.666668,
+      "internal_cycles": 8031909971.333332,
+      "unsafe_cycles": 5798406274.666667,
+      "whole_program_total_cycles": 19779617174.0,
+      "whole_program_unsafe_cycles": 5914535843.0,
+      "unsafe_percentage": 72.19212236394262
+    },
+    "git2": {
+      "total_cycles": 5801271179.333334,
+      "external_cycles": 4857022060.999999,
+      "internal_cycles": 944249118.3333349,
+      "unsafe_cycles": 4328101.333333373,
+      "whole_program_total_cycles": 5801271179.333334,
+      "whole_program_unsafe_cycles": 345850363.6666667,
+      "unsafe_percentage": 0.45836434996865777
+    },
+    "h2": {
+      "total_cycles": 95010891711.66667,
+      "external_cycles": 41900080553.666664,
+      "internal_cycles": 53110811158.00001,
+      "unsafe_cycles": 36833885017.33333,
+      "whole_program_total_cycles": 95010891711.66667,
+      "whole_program_unsafe_cycles": 37858884725.666664,
+      "unsafe_percentage": 69.3528948517765
+    },
+    "hashbrown": {
+      "total_cycles": 273506639770.33334,
+      "external_cycles": 185069840412.00003,
+      "internal_cycles": 88436799358.33331,
+      "unsafe_cycles": 85721624296.66666,
+      "whole_program_total_cycles": 273506639770.33334,
+      "whole_program_unsafe_cycles": 85772337104.66666,
+      "unsafe_percentage": 96.92981306269898
+    },
+    "hashlink": {
+      "total_cycles": 84497541.33333331,
+      "external_cycles": 40638014.333333336,
+      "internal_cycles": 43859526.99999998,
+      "unsafe_cycles": 21582997.333333332,
+      "whole_program_total_cycles": 84497541.33333331,
+      "whole_program_unsafe_cycles": 22067288.0,
+      "unsafe_percentage": 49.20937093857246
+    },
+    "headers": {
+      "total_cycles": 46478058.0,
+      "external_cycles": 22192393.333333332,
+      "internal_cycles": 24285664.666666668,
+      "unsafe_cycles": 4575301.666666667,
+      "whole_program_total_cycles": 46478058.0,
+      "whole_program_unsafe_cycles": 4891762.666666667,
+      "unsafe_percentage": 18.83951594269728
+    },
+    "http": {
+      "total_cycles": 116765600698.66667,
+      "external_cycles": 75480629801.33334,
+      "internal_cycles": 41284970897.33333,
+      "unsafe_cycles": 40215643225.00001,
+      "whole_program_total_cycles": 116765600698.66667,
+      "whole_program_unsafe_cycles": 40591557321.00001,
+      "unsafe_percentage": 97.4098863361379
+    },
+    "http-body": {
+      "total_cycles": 29515979.333333332,
+      "external_cycles": 16689601.333333334,
+      "internal_cycles": 12826377.999999998,
+      "unsafe_cycles": 2100397.6666666665,
+      "whole_program_total_cycles": 29515979.333333332,
+      "whole_program_unsafe_cycles": 2307555.6666666665,
+      "unsafe_percentage": 16.37561022033396
+    },
+    "httparse": {
+      "total_cycles": 780933510032.0,
+      "external_cycles": 426219556063.6667,
+      "internal_cycles": 354713953968.3333,
+      "unsafe_cycles": 273125455580.0,
+      "whole_program_total_cycles": 780933510032.0,
+      "whole_program_unsafe_cycles": 284077838372.0,
+      "unsafe_percentage": 76.9987908635765
+    },
+    "imgref": {
+      "total_cycles": 1382332124.0,
+      "external_cycles": 943699624.0,
+      "internal_cycles": 438632500.0,
+      "unsafe_cycles": 434885931.3333334,
+      "whole_program_total_cycles": 1382332124.0,
+      "whole_program_unsafe_cycles": 435263295.6666667,
+      "unsafe_percentage": 99.14585246951226
+    },
+    "indexmap": {
+      "total_cycles": 18752416828.0,
+      "external_cycles": 3024849821.333333,
+      "internal_cycles": 15727567006.666668,
+      "unsafe_cycles": 15314356078.333334,
+      "whole_program_total_cycles": 18752416828.0,
+      "whole_program_unsafe_cycles": 15584486999.0,
+      "unsafe_percentage": 97.37269643703836
+    },
+    "iri-string": {
+      "total_cycles": 2252478845.6666665,
+      "external_cycles": 1166462486.3333333,
+      "internal_cycles": 1086016359.3333333,
+      "unsafe_cycles": 625604478.3333334,
+      "whole_program_total_cycles": 2252478845.6666665,
+      "whole_program_unsafe_cycles": 636112059.0,
+      "unsafe_percentage": 57.60543779629339
+    },
+    "jni": {
+      "total_cycles": 615061465806.167,
+      "external_cycles": 15689217397.666666,
+      "internal_cycles": 599372248408.5004,
+      "unsafe_cycles": 15632717463.5,
+      "whole_program_total_cycles": 615061465806.167,
+      "whole_program_unsafe_cycles": 15943201775.0,
+      "unsafe_percentage": 2.6081817276340713
+    },
+    "jpeg-decoder": {
+      "total_cycles": 102074645036493.33,
+      "external_cycles": 2934033645646.0,
+      "internal_cycles": 99140611390847.33,
+      "unsafe_cycles": 1286573778204.0002,
+      "whole_program_total_cycles": 102074645036493.33,
+      "whole_program_unsafe_cycles": 1299262539784.0002,
+      "unsafe_percentage": 1.2977262901192648
+    },
+    "lexical-core": {
+      "total_cycles": 8337489.666666666,
+      "external_cycles": 5279424.0,
+      "internal_cycles": 3058065.666666666,
+      "unsafe_cycles": 50418.0,
+      "whole_program_total_cycles": 8337489.666666666,
+      "whole_program_unsafe_cycles": 50418.0,
+      "unsafe_percentage": 1.6486892531302744
+    },
+    "libsecp256k1": {
+      "total_cycles": 792769613.0,
+      "external_cycles": 659320872.3333334,
+      "internal_cycles": 133448740.66666663,
+      "unsafe_cycles": 63039057.00000001,
+      "whole_program_total_cycles": 792769613.0,
+      "whole_program_unsafe_cycles": 67638481.66666667,
+      "unsafe_percentage": 47.238405312090116
+    },
+    "log": {
+      "total_cycles": 6434912767.666667,
+      "external_cycles": 3218809622.3333335,
+      "internal_cycles": 3216103145.3333335,
+      "unsafe_cycles": 1341756356.3333333,
+      "whole_program_total_cycles": 6434912767.666667,
+      "whole_program_unsafe_cycles": 1342020367.3333333,
+      "unsafe_percentage": 41.71994167165515
+    },
+    "loom": {
+      "total_cycles": 58674773171.33333,
+      "external_cycles": 28615155814.66666,
+      "internal_cycles": 30059617356.666668,
+      "unsafe_cycles": 16265824.33333335,
+      "whole_program_total_cycles": 58674773171.33333,
+      "whole_program_unsafe_cycles": 56544733.66666667,
+      "unsafe_percentage": 0.05411188086772465
+    },
+    "matrixmultiply": {
+      "total_cycles": 397775752426.3334,
+      "external_cycles": 70291937492.33333,
+      "internal_cycles": 327483814934.00006,
+      "unsafe_cycles": 50911484913.33334,
+      "whole_program_total_cycles": 397775752426.3334,
+      "whole_program_unsafe_cycles": 182785940302.0,
+      "unsafe_percentage": 15.546259873512792
+    },
+    "memchr": {
+      "total_cycles": 4407721581972.667,
+      "external_cycles": 1740651307721.6667,
+      "internal_cycles": 2667070274251.0,
+      "unsafe_cycles": 2039166443770.9998,
+      "whole_program_total_cycles": 4407721581972.667,
+      "whole_program_unsafe_cycles": 2328878670777.6665,
+      "unsafe_percentage": 76.45716963133505
+    },
+    "memmap2": {
+      "total_cycles": 62030848.333333336,
+      "external_cycles": 35542953.0,
+      "internal_cycles": 26487895.333333336,
+      "unsafe_cycles": 10973563.333333334,
+      "whole_program_total_cycles": 62030848.333333336,
+      "whole_program_unsafe_cycles": 20142415.666666668,
+      "unsafe_percentage": 41.42859670516668
+    },
+    "metrics": {
+      "total_cycles": 3863754564.0,
+      "external_cycles": 1346598695.3333333,
+      "internal_cycles": 2517155868.666667,
+      "unsafe_cycles": 69009269.0,
+      "whole_program_total_cycles": 3863754564.0,
+      "whole_program_unsafe_cycles": 73504924.0,
+      "unsafe_percentage": 2.741557241608327
+    },
+    "miette": {
+      "total_cycles": 8190890667.333334,
+      "external_cycles": 3239559539.3333335,
+      "internal_cycles": 4951331128.0,
+      "unsafe_cycles": 489975827.6666666,
+      "whole_program_total_cycles": 8190890667.333334,
+      "whole_program_unsafe_cycles": 841966191.6666666,
+      "unsafe_percentage": 9.895840431592855
+    },
+    "msgpack-rust": {
+      "total_cycles": 7640854096.666667,
+      "external_cycles": 3827652295.0000005,
+      "internal_cycles": 3813201801.6666665,
+      "unsafe_cycles": 1590235860.6666665,
+      "whole_program_total_cycles": 7640854096.666667,
+      "whole_program_unsafe_cycles": 1590672095.9999998,
+      "unsafe_percentage": 41.70342781154696
+    },
+    "native-tls": {
+      "total_cycles": 18149901571.0,
+      "external_cycles": 5031038469.333334,
+      "internal_cycles": 13118863101.666666,
+      "unsafe_cycles": 1571772229.9999998,
+      "whole_program_total_cycles": 18149901571.0,
+      "whole_program_unsafe_cycles": 1878197144.6666665,
+      "unsafe_percentage": 11.981009465677833
+    },
+    "ndarray": {
+      "total_cycles": 254484078703.0,
+      "external_cycles": 75461719074.66669,
+      "internal_cycles": 179022359628.3333,
+      "unsafe_cycles": 98231676312.66667,
+      "whole_program_total_cycles": 254484078703.0,
+      "whole_program_unsafe_cycles": 99262447302.66667,
+      "unsafe_percentage": 54.87117727450613
+    },
+    "nom": {
+      "total_cycles": 235367516.0,
+      "external_cycles": 142891782.3333333,
+      "internal_cycles": 92475733.66666669,
+      "unsafe_cycles": 53377068.66666667,
+      "whole_program_total_cycles": 235367516.0,
+      "whole_program_unsafe_cycles": 54362629.00000001,
+      "unsafe_percentage": 57.720081312430494
+    },
+    "nu-ansi-term": {
+      "total_cycles": 6556269193.333334,
+      "external_cycles": 3281954519.0,
+      "internal_cycles": 3274314674.333334,
+      "unsafe_cycles": 1364658495.0,
+      "whole_program_total_cycles": 6556269193.333334,
+      "whole_program_unsafe_cycles": 1365156135.3333333,
+      "unsafe_percentage": 41.67768314075833
+    },
+    "num-bigint": {
+      "total_cycles": 153276959806.33334,
+      "external_cycles": 57547865649.99999,
+      "internal_cycles": 95729094156.33334,
+      "unsafe_cycles": 46276631285.33333,
+      "whole_program_total_cycles": 153276959806.33334,
+      "whole_program_unsafe_cycles": 47533395388.666664,
+      "unsafe_percentage": 48.34124013516711
+    },
+    "ordered-float": {
+      "total_cycles": 296982878.0,
+      "external_cycles": 165746776.66666666,
+      "internal_cycles": 131236101.33333334,
+      "unsafe_cycles": 105059048.33333333,
+      "whole_program_total_cycles": 296982878.0,
+      "whole_program_unsafe_cycles": 105604610.33333333,
+      "unsafe_percentage": 80.05346643641023
+    },
+    "ordered-multimap": {
+      "total_cycles": 24429231.333333332,
+      "external_cycles": 9134108.0,
+      "internal_cycles": 15295123.333333332,
+      "unsafe_cycles": 771785.6666666666,
+      "whole_program_total_cycles": 24429231.333333332,
+      "whole_program_unsafe_cycles": 858510.6666666666,
+      "unsafe_percentage": 5.045959093279623
+    },
+    "os_info": {
+      "total_cycles": 6834877379.666667,
+      "external_cycles": 3419302506.3333335,
+      "internal_cycles": 3415574873.3333335,
+      "unsafe_cycles": 1349553772.6666667,
+      "whole_program_total_cycles": 6834877379.666667,
+      "whole_program_unsafe_cycles": 1349882601.0,
+      "unsafe_percentage": 39.51176076399719
+    },
+    "ouroboros": {
+      "total_cycles": 6655414257.666666,
+      "external_cycles": 3329138041.3333335,
+      "internal_cycles": 3326276216.3333325,
+      "unsafe_cycles": 1390118982.0,
+      "whole_program_total_cycles": 6655414257.666666,
+      "whole_program_unsafe_cycles": 1390372947.0,
+      "unsafe_percentage": 41.79204887357116
+    },
+    "parity-scale-codec": {
+      "total_cycles": 316195982526.9999,
+      "external_cycles": 155165308308.33328,
+      "internal_cycles": 161030674218.6666,
+      "unsafe_cycles": 121413245114.66667,
+      "whole_program_total_cycles": 316195982526.9999,
+      "whole_program_unsafe_cycles": 125501043545.66667,
+      "unsafe_percentage": 75.39758850527902
+    },
+    "parking_lot": {
+      "total_cycles": 2248558185717.001,
+      "external_cycles": 49649379659.666664,
+      "internal_cycles": 2198908806057.3342,
+      "unsafe_cycles": 198811213036.00024,
+      "whole_program_total_cycles": 2248558185717.001,
+      "whole_program_unsafe_cycles": 2022478921674.6665,
+      "unsafe_percentage": 9.041357808397283
+    },
+    "petgraph": {
+      "total_cycles": 735526405052.6665,
+      "external_cycles": 246164630506.33334,
+      "internal_cycles": 489361774546.3331,
+      "unsafe_cycles": 474282609853.9999,
+      "whole_program_total_cycles": 735526405052.6665,
+      "whole_program_unsafe_cycles": 481621324627.9999,
+      "unsafe_percentage": 96.91860593191764
+    },
+    "pin-project-lite": {
+      "total_cycles": 9003314661.666666,
+      "external_cycles": 4277044353.6666665,
+      "internal_cycles": 4726270308.0,
+      "unsafe_cycles": 1528164773.3333335,
+      "whole_program_total_cycles": 9003314661.666666,
+      "whole_program_unsafe_cycles": 1528238313.6666667,
+      "unsafe_percentage": 32.33341882174322
+    },
+    "polling": {
+      "total_cycles": 67498492141.666664,
+      "external_cycles": 24358470903.66666,
+      "internal_cycles": 43140021238.0,
+      "unsafe_cycles": 4611142091.666668,
+      "whole_program_total_cycles": 67498492141.666664,
+      "whole_program_unsafe_cycles": 4815391037.333335,
+      "unsafe_percentage": 10.688780300379017
+    },
+    "portable-atomic": {
+      "total_cycles": 216696572682.0,
+      "external_cycles": 30196756076.0,
+      "internal_cycles": 186499816606.0,
+      "unsafe_cycles": 170222887945.66666,
+      "whole_program_total_cycles": 216696572682.0,
+      "whole_program_unsafe_cycles": 173050106040.66666,
+      "unsafe_percentage": 91.27241572857949
+    },
+    "postcard": {
+      "total_cycles": 37376978.666666664,
+      "external_cycles": 23228900.666666668,
+      "internal_cycles": 14148077.999999996,
+      "unsafe_cycles": 9139178.666666666,
+      "whole_program_total_cycles": 37376978.666666664,
+      "whole_program_unsafe_cycles": 9203839.0,
+      "unsafe_percentage": 64.59660928266489
+    },
+    "pulldown-cmark": {
+      "total_cycles": 552152093.6666665,
+      "external_cycles": 286571298.00000006,
+      "internal_cycles": 265580795.66666645,
+      "unsafe_cycles": 84808664.66666666,
+      "whole_program_total_cycles": 552152093.6666665,
+      "whole_program_unsafe_cycles": 86287475.33333333,
+      "unsafe_percentage": 31.933282093601
+    },
+    "rand": {
+      "total_cycles": 1348489983.0000002,
+      "external_cycles": 615512659.6666667,
+      "internal_cycles": 732977323.3333335,
+      "unsafe_cycles": 463688455.0,
+      "whole_program_total_cycles": 1348489983.0000002,
+      "whole_program_unsafe_cycles": 471078967.6666667,
+      "unsafe_percentage": 63.260955044461866
+    },
+    "rayon-core": {
+      "total_cycles": 828523192167.1661,
+      "external_cycles": 39716919939.33335,
+      "internal_cycles": 788806272227.8328,
+      "unsafe_cycles": 279417828029.9999,
+      "whole_program_total_cycles": 828523192167.1661,
+      "whole_program_unsafe_cycles": 297412477851.6665,
+      "unsafe_percentage": 35.422870971960904
+    },
+    "rgb": {
+      "total_cycles": 66827632.33333333,
+      "external_cycles": 35647754.333333336,
+      "internal_cycles": 31179877.999999993,
+      "unsafe_cycles": 1331467.666666667,
+      "whole_program_total_cycles": 66827632.33333333,
+      "whole_program_unsafe_cycles": 1428079.0000000002,
+      "unsafe_percentage": 4.270278628629231
+    },
+    "ring": {
+      "total_cycles": 20451255839884.0,
+      "external_cycles": 9559554277387.334,
+      "internal_cycles": 10891701562496.666,
+      "unsafe_cycles": 4419661203423.333,
+      "whole_program_total_cycles": 20451255839884.0,
+      "whole_program_unsafe_cycles": 4423198840376.333,
+      "unsafe_percentage": 40.578243702907976
+    },
+    "rmp": {
+      "total_cycles": 6371345545.666666,
+      "external_cycles": 3189442570.666667,
+      "internal_cycles": 3181902974.999999,
+      "unsafe_cycles": 1329972628.6666667,
+      "whole_program_total_cycles": 6371345545.666666,
+      "whole_program_unsafe_cycles": 1330415562.6666667,
+      "unsafe_percentage": 41.79802587056153
+    },
+    "ron": {
+      "total_cycles": 1089309476.3333335,
+      "external_cycles": 602955829.6666669,
+      "internal_cycles": 486353646.6666666,
+      "unsafe_cycles": 322960293.0000001,
+      "whole_program_total_cycles": 1089309476.3333335,
+      "whole_program_unsafe_cycles": 335041842.6666668,
+      "unsafe_percentage": 66.40441481491516
+    },
+    "rust-openssl": {
+      "total_cycles": 35572403227.66667,
+      "external_cycles": 25314578745.0,
+      "internal_cycles": 10257824482.666672,
+      "unsafe_cycles": 2346719557.6666665,
+      "whole_program_total_cycles": 35572403227.66667,
+      "whole_program_unsafe_cycles": 3390864043.333333,
+      "unsafe_percentage": 22.877361195174224
+    },
+    "rustc-demangle": {
+      "total_cycles": 3533887083.6666665,
+      "external_cycles": 2574751921.0,
+      "internal_cycles": 959135162.6666665,
+      "unsafe_cycles": 774821525.6666665,
+      "whole_program_total_cycles": 3533887083.6666665,
+      "whole_program_unsafe_cycles": 775670518.9999999,
+      "unsafe_percentage": 80.7833510672723
+    },
+    "scroll": {
+      "total_cycles": 17499068.0,
+      "external_cycles": 12436526.0,
+      "internal_cycles": 5062542.0,
+      "unsafe_cycles": 189069.33333333334,
+      "whole_program_total_cycles": 17499068.0,
+      "whole_program_unsafe_cycles": 214091.6666666667,
+      "unsafe_percentage": 3.734671896713812
+    },
+    "semver": {
+      "total_cycles": 1625875893.9999998,
+      "external_cycles": 1265523100.0,
+      "internal_cycles": 360352793.99999976,
+      "unsafe_cycles": 327416432.6666667,
+      "whole_program_total_cycles": 1625875893.9999998,
+      "whole_program_unsafe_cycles": 338677916.0,
+      "unsafe_percentage": 90.85996781994339
+    },
+    "serde_with": {
+      "total_cycles": 1168741779.333333,
+      "external_cycles": 323809300.3333332,
+      "internal_cycles": 844932478.9999998,
+      "unsafe_cycles": 147378729.66666666,
+      "whole_program_total_cycles": 1168741779.333333,
+      "whole_program_unsafe_cycles": 155838028.0,
+      "unsafe_percentage": 17.442663565388482
+    },
+    "serde_yaml": {
+      "total_cycles": 444476634.3333334,
+      "external_cycles": 171846712.3333333,
+      "internal_cycles": 272629922.00000006,
+      "unsafe_cycles": 139218987.66666663,
+      "whole_program_total_cycles": 444476634.3333334,
+      "whole_program_unsafe_cycles": 199227190.66666663,
+      "unsafe_percentage": 51.065190000188835
+    },
+    "sharded-slab": {
+      "total_cycles": 11820992575.333334,
+      "external_cycles": 6708294847.999999,
+      "internal_cycles": 5112697727.333335,
+      "unsafe_cycles": 4627811016.666666,
+      "whole_program_total_cycles": 11820992575.333334,
+      "whole_program_unsafe_cycles": 4762838077.333333,
+      "unsafe_percentage": 90.51603015616621
+    },
+    "signal-hook": {
+      "total_cycles": 9386984610.0,
+      "external_cycles": 4633773391.666666,
+      "internal_cycles": 4753211218.333334,
+      "unsafe_cycles": 591087326.3333333,
+      "whole_program_total_cycles": 9386984610.0,
+      "whole_program_unsafe_cycles": 594834955.6666666,
+      "unsafe_percentage": 12.435536717861071
+    },
+    "simdutf8": {
+      "total_cycles": 979871182.0,
+      "external_cycles": 491141072.0,
+      "internal_cycles": 488730110.0,
+      "unsafe_cycles": 440535727.0,
+      "whole_program_total_cycles": 979871182.0,
+      "whole_program_unsafe_cycles": 441263646.3333333,
+      "unsafe_percentage": 90.1388553694799
+    },
+    "siphasher": {
+      "total_cycles": 145149431.0,
+      "external_cycles": 74024705.66666667,
+      "internal_cycles": 71124725.33333333,
+      "unsafe_cycles": 22447451.333333332,
+      "whole_program_total_cycles": 145149431.0,
+      "whole_program_unsafe_cycles": 22643615.0,
+      "unsafe_percentage": 31.560686144137705
+    },
+    "slotmap": {
+      "total_cycles": 1806609449.3333333,
+      "external_cycles": 574755739.6666667,
+      "internal_cycles": 1231853709.6666665,
+      "unsafe_cycles": 1095243165.6666667,
+      "whole_program_total_cycles": 1806609449.3333333,
+      "whole_program_unsafe_cycles": 1111606675.6666667,
+      "unsafe_percentage": 88.91016498728848
+    },
+    "smallvec": {
+      "total_cycles": 14932131.666666668,
+      "external_cycles": 7720295.333333333,
+      "internal_cycles": 7211836.333333335,
+      "unsafe_cycles": 314595.6666666667,
+      "whole_program_total_cycles": 14932131.666666668,
+      "whole_program_unsafe_cycles": 338290.3333333334,
+      "unsafe_percentage": 4.362213063718537
+    },
+    "tokio": {
+      "total_cycles": 340457965767.6667,
+      "external_cycles": 111031462901.66667,
+      "internal_cycles": 229426502866.0,
+      "unsafe_cycles": 43913652455.33334,
+      "whole_program_total_cycles": 340457965767.6667,
+      "whole_program_unsafe_cycles": 161713796914.66675,
+      "unsafe_percentage": 19.140618850378317
+    },
+    "triomphe": {
+      "total_cycles": 19689499.0,
+      "external_cycles": 11907033.333333334,
+      "internal_cycles": 7782465.666666666,
+      "unsafe_cycles": 1010990.3333333333,
+      "whole_program_total_cycles": 19689499.0,
+      "whole_program_unsafe_cycles": 1111413.3333333333,
+      "unsafe_percentage": 12.990617326633885
+    },
+    "unicode-normalization": {
+      "total_cycles": 20862069341.0,
+      "external_cycles": 11184145174.666668,
+      "internal_cycles": 9677924166.333332,
+      "unsafe_cycles": 6872645811.333334,
+      "whole_program_total_cycles": 20862069341.0,
+      "whole_program_unsafe_cycles": 7051157648.666667,
+      "unsafe_percentage": 71.01363570548794
+    },
+    "utf8parse": {
+      "total_cycles": 31259867001.0,
+      "external_cycles": 17815284246.666668,
+      "internal_cycles": 13444582754.333332,
+      "unsafe_cycles": 9956144997.333334,
+      "whole_program_total_cycles": 31259867001.0,
+      "whole_program_unsafe_cycles": 10160789582.333334,
+      "unsafe_percentage": 74.05320923123749
+    },
+    "uuid": {
+      "total_cycles": 11893350299.333334,
+      "external_cycles": 3712055208.666667,
+      "internal_cycles": 8181295090.666667,
+      "unsafe_cycles": 1547381809.0000002,
+      "whole_program_total_cycles": 11893350299.333334,
+      "whole_program_unsafe_cycles": 1547711109.3333335,
+      "unsafe_percentage": 18.913653545699315
+    },
+    "value-bag": {
+      "total_cycles": 12374098.0,
+      "external_cycles": 7041358.0,
+      "internal_cycles": 5332740.0,
+      "unsafe_cycles": 69073.66666666667,
+      "whole_program_total_cycles": 12374098.0,
+      "whole_program_unsafe_cycles": 79228.0,
+      "unsafe_percentage": 1.295275349382619
+    },
+    "winnow": {
+      "total_cycles": 20600847986.666668,
+      "external_cycles": 6512641599.333333,
+      "internal_cycles": 14088206387.333336,
+      "unsafe_cycles": 202767976.0,
+      "whole_program_total_cycles": 20600847986.666668,
+      "whole_program_unsafe_cycles": 203041540.0,
+      "unsafe_percentage": 1.4392745990881286
+    },
+    "zopfli": {
+      "total_cycles": 528538762535.99994,
+      "external_cycles": 265632744161.66672,
+      "internal_cycles": 262906018374.33322,
+      "unsafe_cycles": 214582758489.33334,
+      "whole_program_total_cycles": 528538762535.99994,
+      "whole_program_unsafe_cycles": 215039069369.33334,
+      "unsafe_percentage": 81.61956877830167
+    }
+  }
+}

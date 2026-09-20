@@ -8,9 +8,7 @@ Currently we measure
 
 ## Compile and Link
 
-To enable the runtime libraries, compile them separately in the
-`unsafe_perf_source` directory (prebuilt copies for `cpu`/`heap`/`counter` are
-also shipped under `unsafe_perf_prebuilt/`):
+To enable the runtime libraries, compile them separately in the `perf` directory:
 
 ### Individual Features
 
@@ -36,8 +34,8 @@ To link this library, in the target crate's `.cargo/config.toml`, add
 [build]
 rustflags = [
   "-Z", "unstable-options",
-  "--extern", "force:unsafe_perf=/you_path/unsafe_perf_source/target/release/libunsafe_perf.rlib",
-  "-L", "/you_path/unsafe_perf_source/target/release/deps"
+  "--extern", "force:unsafe_perf=/you_path/perf/target/release/libunsafe_perf.rlib",
+  "-L", "/you_path/perf/target/release/deps"
 ]
 ```
 

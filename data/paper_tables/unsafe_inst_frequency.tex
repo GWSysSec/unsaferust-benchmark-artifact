@@ -1,0 +1,19 @@
+\begin{table}[tb]
+\caption{Unsafe Instruction Frequency Analysis for Common Crates.
+Dynamic runtime behavior comparison showing how native library attribution affects
+unsafe instruction execution frequency (RQ3: How frequently are unsafe instructions executed?)}
+\label{table:unsafe_inst_frequency}
+\centering
+\begin{tabular}{@{}l|c|c@{}}
+\toprule
+\textbf{Metric} & \textbf{w/o native lib} & \textbf{w/ native lib} \\
+\midrule
+Unsafe \% (Min) & 0.01\% & 0.69\% \\
+Unsafe \% (Geo Mean) & 1.79\% & 18.33\% \\
+Unsafe \% (Median) & 1.60\% & 19.59\% \\
+Unsafe \% (Max) & 32.26\% & 49.03\% \\
+\midrule
+\multicolumn{3}{c}{\textbf{Impact of native libraries: 10.2x}} \\
+\bottomrule
+\end{tabular}
+\end{table}

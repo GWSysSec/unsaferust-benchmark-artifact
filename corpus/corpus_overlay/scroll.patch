@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index e0b9e5c..14f273e 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -19,3 +19,6 @@ derive = ["dep:scroll_derive"]
+ 
+ [dependencies]
+ scroll_derive = { version = "0.12", optional = true, path = "scroll_derive" }
++
++
++[workspace]

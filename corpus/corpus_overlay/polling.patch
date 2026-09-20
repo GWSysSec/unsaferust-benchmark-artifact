@@ -1,0 +1,11 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 1058ba5..2cd9215 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -61,3 +61,6 @@ libc = "0.2"
+ 
+ [target.'cfg(all(unix, not(target_os="vita")))'.dev-dependencies]
+ signal-hook = "0.3.17"
++
++
++[workspace]
