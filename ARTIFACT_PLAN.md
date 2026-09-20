@@ -120,6 +120,14 @@ generated here at measurement time from whatever crates.io served then. Without
 those files a rebuild re-resolves every dependency to whatever is newest on the
 day and measures a different program.
 
+One caveat on the lockfiles. The harness does not pass `cargo --locked`, so
+cargo may update a lockfile rather than fail, and on a resolution failure the
+harness deletes the lockfile and retries with an older-versions fallback, which
+a few crates genuinely need. Shipping the lockfiles therefore makes a rebuild
+start from the same input the measured run started from, which is the right
+guarantee, but it is not an enforced one. Adding `--locked` to the artifact's
+documented flow would turn silent drift into a visible error.
+
 What fetching cannot pin is availability. The 97 git crates depend on their
 repositories still existing and still holding the recorded commit; a deleted
 repository or a force-pushed history breaks the rebuild years from now. The 3
