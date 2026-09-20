@@ -140,6 +140,16 @@ instruments only the primary package, or also the dependency-include run. This
 one has a consequence: the dependency-include run needs three compiler commits
 that are not pushed anywhere (see below), so choosing it means publishing them.
 
+A separate question turned out to have a clear answer: the artifact cannot keep
+shipping the compiler binary it has. Measured across eight crates, all three
+features and both variants, the four commits between that binary and the current
+compiler change instruction counts by a median of 0.03% and heap totals by a
+median of 0.56%, all inside the corpus's own run-to-run variation. But the
+shipped binary cannot build `colored` under the heap tracker at all: it fails to
+link with the undefined-symbol error that commit `6277bbba7148` repairs, with
+only the primary package instrumented. An evaluator using it gets heap data for
+99 of the 100 crates. `rust-dyn-bench-paper/COMPILER_AB.md` has the numbers.
+
 **3. Keep `benchmarks/`?** Its 19 trees are a subset of the 100 the fetch script
 rebuilds, and the directory also carries 7.1 GB of untracked build output on
 this machine. Replacing it with the fetch flow removes a second, inconsistent
