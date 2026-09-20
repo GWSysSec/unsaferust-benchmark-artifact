@@ -1,0 +1,199 @@
+analysis = '''
+These benchmarks are meant to test that each benchmark model passes a basic
+check for a particular regex engine. These don't exhaustively test every nook
+and cranny of each model. It does include basic things like ensuring span
+counts are correct and that `\r` and `\n` are treated as line terminators in
+the `grep` and `grep-captures` models.
+
+These benchmarks aren't really intended to be used for collecting timing
+measurements.
+'''
+
+[[bench]]
+model = "count"
+name = "count"
+regex = '[a-z][a-z][a-z][a-z][a-z]'
+haystack = { contents = "then as it was, then again it will be" }
+count = 1
+engines = [
+  'd/dmd/std-regex',
+  'dotnet',
+  'dotnet/compiled',
+  'dotnet/nobacktrack',
+  'go/regexp',
+  'hyperscan',
+  'icu',
+  'java/hotspot',
+  'javascript/v8',
+  'pcre2',
+  'pcre2/jit',
+  'perl',
+  'python/re',
+  'python/regex',
+  're2',
+  'regress',
+  'rust/regex',
+  'rust/regex/lite',
+]
+analysis = '''
+This benchmark is a way to test the most basic capabilities of probably almost
+any regex engine worth benchmarking, and does so via the `count` model. It
+doesn't even use a bounded repetition operator. Just a simple manual repetition
+with exactly one possible match.
+'''
+
+[[bench]]
+model = "count-spans"
+name = "count-spans"
+regex = '[a-z][a-z][a-z][a-z][a-z]'
+haystack = { contents = "then as it was, then again it will be" }
+count = 5
+engines = [
+  'd/dmd/std-regex',
+  'dotnet',
+  'dotnet/compiled',
+  'dotnet/nobacktrack',
+  'go/regexp',
+  'hyperscan',
+  'icu',
+  'java/hotspot',
+  'javascript/v8',
+  'pcre2',
+  'pcre2/jit',
+  'perl',
+  'python/re',
+  'python/regex',
+  're2',
+  'regress',
+  'rust/regex',
+  'rust/regex/lite',
+]
+analysis = '''
+This is like `count`, but uses the `count-spans` model to ensure the count is
+correct.
+'''
+
+[[bench]]
+model = "count-captures"
+name = "count-captures"
+regex = '([a-z][a-z][a-z])([a-z][a-z])([a-z])?'
+haystack = { contents = "then as it was, then again it will be" }
+count = 3
+engines = [
+  'd/dmd/std-regex',
+  'dotnet',
+  'dotnet/compiled',
+  'dotnet/nobacktrack',
+  'go/regexp',
+  'icu',
+  'java/hotspot',
+  'javascript/v8',
+  'pcre2',
+  'pcre2/jit',
+  'perl',
+  'python/re',
+  'python/regex',
+  're2',
+  'regress',
+  'rust/regex',
+  'rust/regex/lite',
+]
+analysis = '''
+This is like `count`, but uses the `count-captures` model to ensure the runner
+program implements capture groups correctly.
+'''
+
+[[bench]]
+model = "grep"
+name = "grep"
+regex = '[a-z][a-z][a-z]'
+haystack = { contents = "foo foo\nZ\nfoo" }
+count = 2
+engines = [
+  'd/dmd/std-regex',
+  'dotnet',
+  'dotnet/compiled',
+  'dotnet/nobacktrack',
+  'go/regexp',
+  'hyperscan',
+  'icu',
+  'java/hotspot',
+  'javascript/v8',
+  'pcre2',
+  'pcre2/jit',
+  'perl',
+  'python/re',
+  'python/regex',
+  're2',
+  'regress',
+  'rust/regex',
+  'rust/regex/lite',
+]
+analysis = '''
+This is like `count`, but uses the `grep` model to ensure the runner program
+implements line oriented searching correctly. In particular, that the total
+number of matching lines is counted and not the total number of matches.
+'''
+
+[[bench]]
+model = "grep-captures"
+name = "grep-captures"
+regex = '([a-z][a-z])([a-z])([\r\n])?'
+haystack = { contents = "foo foo\r\nZ\r\nfoo\r\nfoo" }
+count = 12
+engines = [
+  'd/dmd/std-regex',
+  'dotnet',
+  'dotnet/compiled',
+  'dotnet/nobacktrack',
+  'go/regexp',
+  'icu',
+  'java/hotspot',
+  'javascript/v8',
+  'pcre2',
+  'pcre2/jit',
+  'perl',
+  'python/re',
+  'python/regex',
+  're2',
+  'regress',
+  'rust/regex',
+  'rust/regex/lite',
+]
+analysis = '''
+This is like `count`, but uses the `grep-captures` model to ensure the runner
+program implements capture group search in a line oriented way. In particular,
+that all matching capture groups are counted and that each search should behave
+as if the line terminator is not included.
+'''
+
+[[bench]]
+model = "compile"
+name = "compile"
+regex = '[a-z][a-z][a-z][a-z][a-z]'
+haystack = { contents = "then as it was, then again it will be" }
+count = 1
+engines = [
+  'd/dmd/std-regex',
+  'dotnet',
+  'dotnet/compiled',
+  'dotnet/nobacktrack',
+  'go/regexp',
+  'hyperscan',
+  'icu',
+  'java/hotspot',
+  'javascript/v8',
+  'pcre2',
+  'pcre2/jit',
+  'perl',
+  'python/re',
+  'python/regex',
+  're2',
+  'regress',
+  'rust/regex',
+  'rust/regex/lite',
+]
+analysis = '''
+This is like `count`, but uses the `compile` model to ensure the count is
+correct.
+'''

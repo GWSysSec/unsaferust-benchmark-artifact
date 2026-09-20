@@ -1,0 +1,98 @@
+analysis = '''
+These benchmarks test the support (or not) of UTF-8 in the regex engine.
+
+These benchmarks aren't really intended to be used for collecting timing
+measurements. These are just about verifying functionality.
+'''
+
+[[bench]]
+model = "count"
+name = "dot-matches-byte"
+regex = '.'
+haystack = '💩'
+count = [
+  # D's regex dosnt support disableing unicode. The fundamental atom is always
+  # a codepoint.
+  { engine = 'd/dmd/std-regex', count = 1 },
+  # .NET always treats the UTF-16 code unit as the fundamental atom of
+  # matching.
+  { engine = 'dotnet.*', count = 2 },
+  # Go always treats a single codepoint as the fundamental atom of matching and
+  # there is no way to disable it.
+  { engine = 'go/regexp', count = 1 },
+  # ICU always treats a single codepoint as the fundamental atom of matching
+  # and there is no way to disable it.
+  { engine = 'icu', count = 1 },
+  # Java does seem to always treat the fundamental atom of matching as a single
+  # codepoint, and not a UTF-16 code unit (unlike .NET).
+  { engine = 'java/.*', count = 1 },
+  # Javascript, when Unicode mode is disabled, treats the UTF-16 code unit as
+  # the fundamental atom of matching.
+  { engine = 'javascript.*', count = 2 },
+  # regress seems to differ from Javascript here (where Unicode mode is
+  # disabled). It seems to always treats the fundamental atom matching
+  # as one codepoint (quite sensibly), but ECMAScript RegExps require that
+  # the atom be the UTF-16 code unit when Unicode mode isn't enabled.
+  { engine = 'regress', count = 1 },
+  # rust/regex/lite always matches one codepoint at a time. This cannot be
+  # disabled by design in the name simplicity of implementation.
+  { engine = 'rust/regex/lite', count = 1 },
+  { engine = '.*', count = 4 },
+]
+engines = [
+  'd/dmd/std-regex',
+  'dotnet',
+  'dotnet/compiled',
+  'dotnet/nobacktrack',
+  'go/regexp',
+  'hyperscan',
+  'icu',
+  'java/hotspot',
+  'javascript/v8',
+  'pcre2',
+  'pcre2/jit',
+  'perl',
+  'python/re',
+  'python/regex',
+  're2',
+  'regress',
+  'rust/regex',
+  'rust/regex/lite',
+]
+
+[[bench]]
+model = "count"
+name = "dot-matches-codepoint"
+regex = '.'
+unicode = true
+haystack = '💩'
+count = [
+  # For engines that treat spans as a sequence of UTF-16 code units. Since a
+  # pile of poo is outside the BMP, this uses a surrogate pair, which consists
+  # of two UTF-16 code units.
+  #
+  # Actually this seems to only apply to .NET. Java correctly treats this as a
+  # single match despite also using strings represented by UTF-16 code units.
+  { engine = 'dotnet.*', count = 2 },
+  { engine = '.*', count = 1 },
+]
+engines = [
+  'd/dmd/std-regex',
+  'dotnet',
+  'dotnet/compiled',
+  'dotnet/nobacktrack',
+  'go/regexp',
+  'hyperscan',
+  'icu',
+  'java/hotspot',
+  'javascript/v8',
+  'pcre2',
+  'pcre2/jit',
+  'perl',
+  'python/re',
+  'python/regex',
+  're2',
+  'regress',
+  'rust/regex',
+  'rust/regex/lite',
+]

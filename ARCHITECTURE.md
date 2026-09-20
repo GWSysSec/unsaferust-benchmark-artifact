@@ -6,27 +6,33 @@ nobody can check. This one is built so that every claim in the paper can be
 checked in minutes, and the expensive re-measurement is an optional deepening
 rather than the price of entry.
 
-## The two things an evaluator can check, and the difference between them
+## The evaluator measures; our data is what they compare against
 
-**Does the shipped data produce the paper's numbers?** Instant, exact, and the
-check most worth running. Each table in the paper has one script here. The
-script rebuilds that table from the measurement data we ship and compares it,
-character for character, against the table in the submitted paper. Nothing is
-measured, nothing is random: it either matches or it does not.
+Each table in the paper has one script here, and by default that script builds
+the table out of the evaluator's own measurement. It then puts three things next
+to each other: the table from their numbers, the same table from the paper, and
+a crate-by-crate comparison against ours. Our measurement data ships too, but it
+is the reference, not the input.
 
-**Does a fresh measurement reproduce the shipped data?** Slow, and approximate
-by nature. The same scripts take `--from-run`, pointing at a measurement the
-evaluator made themselves, and report how far each crate lands from ours. This
-is approximate because the corpus is not deterministic: over 200
-crate-and-variant pairs measured twice, 112 agreed to better than one part in
-ten thousand, 59 more to within 1%, 22 to within 10%, and 7 differed by more
-than 10%. Those 7 belong to four crates whose tests drive randomly generated
-input. The scripts grade against that measured spread instead of demanding
-equality.
+The comparison grades rather than demanding equality, because the corpus is not
+deterministic. Over 200 crate-and-variant pairs measured twice, 112 agreed to
+better than one part in ten thousand, 59 more to within 1%, 22 to within 10%,
+and 7 differed by more than 10%; those 7 belong to four crates whose tests drive
+randomly generated input. A handful of crates outside 10% is the expected
+outcome, not a failure.
 
-Keeping these apart matters. The first says our data and our paper agree. The
-second says our data and the world agree. A reader who conflates them will read
-ordinary workload variance as a failure to reproduce.
+There is a second, much weaker check: `run/check_shipped_data.sh` rebuilds every
+table from the data we ship and compares it character for character with the
+paper, in about twenty seconds. It answers a different question — whether the
+data behind the paper was ever consistent with the paper — and it exists so that
+when a fresh measurement and the paper disagree, the evaluator can tell which
+side moved. It is not the artifact's main path.
+
+One consequence worth stating plainly: a table summarises the crates that were
+measured. A 12-crate run produces a 12-crate table, and the paper's is over 100.
+Min, geomean, median and max over different populations are not the same
+statistic, so the scripts say so rather than letting the two be compared
+silently.
 
 ## Layout
 
@@ -35,10 +41,24 @@ ordinary workload variance as a failure to reproduce.
     docker/                the image: builds the compiler from source
     compiler/              the compiler source (rustc 1.80 + LLVM 18 + passes)
     corpus/                how to obtain the 100 crates at the exact versions used
-    run/                   scripts that measure, in three sizes
+    benchmark_suite/       the 19-crate suite, which is a different thing (below)
+    run/                   fetch, measure in three sizes, check the shipped data
     tables/                one script per table and figure in the paper
     data/                  the measurement data the paper reports
     tools/                 aggregation and comparison code
+
+## The corpus and the benchmark suite are different things
+
+The corpus is the 100 crates the empirical study measures, through
+`cargo test --tests`. The benchmark suite is 19 crates proposed for measuring
+what unsafe-Rust defenses cost, through `cargo bench`. Sixteen crates are in
+both; `rayon`, `rebar` and `simd-json` are only in the suite. They are kept in
+separate directories because mixing them would make it look as though the suite
+were a subset of the corpus, and because their per-crate run commands differ.
+
+The suite is shipped as source rather than fetched from a lock: unlike the
+corpus crates, those trees carry no repository or release marker, so there is
+nothing to reconstruct them from.
 
 ## Why the corpus is fetched rather than shipped whole
 

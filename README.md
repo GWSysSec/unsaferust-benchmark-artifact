@@ -1,89 +1,63 @@
 # Dynamic Analysis of Unsafe Rust: Behaviors and Benchmarks — artifact
 
-This artifact contains everything needed to check the paper's numbers: the
-source of the instrumented compiler, the exact source of all 100 crates that
-were measured, the measurement data the paper reports, and one script per table
-and figure in the paper.
+This artifact lets you rerun the study and compare what you measure against
+what the paper reports. It contains the source of the instrumented compiler,
+the source of all 100 crates the study measures, the 19-crate benchmark suite
+the paper proposes, and one script per table in the paper.
 
-There are two different things you can check, and they take very different
-amounts of time.
+The intended path is that you measure the corpus yourself and build the tables
+from your own numbers. Our measurement data is here too, but as the thing to
+compare against, not as the input.
 
-**Does the shipped data produce the paper's tables?** About twenty seconds, no
-Docker and no network. This is exact: each table is rebuilt from the data and
-compared character for character against the table in the paper.
+## In order
 
-**Does a fresh measurement reproduce the shipped data?** Hours to days,
-depending on how much of the corpus you run. This one is approximate, because
-the corpus is not deterministic. Numbers are below.
+    docker/build.sh                  build the compiler from source
+    docker/run.sh                    open a shell in the image
+    run/fetch_corpus.sh              obtain the 100 crates at the exact versions
+    run/measure.sh --tier smoke      measure
+    tables/rq3_unsafe_inst_frequency.sh    build that table from what you measured
 
----
+Each step is described below with the time it takes.
 
-## 1. Check the tables (20 seconds)
-
-Needs only Python 3.10+ with `matplotlib` and `numpy`.
-
-```bash
-run/check_all_tables.sh
-```
-
-Expected output: seven lines reading `match`, then
-`All tables and figures reproduce from the shipped data.`
-
-To see any single table, with its numbers and the comparison:
-
-```bash
-tables/rq1_cpu_cycles.sh            # CPU cycles spent in unsafe code (RQ1, RQ6)
-tables/rq2_heap.sh                  # heap memory reached by unsafe code (RQ2)
-tables/rq3_unsafe_inst_frequency.sh # how often executed instructions are unsafe (RQ3)
-tables/rq4_inst_types.sh            # what kind of instruction the unsafe ones are (RQ4)
-tables/rq5_unsafe_functions.sh      # how often functions holding unsafe code run (RQ5)
-tables/figure_cycles_cdf.sh         # the RQ1/RQ6 distribution figure
-tables/figure_heap_cdf.sh           # the RQ2 distribution figure
-```
-
-Add `--dataset alldeps` to any of them for the same measurement taken with every
-crate in the dependency graph instrumented, rather than only the crate under
-study. Those tables are new in the camera-ready, so there is nothing in the
-submitted paper to compare them against; the script prints them instead.
-
-## 2. Build the compiler (2 to 4 hours)
+## 1. Build the compiler
 
 ```bash
 docker/build.sh
 ```
 
-This builds LLVM 18 with assertions and then rustc 1.80, from the source in
+Builds LLVM 18 with assertions and then rustc 1.80 from
 `compiler/compiler-src.tar.zst`. Assertions are on because that is what the
 measurements were taken with; turning them off would be a different compiler.
-Budget about 40 GB of disk while it runs. Then:
 
-```bash
-docker/run.sh
-```
+Budget about 40 GB of disk. The build caps its own parallelism by available
+memory, roughly 2 GB per compile job, because an uncapped build on a machine
+with less memory than cores gets its tablegen steps killed by the kernel and
+reports only `FAILED` with nothing underneath. Override with
+`--build-arg COMPILE_JOBS=n --build-arg LINK_JOBS=m`.
 
-which drops you in a shell at `/workspace/artifact` with the compiler linked as
-the `stage1` toolchain.
+Then `docker/run.sh` gives you a shell at `/workspace/artifact` with the
+compiler linked as the `stage1` toolchain.
 
-## 3. Fetch the crate sources (a few minutes, needs network)
+## 2. Get the crate sources
 
 ```bash
 run/fetch_corpus.sh
 ```
 
 Clones or downloads each of the 100 crates at the exact commit or released
-version recorded in `corpus/corpus_lock.csv`, then applies
-`corpus/corpus_overlay/`. About 1.7 GB.
+version in `corpus/corpus_lock.csv`, then applies `corpus/corpus_overlay/`,
+which carries every difference between that upstream tree and the tree we
+measured — including the 113 `Cargo.lock` files that pin the dependency
+versions. Without those a rebuild resolves different dependencies and measures
+a different program.
 
-To confirm the result is what was measured, point it at a reference copy:
+A few minutes and about 1.7 GB. `corpus/corpus-sources.tar.zst` is the same
+thing packaged for evaluation without network access.
 
-```bash
-run/fetch_corpus.sh --verify-against /path/to/reference
-```
+To confirm you got what we measured, pass `--verify-against` a reference copy.
+Run against our own trees, all 100 crates rebuild and verify file by file.
 
-We ran that against our own trees: all 100 crates rebuild and verify file by
-file.
-
-## 4. Measure (32 minutes to 121 hours)
+## 3. Measure
 
 ```bash
 run/measure.sh --tier smoke     # 12 crates, about 32 minutes
@@ -91,55 +65,92 @@ run/measure.sh --tier fast      # 58 crates, about 1.5 hours
 run/measure.sh --tier full      # all 100 crates, 121.7 hours
 ```
 
-Add `--scope alldeps` to instrument every crate in the dependency graph instead
-of only the crate under study.
+Add `--scope alldeps` to instrument every crate in the dependency graph rather
+than only the crate under study.
 
-The tiers exist because the full corpus really does take that long: the median
-crate finishes in 2.7 minutes, but ten crates take more than four hours each and
-tokio alone takes 16.3. The smoke tier spans unsafe shares from 0.03% to 10.15%,
-so it exercises the range rather than a corner of it.
+The tiers exist because the full corpus really does take that long. The median
+crate finishes in 2.7 minutes, but ten take over four hours each and tokio alone
+takes 16.3. The smoke tier spans unsafe shares from 0.03% to 10.15%, so it
+exercises the range rather than a corner of it.
 
-## 5. Compare your measurement against ours
+## 4. Build the tables from your measurement
 
 ```bash
-tables/rq3_unsafe_inst_frequency.sh --from-run results/<timestamp>
+tables/rq1_cpu_cycles.sh             # CPU cycles in unsafe code (RQ1, RQ6)
+tables/rq2_heap.sh                   # heap memory reached by unsafe code (RQ2)
+tables/rq3_unsafe_inst_frequency.sh  # how often executed instructions are unsafe (RQ3)
+tables/rq4_inst_types.sh             # what kind of instruction the unsafe ones are (RQ4)
+tables/rq5_unsafe_functions.sh       # how often functions holding unsafe code run (RQ5)
+tables/figure_cycles_cdf.sh          # the RQ1/RQ6 distribution figure
+tables/figure_heap_cdf.sh            # the RQ2 distribution figure
 ```
 
-This grades each crate rather than demanding equality, and it should: rerunning
-this corpus does not give identical numbers. We measured the spread by running
-the whole instruction counter twice over all 100 crates. Of the 200
+Each uses your most recent run under `results/`, builds the table from it,
+prints it beside the same table in the paper, and then compares crate by crate
+against our measurement. `--run DIR` picks a different run; `--scope alldeps`
+says what the run instrumented.
+
+Two things to expect.
+
+**A partial run makes a partial table.** A table summarises the crates that were
+measured, so the smoke tier gives you a 12-crate table and the paper's is over
+100. Those are not the same statistic and the script says so. Only `--tier full`
+covers the paper's population.
+
+**Rerunning does not give identical numbers.** We measured the spread by running
+the whole instruction counter twice over all 100 crates: of the 200
 crate-and-variant pairs, 112 agreed to better than one part in ten thousand, 59
 more to within 1%, 22 to within 10%, and 7 differed by more than 10%. Those 7
 belong to four crates — petgraph, zopfli, portable-atomic and http — whose tests
-drive randomly generated input; petgraph's unsafe instruction count moved by 73%
-between our own two runs.
+drive randomly generated input; petgraph's unsafe instruction count moved 73%
+between our own two runs. The comparison grades against that spread rather than
+demanding equality, and a handful of crates outside 10% is the expected outcome.
 
-A handful of crates outside 10% is the expected outcome, not a failure.
+## 5. If your numbers and the paper's disagree
+
+```bash
+run/check_shipped_data.sh
+```
+
+Rebuilds every table from the data we ship and checks it against the paper, in
+about twenty seconds with no measurement and no network. This tells you whether
+the data behind the paper was ever consistent with the paper, which is a
+different question from whether your machine reproduces it.
+
+## The benchmark suite
+
+`benchmark_suite/` is the paper's second contribution and is not the study
+corpus. It is 19 crates proposed for measuring the overhead that unsafe-Rust
+defenses impose, run through `cargo bench` rather than `cargo test`. Sixteen
+also appear in the corpus; `rayon`, `rebar` and `simd-json` do not. Several need
+something other than a plain `cargo bench`, and `docs/benchmark_configs.md`
+gives the command for each. See `benchmark_suite/README.md`.
 
 ## What is where
 
-    README.md              this file
-    ARCHITECTURE.md        why the artifact is shaped this way
-    compiler/              the instrumented compiler, as source, with its commit hashes
-    corpus/                the crate lock, the overlay, the fetch script, the generated workloads
-    data/                  the measurement data the paper reports, and the tables as submitted
-    docker/                the image definition
-    run/                   check the tables, fetch the corpus, measure
-    tables/                one script per table and figure
-    tools/                 aggregation, comparison, and the measurement harness
-    unsafe_perf_source/    the instrumentation runtime library
+    compiler/            the instrumented compiler as source, with its commit hashes
+    corpus/              the 100-crate lock, overlay, fetch script, generated workloads
+    benchmark_suite/     the 19-crate benchmark suite, as source
+    data/                our measurement data, and the tables as submitted
+    docker/              the image definition
+    run/                 fetch, measure, and the shipped-data check
+    tables/              one script per table and figure
+    tools/               aggregation, comparison, and the measurement harness
+    unsafe_perf_source/  the instrumentation runtime library
+    docs/                the crate dataset and the per-benchmark configurations
 
 ## Limits worth knowing before you start
 
-The corpus is not deterministic, as described above. Four crates drive random
-input and will not reproduce closely.
+Four crates drive random input and will not reproduce closely, as above.
 
-The full measurement takes 121.7 hours sequentially. Nothing in this artifact
-runs it for you in less; the tiers are the honest way to spend less time.
-
-The crates are libraries, not applications, and most sit low in a dependency
-tree. The paper says so, and it bounds what the results generalise to.
+The corpus crates are libraries, not applications, and most sit low in a
+dependency tree. The paper says so, and it bounds what the results generalise to.
 
 The workloads are each crate's own integration tests plus generated drivers that
 raise public-API coverage from 76.4% to 90.4%. High API coverage is not the same
-as representing how the API gets used in production.
+as representing how the API is used in production.
+
+Three tables in the paper describe the benchmark suite rather than the corpus —
+its dynamic characteristics, its composition, and its comparison against the
+suites prior defenses use. Those were produced by hand rather than by a script,
+so there is no `tables/` entry for them yet.

@@ -32,25 +32,47 @@ RUN mkdir -p /workspace/compiler-src \
 # The bootstrap configuration is not part of the source tree, so write the one
 # the measurements used. Assertions stay on: they are slower, but turning them
 # off would be a different compiler from the one that produced the data.
-RUN printf '%s\n' \
-    'change-id = 125535' \
-    '' \
-    '[llvm]' \
-    'build-config = { "LLVM_ENABLE_RTTI" = "ON" }' \
-    'download-ci-llvm = false' \
-    'optimize = true' \
-    'assertions = true' \
-    'ninja = true' \
-    'targets = "X86"' \
-    'link-shared = false' \
-    '' \
-    '[build]' \
-    'submodules = false' \
-    'extended = false' \
-    'profiler = true' \
-    > /workspace/compiler-src/config.toml
+#
+# Parallelism is capped by memory, not by core count. Compiling LLVM and the
+# vendored Z3 at one job per core needs far more memory than a typical machine
+# has: on a 32-core host with 19 GB free, an uncapped build had tablegen killed
+# by the kernel at step 337 of 3374, which surfaces only as "FAILED" with no
+# error message underneath it. Roughly 2 GB per compile job and 8 GB per link
+# job keeps it alive. Override with --build-arg COMPILE_JOBS=n LINK_JOBS=m.
+ARG COMPILE_JOBS=
+ARG LINK_JOBS=
+RUN set -eu; \
+    mem_gb=$(awk '/MemTotal/ {printf "%d", $2/1024/1024}' /proc/meminfo); \
+    cpus=$(nproc); \
+    cj="${COMPILE_JOBS:-$(( mem_gb/2 < cpus ? mem_gb/2 : cpus ))}"; \
+    lj="${LINK_JOBS:-$(( mem_gb/8 > 0 ? mem_gb/8 : 1 ))}"; \
+    [ "$cj" -lt 1 ] && cj=1; [ "$lj" -lt 1 ] && lj=1; \
+    echo "building with $cj compile jobs and $lj link jobs ($cpus cpus, ${mem_gb} GB)"; \
+    printf '%s\n' \
+      'change-id = 125535' \
+      '' \
+      '[llvm]' \
+      "build-config = { \"LLVM_ENABLE_RTTI\" = \"ON\", \"LLVM_PARALLEL_COMPILE_JOBS\" = \"$cj\", \"LLVM_PARALLEL_LINK_JOBS\" = \"$lj\" }" \
+      'download-ci-llvm = false' \
+      'optimize = true' \
+      'assertions = true' \
+      'ninja = true' \
+      'targets = "X86"' \
+      'link-shared = false' \
+      '' \
+      '[build]' \
+      'submodules = false' \
+      'extended = false' \
+      'profiler = true' \
+      > /workspace/compiler-src/config.toml; \
+    echo "$cj" > /workspace/jobs; \
+    cat /workspace/compiler-src/config.toml
 
-RUN cd /workspace/compiler-src && python3 x.py build library --stage 1
+# The rustc side takes its job count on the command line. `jobs` is not a key
+# bootstrap 1.80 accepts under [build]; putting it there stops the build before
+# it starts.
+RUN cd /workspace/compiler-src \
+ && python3 x.py build library --stage 1 -j "$(cat /workspace/jobs)"
 
 # --- cargo -------------------------------------------------------------------
 # A current cargo drives the build. The stage-0 cargo that ships with a 1.80

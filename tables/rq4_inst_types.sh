@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Rebuild this table from the data this artifact ships and check it against the
-# submitted paper. Add --dataset alldeps for the dependency-include numbers,
-# or --from-run <dir> to also check a measurement run of your own.
-exec python3 "$(dirname "$0")/../tools/check_table.py" rq4_inst_types "$@"
+# Build this table from YOUR measurement and compare it with the paper.
+# Measure first with run/measure.sh. Options:
+#   --run DIR      a measurement directory other than the newest in results/
+#   --scope alldeps  the run instrumented every crate in the dependency graph
+#   --our-data     build from the data this artifact ships instead of yours
+exec python3 "$(dirname "$0")/../tools/make_table.py" rq4_inst_types "$@"

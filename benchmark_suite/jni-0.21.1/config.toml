@@ -1,0 +1,15 @@
+[build]
+rustc = "/home/arsalan/Documents/Github/unsafe-rust-benchmark/build/x86_64-unknown-linux-gnu/stage1/bin/rustc" 
+rustflags = [
+    "--emit=llvm-ir",
+    "-C", "unsafe_include_native_lib=true",
+    "-C", "llvm-args=-enable-instmarker",
+    #"-C", "llvm-args=-enable-heap-tracker",
+    # "-C", "llvm-args=-enable-unsafe-function-tracker",
+    # "-C", "llvm-args=-enable-unsafe-inst-counter",
+    "-C", "llvm-args=-enable-dynamic-line-count",
+    # "-C", "llvm-args=-enable-cpu-cycle-count",
+    "-Z", "unstable-options",
+    "--extern", "force:unsafe_perf=/home/arsalan/Documents/Github/unsafe-dyn-rust-expr/lib/perf/target/release/libunsafe_perf.rlib",
+    "-L", "/home/arsalan/Documents/Github/unsafe-dyn-rust-expr/lib/perf/target/release/deps"
+]

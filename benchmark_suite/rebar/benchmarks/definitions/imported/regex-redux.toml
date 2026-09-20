@@ -1,0 +1,42 @@
+analysis = '''
+This is a port of the [Benchmark Game's regex-redux
+benchmark][benchgame-regexredux]. It is not precisely equivalent because it
+bans things like parallelism and ensures all regex engines use as similar
+configuration as possible. (For example, disabling Unicode mode in any regex
+engine that enables it by default, since this benchmark is purely ASCII.)
+
+See the [MODELS](MODELS.md) document in the repo root for a more in depth
+description of the regex-redux model. Namely, this particular benchmark is
+different from the rest in that it is more complicated than "search a regex in
+some haystack repeatedly."
+
+[benchgame-regexredux]: https://benchmarksgame-team.pages.debian.net/benchmarksgame/performance/regexredux.html
+'''
+
+[[bench]]
+model = "regex-redux"
+name = "regex-redux"
+regex = [] # many regexes are used, but are hard-coded into the model
+haystack = { path = "imported/regex-redux-100000.fasta" }
+count = 547_899
+engines = [
+  'd/dmd/std-regex',
+  'd/ldc/std-regex',
+  'dotnet',
+  'dotnet/compiled',
+  'dotnet/nobacktrack',
+  'go/regexp',
+  'hyperscan',
+  'java/hotspot',
+  'javascript/v8',
+  'pcre2',
+  'pcre2/jit',
+  'perl',
+  'python/re',
+  'python/regex',
+  're2',
+  'regress',
+  'rust/regex',
+  'rust/regex/lite',
+  'rust/regexold',
+]

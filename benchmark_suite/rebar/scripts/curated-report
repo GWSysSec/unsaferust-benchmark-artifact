@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ $# != 1 ]; then
+  echo "Usage: $(basename "$0") <csv-result-directory>" >&2
+  exit 1
+fi
+
+dir="${1%%/}"  # drop the trailing / if one exists
+# We exclude rust/regexold because it's more of a test to ensure we didn't have
+# any major regressions when we cut over to regex-automata in the rust/regex
+# 1.9 release. It otherwise isn't really meant to be measured as a distinct
+# engine in the curated set of benchmarks.
+exclude='^(rust/regexold)$'
+exec rebar report \
+  --splice README.md \
+  --statistic median \
+  --units throughput \
+  -f '^curated/' \
+  --summary-exclude "$exclude" \
+  "$dir"/*.csv

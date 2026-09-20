@@ -103,6 +103,35 @@ ALLDEPS = Dataset(
 DATASETS = {d.name: d for d in (PUBLISHED, ALLDEPS)}
 
 
+# A measurement someone made themselves, registered when ARTIFACT_RUN_DIR names
+# one. This is how the artifact's table scripts work: the evaluator runs the
+# harness, and the tables are then built from THEIR output rather than from
+# ours, with ours kept only as the thing to compare against.
+#
+# keep_test_failures is on. A fresh run's summaries list every generated
+# coverage workload binary with its real exit code, so filtering on exit 101
+# would drop binaries that ran their whole workload and only failed an
+# assertion -- and the published run never filtered them, because its summaries
+# do not list them at all. Keeping them is what puts the same binaries on both
+# sides of the comparison.
+_RUN_DIR = os.environ.get("ARTIFACT_RUN_DIR")
+if _RUN_DIR:
+    _scope = os.environ.get("ARTIFACT_RUN_SCOPE", "primary")
+    _alldeps = _scope == "alldeps"
+    YOURRUN = Dataset(
+        name="yourrun",
+        counter_root=Path(_RUN_DIR),
+        heap_root=Path(_RUN_DIR),
+        cpu_root=Path(_RUN_DIR),
+        suffix="_yourrun",
+        cycle_metric="whole_program" if _alldeps else "internal",
+        scope=("every crate in the dependency graph" if _alldeps
+               else "primary package only"),
+        keep_test_failures=True,
+    )
+    DATASETS["yourrun"] = YOURRUN
+
+
 def get(name: str) -> Dataset:
     try:
         return DATASETS[name]
@@ -118,5 +147,7 @@ def add_argument(parser) -> None:
         "--dataset",
         default="published",
         choices=sorted(DATASETS),
-        help="which measurement run to read (default: published)",
+        help="which measurement run to read (default: published). "
+             "'yourrun' appears when ARTIFACT_RUN_DIR names a measurement "
+             "directory of your own.",
     )
