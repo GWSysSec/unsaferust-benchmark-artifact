@@ -1,48 +1,23 @@
 #!/usr/bin/env python3
-"""Compare a fresh measurement run against the numbers this repository ships.
+"""Compare a fresh measurement run with the numbers the paper reports.
 
-This is the check an artifact evaluator runs. Point it at the output directory
-the measurement harness wrote and say which of our datasets it should reproduce;
-it aggregates the fresh run with the same code that produced our numbers and
-reports, per research question, how many crates agree.
+    python3 verify_reproduction.py /path/to/rebench_output --dataset published
 
-    python3 verify_reproduction.py /path/to/rebench_output --dataset alldeps
+Every research question is compared as a share -- unsafe instructions out of
+all executed instructions, unsafe heap bytes out of all heap bytes, and so on.
+That is what the paper's tables report, and it is what carries across machines:
+cycle counts and instruction counts depend on the hardware and on how much work
+a test suite happened to do, while the ratio between them does not.
 
-What "agree" means, and why it is not "identical".
-
-Rerunning this corpus does not give identical numbers. We measured that: the
-dependency-include run repeated its whole instruction-counter pass over all 100
-crates, and comparing the two repetitions, 112 of the 200 crate-and-variant
-pairs agreed to better than one part in ten thousand, 59 more agreed to within
-1%, 22 to within 10%, and 7 differed by more than 10%. The 7 belong to four
-crates -- petgraph, zopfli, portable-atomic and http -- whose test suites drive
-randomly generated input, so each run does a different amount of work.
-petgraph's unsafe instruction count moved by 73% between our own two runs.
-
-So this tool grades each crate against a tolerance and reports the distribution,
-rather than demanding equality. A crate outside tolerance is worth looking at;
-a handful of them, especially the four named above, is the expected outcome.
-
-Every question is compared as a SHARE, never as a raw count, for two reasons.
-
-The first is the machine. Cycle counts depend on the processor, so comparing
-them against ours means nothing; the share of cycles spent in unsafe code is
-what should carry over.
-
-The second is our own data. The published instruction-counter run is not one
-measurement pass. Its stat files span 2026-05-18 to 2026-05-30; 1,082 of its
-1,271 test binaries were measured twice and three were measured four times, and
-the aggregator sums every stat file it finds. Our published totals are therefore
-1.596 times what a single pass executes. A crate like libsecp256k1, every one of
-whose binaries was measured twice, has published counts that are exactly double.
-A fresh run measures each binary once, so raw counts would show it a hundred
-percent away from us while every share agreed to three decimal places.
-`audit_duplicate_stats.py` in this directory measures that, and gates itself by
-first reproducing the published aggregation exactly.
-
-A share still moves when a test binary does a different amount of work between
-runs, and a crate's share is dominated by its largest binary. Examine the
-binaries before concluding a crate failed to reproduce.
+Rerunning does not give identical numbers and is not expected to. We measured
+the spread by running the whole instruction counter twice over all 100 crates:
+of the 200 crate-and-variant pairs, 112 agreed to better than one part in ten
+thousand, 59 more to within 1%, 22 to within 10%, and 7 differed by more than
+10%. The 7 belong to crates whose test suites generate their input, so each run
+does a different amount of work. This tool therefore grades each crate against
+a tolerance and reports the distribution. A difference below a tenth of a
+percentage point counts as agreement, because a share near zero otherwise
+produces enormous relative differences out of nothing.
 """
 
 from __future__ import annotations
@@ -77,7 +52,7 @@ def grade(rel: float) -> str:
 
 
 def share(d: dict, numerator: str, denominator: str) -> float:
-    """numerator/denominator out of one stat block, or 0 when it cannot be had."""
+    """numerator/denominator out of one stat block, or 0 if the denominator is."""
     den = d.get(denominator, 0) or 0
     return (d.get(numerator, 0) or 0) / den if den else 0.0
 
@@ -86,11 +61,9 @@ def rel_diff(fresh: float, ours: float, floor: float = 0.0) -> float:
     """How far apart two shares are, relative to ours.
 
     `floor` is the size below which a difference is not worth reporting, in the
-    same unit as the two values. Every caller passes a tenth of a percentage
-    point. Without it a share that is near zero produces enormous relative
-    differences out of nothing: deranged's published heap share is 0.0258% and
-    a fresh run read 22.3%, which is a relative difference of 86,433% and tells
-    the reader far less than "22 percentage points apart" would.
+    same unit as the two values; every caller passes a tenth of a percentage
+    point. Without it, two shares that are both near zero read as hundreds of
+    percent apart.
     """
     if abs(fresh - ours) <= floor:
         return 0.0
@@ -192,10 +165,8 @@ def main() -> int:
     out += report("RQ2  share of heap bytes reached by unsafe code", res)
 
     # RQ3 to RQ5: the instruction and function counters.
-    # Each of these is a share of something the same stat files also count, so
-    # a run that executed a workload twice compares equal to one that ran it
-    # once. RQ4 asks what fraction of the unsafe instructions are pointer
-    # arithmetic, which is the question its table answers.
+    # RQ4 asks what fraction of the unsafe instructions are pointer arithmetic,
+    # which is the question its table answers.
     for label, num, den in (
             ("RQ3  share of executed instructions that are unsafe",
              "unsafe_instructions", "total_instructions"),
@@ -219,10 +190,9 @@ def main() -> int:
 
     print("\n".join(out))
     print("\nA handful of crates outside 10% is the expected outcome, not a")
-    print("failure. A crate's share is dominated by its largest test binary,")
-    print("so one binary that executed a different amount of work moves the")
-    print("whole crate. slotmap, petgraph, zopfli, portable-atomic and http")
-    print("drive randomly generated input and do so on every run.")
+    print("failure. slotmap, petgraph, zopfli, portable-atomic and http")
+    print("generate their test input, so they do different work on every run,")
+    print("and a crate's share is dominated by its largest test binary.")
     return 0
 
 

@@ -1,9 +1,10 @@
 # Dynamic Analysis of Unsafe Rust: Behaviors and Benchmarks — artifact
 
-Measure the 100-crate corpus yourself and compare the result with the paper.
-The artifact contains the instrumented compiler as source and prebuilt, all 100
-crate source trees, the 19-crate benchmark suite, and one script per table and
-figure. No GitHub account, access token or other credential is needed.
+Measure the 100-crate corpus and rebuild the paper's tables and figures from
+what you measured. The artifact contains the instrumented compiler as source
+and prebuilt, all 100 crate source trees, the 19-crate benchmark suite, and one
+script per table and figure. No GitHub account, access token or other
+credential is needed.
 
 ## Sizes
 
@@ -18,58 +19,61 @@ figure. No GitHub account, access token or other credential is needed.
 ## Run it
 
 ```bash
-docker/build.sh                  # 7 min   image, then the prebuilt compiler
-docker/run.sh                    #         shell at /workspace/artifact
+docker/build.sh                 # 7 min   image, then the prebuilt compiler
+docker/run.sh                   #         shell at /workspace/artifact
 ```
 
-Inside that shell:
+Inside that shell, one command does everything:
 
 ```bash
-run/fetch_corpus.sh              # 2 s     unpack the 100 crate sources
-run/measure.sh --tier smoke      # 20 min  measure 12 crates
-tables/rq4_inst_types.sh         # 1 min   build Table `table:inst` from it
+run/reproduce.sh                # 25 min  fetch, measure 12 crates, build every
+                                #         table and figure from the result
+```
+
+Output is in `results/<timestamp>/`, and the tables and figures in
+`results/<timestamp>/tables/`. `results/` and `corpus/sources/` are mounted from
+the host and owned by your user account after the container exits.
+
+Larger runs:
+
+```bash
+run/reproduce.sh --tier fast    # 58 crates, about 2 hours
+run/reproduce.sh --tier full    # 100 crates, 121.7 hours — the paper's corpus
 ```
 
 Times are from a 32-core machine with 30 GB of memory.
 
-`results/` and `corpus/sources/` are mounted from the host and owned by your
-user account after the container exits.
-
 ## For an automated reviewer
 
-Run these and check the quoted strings. Do not run `--tier full`; it takes
-121.7 hours.
+Run these and check the quoted strings. `--tier full` takes 121.7 hours; the
+default tier is the one to use.
 
 ```bash
 docker/build.sh                                     # "rustc 1.80.0-dev"
-docker/run.sh bash -c 'run/fetch_corpus.sh'         # "crates: 100"
 docker/run.sh bash -c 'run/check_shipped_data.sh'   # "The shipped data reproduces every table in the paper."
-docker/run.sh bash -c 'run/measure.sh --tier smoke' # "rebench complete: 12 crate(s)"
-docker/run.sh bash -c 'for s in tables/*.sh; do bash "$s"; done'
+docker/run.sh bash -c 'run/reproduce.sh'            # "rebench complete: 12 crate(s)"
 ```
 
-A non-zero exit is a failure. A difference in the per-crate comparison is not;
-read **Why numbers vary** first.
+A non-zero exit is a failure. Each table script prints the table built from the
+measurement, the same table as submitted, and a per-crate comparison. Read
+**Expected variation** before reading the comparison.
 
-Evidence afterwards, on the host: `results/<timestamp>/` is the measurement,
-`results/<timestamp>/tables/` holds every table and figure built from it.
-
-## The compiler: prebuilt and source
+## The compiler
 
 ```bash
-docker/build.sh                  # unpack the prebuilt toolchain   1 min
-docker/build.sh --from-source    # build it from source            836 s, 7.0 GB
+docker/build.sh                 # unpack the prebuilt toolchain   1 min
+docker/build.sh --from-source   # build it from source            836 s, 7.0 GB
 ```
 
-`compiler/stage1-toolchain.tar.zst` (87 MB) is the stage-1 toolchain we built
-from `compiler/compiler-src.tar.zst` (213 MB): rustc, the libraries it links,
-and the standard library compiled against it. `tools/package_toolchain.sh`
-produced it and tested it first.
+`compiler/stage1-toolchain.tar.zst` (87 MB) is the stage-1 toolchain built from
+`compiler/compiler-src.tar.zst` (213 MB): rustc, the libraries it links, and the
+standard library compiled against it. `tools/package_toolchain.sh` produced it
+and tested it first.
 
-`compiler-src.tar.zst` is rustc 1.80.0-dev with LLVM 18, the instrumentation
-passes, and the rustc changes that carry unsafe metadata from HIR to LLVM IR.
-Assertions are on, as in the measurements. `compiler/COMMIT` records the commit
-of the rustc tree and of all twelve submodules.
+The source is rustc 1.80.0-dev with LLVM 18, the instrumentation passes, and the
+rustc changes that carry unsafe metadata from HIR to LLVM IR. Assertions are on,
+as in the measurements. `compiler/COMMIT` records the commit of the rustc tree
+and of all twelve submodules.
 
 The compiler lives in a Docker volume, not an image layer. An interrupted build
 resumes when you run the script again. `docker volume rm unsaferust-compiler`
@@ -78,7 +82,7 @@ reclaims the space. Parallelism is capped by available memory; override it with
 
 Docker names: image `unsaferust-artifact:local`, volume `unsaferust-compiler`.
 
-## The crate sources are packaged
+## The crate sources
 
 ```bash
 run/fetch_corpus.sh
@@ -86,33 +90,17 @@ run/fetch_corpus.sh
 
 Unpacks all 100 crate source trees, exactly as measured, from
 `corpus/corpus-sources.tar.zst` (75 MB compressed, 419 MB unpacked). No network.
+`run/reproduce.sh` calls this for you if `corpus/sources/` is empty.
 
-All 100 are in the tarball. They are shipped rather than cloned because 97 of
-them come from git repositories and 3 from crates.io releases, and cloning 97
-repositories from GitHub in one sitting hits the unauthenticated rate limit,
-which would force you to create and paste a personal access token.
+They are shipped rather than cloned because 97 of the 100 come from git
+repositories, and cloning 97 repositories from GitHub in one sitting hits the
+unauthenticated rate limit, which would force you to create and paste a personal
+access token.
 
-Rebuilding them from their original sources is still available:
+Measuring itself does need network: each crate's dependencies come from
+crates.io at the versions its `Cargo.lock` pins.
 
-```bash
-run/fetch_corpus.sh --from-upstream                          # needs network
-run/fetch_corpus.sh --from-upstream --verify corpus/sources  # and compare
-```
-
-This reads `corpus/corpus_lock.csv` (the exact commit or release per crate) and
-applies `corpus/corpus_overlay/`, which holds every difference from upstream,
-including the 113 `Cargo.lock` files that pin dependency versions. All 100
-crates rebuild and verify file by file against our trees.
-
-Measuring needs network: each crate's dependencies come from crates.io at the
-versions its `Cargo.lock` pins.
-
-If a build fails because a dependency needs a newer edition than rustc 1.80
-understands, the harness deletes that crate's `Cargo.lock`, re-resolves to older
-versions and retries, printing `retrying after lockfile regen`. This happened to
-one crate, borsh-rs.
-
-## Measure
+## Measure on its own
 
 ```bash
 run/measure.sh --tier smoke          # 12 crates, 20 min
@@ -147,39 +135,33 @@ beside the submitted table, and compares crate by crate against our data.
 `bench_dyn`, `benchmarks` and `bench_comparisons` describe the benchmark suite
 and were made by hand; there is no script for them.
 
-## Why numbers vary
+## Expected variation
 
-1. **Randomised workloads.** petgraph, zopfli, portable-atomic, http and
-   slotmap generate their test input, so each run does different work.
-   petgraph's unsafe instruction count moved 73% between two of our own runs.
+Comparisons are in shares — unsafe instructions out of all executed
+instructions, unsafe heap bytes out of all heap bytes — because that is what the
+paper's tables report and what carries across machines. Counts do not: they
+depend on the hardware and on how much work a test suite happens to do.
+
+Three things move the numbers between runs:
+
+1. **Generated test input.** petgraph, zopfli, portable-atomic, http and slotmap
+   generate their test input, so each run does different work. petgraph's unsafe
+   instruction count moved 73% between two of our own runs.
 2. **The machine.** CPU cycles depend on the processor and on load, so RQ1
-   compares the share of cycles and still varies more than the instruction
-   counters. Tests that time out or depend on thread scheduling move with load.
+   varies more than the instruction counters. Tests that time out or depend on
+   thread scheduling move with load.
 3. **Which binaries ran.** A crate's share is dominated by its largest test
-   binary, so one binary doing different work moves the crate.
+   binary, so one binary doing different work moves the crate. deranged is the
+   clearest case in RQ2.
 
-Smoke tier against our data: median difference 0.21% for RQ3, 0.00% for RQ4 and
-RQ5, 6.83% for RQ1, 8.14% for RQ2. Of 24 crate-and-variant pairs, 12, 16 and 14
-agreed to one part in ten thousand for RQ3, RQ4 and RQ5.
+Running `run/reproduce.sh` here and comparing against our data, the median
+difference was 0.21% for RQ3, 0.00% for RQ4, 0.15% for RQ5, 8.25% for RQ1 and
+8.52% for RQ2, over 24 crate-and-variant pairs. A few crates outside 10% is the
+expected outcome.
 
-## Before quoting a number
-
-**Comparisons use shares, not counts.** In our published instruction-counter
-run, 1,082 of 1,271 test binaries were measured twice and three four times, and
-the aggregator sums every stat file, so our absolute totals are 1.596 times one
-pass. `tools/analysis/audit_duplicate_stats.py` measures this and gates itself
-by reproducing the published aggregation first. A difference below a tenth of a
-percentage point counts as agreement.
-
-**One heap figure does not hold up.** deranged's published heap share is 0.0258%
-for both `with_native` and `without_native`; a fresh run reads 22.3% and 0.028%.
-Eight of 100 crates report the same unsafe heap bytes in both variants, three of
-them nonzero.
-
-**A partial run gives a partial table.** A 12-crate table and the paper's
-100-crate table are different statistics. The per-crate comparison each script
-prints is unaffected: it compares your crates against the same crates in our
-data.
+A 12-crate table and the paper's 100-crate table are different statistics, and
+each script says so. The per-crate comparison is unaffected: it compares your
+crates against the same crates in our data.
 
 ## Check our data without measuring
 
@@ -200,11 +182,11 @@ Per-crate commands are in `docs/benchmark_configs.md`.
 ## Layout
 
     compiler/            compiler source (213 MB) and prebuilt toolchain (87 MB)
-    corpus/              100 crate sources (75 MB), lock, overlay, workloads
+    corpus/              100 crate sources (75 MB), crate list, generated workloads
     benchmark_suite/     the 19-crate benchmark suite
     data/                our measurement data and the tables as submitted
     docker/              image and compiler-volume scripts
-    run/                 fetch, measure, check
+    run/                 reproduce, fetch, measure, check
     tables/              one script per table and figure
     tools/               aggregation, comparison, packaging, harness
     unsafe_perf_source/  instrumentation runtime library

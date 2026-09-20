@@ -14,19 +14,18 @@ to each other: the table from their numbers, the same table from the paper, and
 a crate-by-crate comparison against ours. Our measurement data ships too, but it
 is the reference, not the input.
 
-The comparison grades rather than demanding equality, because the corpus is not
-deterministic. Over 200 crate-and-variant pairs measured twice, 112 agreed to
-better than one part in ten thousand, 59 more to within 1%, 22 to within 10%,
-and 7 differed by more than 10%; those 7 belong to four crates whose tests drive
-randomly generated input. A handful of crates outside 10% is the expected
-outcome, not a failure.
+The comparison is in shares, and it grades rather than demanding equality,
+because the corpus is not deterministic. Over 200 crate-and-variant pairs
+measured twice, 112 agreed to better than one part in ten thousand, 59 more to
+within 1%, 22 to within 10%, and 7 differed by more than 10%; those 7 belong to
+crates whose tests generate their input. A handful of crates outside 10% is the
+expected outcome, not a failure.
 
-There is a second, much weaker check: `run/check_shipped_data.sh` rebuilds every
-table from the data we ship and compares it character for character with the
-paper, in about twenty seconds. It answers a different question — whether the
-data behind the paper was ever consistent with the paper — and it exists so that
-when a fresh measurement and the paper disagree, the evaluator can tell which
-side moved. It is not the artifact's main path.
+`run/check_shipped_data.sh` rebuilds every table from the data we ship and
+compares it character for character with the paper, in about twenty seconds and
+with no measurement. It is there so that a disagreement can be located: it shows
+whether the data behind the paper matches the paper, independently of what a
+fresh run on a different machine produces.
 
 One consequence worth stating plainly: a table summarises the crates that were
 measured. A 12-crate run produces a 12-crate table, and the paper's is over 100.
@@ -38,11 +37,11 @@ silently.
 
     README.md              what to run, in order, with the time each step takes
     ARCHITECTURE.md        this file
-    docker/                the image, and the script that builds the compiler
+    docker/                the image, and the scripts that fill the compiler volume
     compiler/              the compiler source (rustc 1.80 + LLVM 18 + passes)
-    corpus/                how to obtain the 100 crates at the exact versions used
+    corpus/                the 100 crate sources, the crate list, the workloads
     benchmark_suite/       the 19-crate suite, which is a different thing (below)
-    run/                   get the corpus, measure in three sizes, check our data
+    run/                   reproduce in one command, or fetch and measure apart
     tables/                one script per table and figure in the paper
     data/                  the measurement data the paper reports
     tools/                 aggregation and comparison code
@@ -56,30 +55,15 @@ both; `rayon`, `rebar` and `simd-json` are only in the suite. They are kept in
 separate directories because mixing them would make it look as though the suite
 were a subset of the corpus, and because their per-crate run commands differ.
 
-The suite is shipped as source rather than fetched from a lock: unlike the
-corpus crates, those trees carry no repository or release marker, so there is
-nothing to reconstruct them from.
-
-## Two ways to get the corpus, answering two questions
+## The corpus is shipped, not fetched
 
 `run/fetch_corpus.sh` unpacks `corpus/corpus-sources.tar.zst` — the 100 trees as
 measured, 75 MB compressed and 419 MB on disk — in a couple of seconds and with
-no network. That is the default because it is what the measurement steps need,
-and because it still works on the day a repository disappears or is force-pushed.
-
-`run/fetch_corpus.sh --from-upstream` answers the other question: can the corpus
-be rebuilt from its published sources? It reads `corpus/corpus_lock.csv`, which
-records for each crate the exact commit or released version it was measured on,
-clones or downloads each one, and then applies `corpus/corpus_overlay/`, 2.3 MB
-holding every difference between that upstream tree and the tree we measured.
-With `--verify DIR` it compares the result against an unpacked copy, file by
-file; against our own trees all 100 crates rebuild and verify.
-
-The overlay carries 113 `Cargo.lock` files, and that is the part that matters.
-Upstream commits a lockfile for only 14 of these crates; for 81 more the
-lockfile was generated on our machine at measurement time from whatever
-crates.io served that day. Without them a rebuild re-resolves every dependency
-to whatever is newest today and measures a different program.
+no network. Ninety-seven of the crates came from git repositories, and cloning
+that many from GitHub in one sitting hits the unauthenticated rate limit, so
+fetching them would make an evaluator create and paste an access token to get
+the inputs. Shipping them also means a renamed, deleted or force-pushed
+repository cannot break the artifact.
 
 ## The compiler is built into a volume, not into an image layer
 

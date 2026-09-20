@@ -45,23 +45,22 @@ for f in cumulative_frequency_unsafe_execution_rq1_rq6 heap_native_cdf; do
   [ -f "$PAPER/Latex/figures/$f.pdf" ] && cp "$PAPER/Latex/figures/$f."{pdf,png} "$HERE/data/paper_figures/" 2>/dev/null || true
 done
 
-echo "corpus lock, overlay and harness <- $BENCH"
-cp "$BENCH/corpus_lock.csv" "$HERE/corpus/corpus_lock.csv"
-rm -rf "$HERE/corpus/corpus_overlay"
-cp -r "$BENCH/corpus_overlay" "$HERE/corpus/corpus_overlay"
-cp "$BENCH/scripts/fetch_corpus.py" "$HERE/corpus/fetch_corpus.py"
+echo "crate list and measurement harness <- $BENCH"
 cp "$BENCH/rebench_100crates.csv" "$HERE/corpus/crates.csv"
 # rebench.py resolves the corpus list relative to its own repository root, so it
 # needs a copy under the harness directory too, under the name it expects.
 mkdir -p "$HERE/tools/harness"
 cp "$BENCH/rebench_100crates.csv" "$HERE/tools/harness/rebench_100crates.csv"
 
-mkdir -p "$HERE/tools/harness/scripts" "$HERE/tools/harness/pipeline"
+# Only what a measurement run imports. The test-generation half of that
+# repository is not copied here.
+mkdir -p "$HERE/tools/harness/scripts" "$HERE/tools/harness/pipeline/tools"
 cp "$BENCH/scripts/rebench.py" "$HERE/tools/harness/scripts/"
-# The all-deps mode needs its rustc wrapper next to rebench.py: the wrapper is
-# what keeps build scripts and proc-macro crates out of the instrumented set.
 cp "$BENCH/scripts/rustc-wrapper-alldeps.sh" "$HERE/tools/harness/scripts/"
-cp -r "$BENCH/pipeline/"* "$HERE/tools/harness/pipeline/"
+cp "$BENCH/pipeline/__init__.py" "$BENCH/pipeline/config.py" "$HERE/tools/harness/pipeline/"
+for m in __init__ api_discovery coverage crate_prep csv_book runtime_bench workspace; do
+  cp "$BENCH/pipeline/tools/$m.py" "$HERE/tools/harness/pipeline/tools/"
+done
 find "$HERE/tools/harness" -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
 
 echo "generated workloads <- $BENCH/recipes"
@@ -78,5 +77,4 @@ echo
 echo "done. Counts:"
 echo "  analysis data files : $(find "$HERE/tools/analysis" -name '*.json' | wc -l)"
 echo "  paper tables        : $(ls "$HERE/data/paper_tables" 2>/dev/null | wc -l)"
-echo "  corpus overlay      : $(du -sh "$HERE/corpus/corpus_overlay" | cut -f1)"
 echo "  generated workloads : $(find "$HERE/corpus/generated_tests" -name '*.rs' | wc -l)"
