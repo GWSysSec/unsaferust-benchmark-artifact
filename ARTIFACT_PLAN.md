@@ -56,9 +56,10 @@ All three live in the two working repositories and can be copied here.
 
 **`corpus_lock.csv` and `corpus_overlay/`** (in `rusttest-gen`). The lock records,
 for each of the 100 crates, where its source came from and the exact commit or
-released version: 97 git clones and 3 crates.io releases. The overlay, 935 KB in
+released version: 97 git clones and 3 crates.io releases. The overlay, 2.3 MB in
 total, records every difference between that upstream tree and the tree we
-measured.
+measured, including the 113 `Cargo.lock` files that pin the dependency
+versions.
 
 **`scripts/fetch_corpus.py`** (in `rusttest-gen`) rebuilds the corpus from the
 lock. Run with `--verify-against` a reference copy, all 100 crates rebuild and
@@ -105,12 +106,26 @@ correct reproduction will look like a failed one.
 
 ## Four decisions
 
-**1. Ship the crate sources, or fetch them?** Fetching is 935 KB of overlay and
-rebuilds all 100 trees exactly; shipping is 986 MB that works with no network
-and cannot rot. Upstream repositories can disappear or be force-pushed, which
-would break a fetch-only artifact years from now. The safe answer is to do both:
-make fetching the documented path and include a source tarball as the offline
-fallback. That needs your call on artifact size.
+**1. Ship the crate sources, or fetch them?** Measured both ways. Shipping is
+436 MB of source, 76 MB compressed with `zstd -19`, on top of the 674 MB
+toolchain and 246 MB prebuilt runtime already here. Fetching is a 2.3 MB
+overlay plus the clones and downloads, and rebuilds all 100 trees file for
+file.
+
+Fetching pins what gets compiled, not just what gets checked out. The overlay
+carries 113 `Cargo.lock` files, which fix the version of every dependency that
+was compiled and measured. That matters more than it sounds: upstream commits a
+lockfile for only 14 of the corpus crates, so for 81 more the lockfile was
+generated here at measurement time from whatever crates.io served then. Without
+those files a rebuild re-resolves every dependency to whatever is newest on the
+day and measures a different program.
+
+What fetching cannot pin is availability. The 97 git crates depend on their
+repositories still existing and still holding the recorded commit; a deleted
+repository or a force-pushed history breaks the rebuild years from now. The 3
+crates.io releases are immutable and survive even a yank. So the safe answer is
+both: make fetching the documented path, and include the 76 MB source tarball
+as the offline fallback.
 
 **2. Which dataset does the artifact reproduce?** The published run, which
 instruments only the primary package, or also the dependency-include run. This
