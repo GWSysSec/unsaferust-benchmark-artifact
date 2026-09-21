@@ -1,9 +1,6 @@
-# The image holds everything the measurements need except the compiler itself:
-# the build dependencies, the compiler source, a current cargo, and the artifact
-# scripts. It takes about six minutes to build.
-#
-# The compiler is built separately, by `docker/build.sh`, into a Docker volume.
-# See the comment above the STAGE1 lines below for why it is not built here.
+# The image holds the build dependencies, compiler source, prebuilt instrumented
+# compiler, current cargo, and artifact scripts. It can run the artifact without
+# a separate compiler volume.
 
 FROM ubuntu:22.04
 
@@ -83,17 +80,25 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
       | sh -s -- -y --default-toolchain stable --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# The compiler itself is not built here. `docker/build.sh` builds it in a
-# container, into a Docker volume mounted at /workspace/compiler-src/build, for
-# three reasons. The build takes hours, and a volume makes it resumable: if it
-# is interrupted, running the step again continues from where it stopped rather
-# than starting over. The 40 GB it needs stays out of the image, so the image
-# remains small enough to rebuild in minutes when a script changes. And the
-# progress of a `docker run` is easier to watch than the progress of a layer.
+# The shipped stage-1 toolchain makes the distributed image self-contained.
+# `docker/build.sh --from-source` can still build a replacement compiler into a
+# mounted volume for compiler-development work.
+COPY compiler/stage1-toolchain.tar.zst /tmp/stage1-toolchain.tar.zst
+RUN mkdir -p /workspace/compiler-src/build \
+ && zstd -dc /tmp/stage1-toolchain.tar.zst | tar x -C /workspace/compiler-src/build \
+ && rm /tmp/stage1-toolchain.tar.zst
+
 ENV STAGE1=/workspace/compiler-src/build/x86_64-unknown-linux-gnu/stage1
 ENV ARTIFACT_STAGE1="$STAGE1"
 
+# The stage-1 archive contains rustc and its libraries. Use the current Cargo
+# installed above because the bootstrap Cargo is too old for some dependencies.
+RUN cp "$(rustup which --toolchain stable cargo)" "$ARTIFACT_STAGE1/bin/cargo" \
+ && "$ARTIFACT_STAGE1/bin/rustc" --version
+
 # --- everything else ---------------------------------------------------------
+# This copies the complete artifact, including README.md and component README
+# files. .dockerignore excludes generated output but no Markdown documentation.
 COPY . /workspace/artifact
 WORKDIR /workspace/artifact
 
@@ -102,9 +107,6 @@ RUN python3 -c "import sys; assert sys.version_info >= (3,10)" \
 
 ENV RUSTC_BOOTSTRAP=1
 
-# The entrypoint links the stage-1 compiler as a rustup toolchain, but only
-# once it exists. The link cannot be made here: rustup refuses to link a
-# toolchain whose rustc is not already a file, and the compiler is built later,
-# into a volume.
+# The entrypoint links the bundled stage-1 compiler as a rustup toolchain.
 ENTRYPOINT ["/workspace/artifact/docker/entrypoint.sh"]
 CMD ["/bin/bash"]

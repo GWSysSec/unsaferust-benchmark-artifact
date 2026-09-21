@@ -1,201 +1,172 @@
-# Dynamic Analysis of Unsafe Rust: Behaviors and Benchmarks — artifact
+# Dynamic Analysis of Unsafe Rust
 
-Measure the 100-crate corpus and rebuild the paper's tables and figures from
-what you measured. The artifact contains the instrumented compiler as source
-and prebuilt, all 100 crate source trees, the 19-crate benchmark suite, and one
-script per table and figure. No GitHub account, access token or other
-credential is needed.
+This guide is the shortest path to getting started
 
-## Sizes
+## Quick Start
 
-| | |
-|---|---|
-| artifact directory | 651 MB |
-| Docker image | 4.88 GB |
-| compiler volume, prebuilt | 343 MB |
-| compiler volume, built from source | 7.0 GB |
-| corpus, unpacked | 419 MB |
-
-## Run it
+The provided Docker image starts in `/workspace/artifact`. To run every
+experiment and generate every table and figure, run:
 
 ```bash
-docker/build.sh                 # 7 min   image, then the prebuilt compiler
-docker/run.sh                   #         shell at /workspace/artifact
+# 100 crate, full experimental run
+bash run/reproduce.sh --tier full
 ```
 
-Inside that shell, one command does everything:
+This is the artifact's end-to-end reproduction entry point. It extracts the
+100 crates if needed, measures all 100 crates with the supplied
+instrumented compiler, and generates every table and figure. Results are saved
+under `results/<timestamp>/`.
+
+The 100-crate run takes about 121.7 hours on our 32 core machine.
+
+To run smaller subsets instead:
 
 ```bash
-run/reproduce.sh                # 25 min  fetch, measure 12 crates, build every
-                                #         table and figure from the result
+# 12 crate smoke tier, about 25 minutes
+bash run/reproduce.sh
+
+# 58 crate manageable run
+bash run/reproduce.sh --tier fast
 ```
 
-Output is in `results/<timestamp>/`, and the tables and figures in
-`results/<timestamp>/tables/`. `results/` and `corpus/sources/` are mounted from
-the host and owned by your user account after the container exits.
+## Image Structure
 
-Larger runs:
+The image contains both our pre-built compiler and source code for our customized Rust compiler with our passes. You start inside the **workspace/artifact** path.
+
+We list the main layout of the Docker image below
+
+```text
+Raw instrumented rustc 1.80.0-dev + LLVM 18 source
+/workspace/compiler-src/
+
+Built compiler, mounted from Docker volume
+/workspace/compiler-src/build/
+
+Repository files and artifact scripts
+/workspace/artifact/
+```
+
+`bash docker/build.sh` uses the prebuilt toolchain by default. To build the
+compiler from the shipped raw source instead, use:
 
 ```bash
-run/reproduce.sh --tier fast    # 58 crates, about 2 hours
-run/reproduce.sh --tier full    # 100 crates, 121.7 hours — the paper's corpus
+bash docker/build.sh --from-source
 ```
 
-Times are from a 32-core machine with 30 GB of memory.
+Below is our structure for the main artifact directory
 
-## For an automated reviewer
+```text
+Compiler source archive, prebuilt toolchain, source revision record
+compiler/
 
-Run these and check the quoted strings. `--tier full` takes 121.7 hours; the
-default tier is the one to use.
+100-crate crate archive, crate list, and generated test workloads
+corpus/
+
+Published measurement data plus submitted tables and figures
+data/
+
+Image definition and container setup scripts
+docker/
+
+Crate extraction, measurement, reproduction, and data-check scripts
+run/
+
+Wrappers that generate paper tables and figures
+tables/
+
+Measurement harness, aggregation, comparison, and analysis code
+tools/
+
+Rust runtime library used by the instrumentation
+unsafe_perf_source/
+
+19-crate benchmark suite
+benchmark_suite/
+
+Reference metadata and workload descriptions
+docs/
+
+Output directory created by measurements
+results/
+```
+
+## Useful Commands
+
+Run the commands inside
+the container, for example with `bash docker/run.sh bash COMMAND`.
+
+| Command                                   | What it does                                                                                          |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `bash docker/run.sh`                      | Opens a shell with the compiler volume and persistent results mounts.                                 |
+| `bash run/reproduce.sh`                   | Extracts the crates if needed, measures them, and produces every table and figure.                    |
+| `bash run/reproduce.sh --tier fast`       | Runs the 58-crate fast tier, then generates every table and figure.                                   |
+| `bash run/reproduce.sh --tier full`       | Runs all 100 corpus crates, then generates every table and figure.                                    |
+| `bash run/fetch_corpus.sh`                | Extracts the shipped corpus source trees without network access.                                      |
+| `bash run/measure.sh --tier smoke`        | Measures 12 representative crates without generating tables.                                          |
+| `bash run/measure.sh --tier fast`         | Measures 58 faster crates without generating tables.                                                  |
+| `bash run/measure.sh --tier full`         | Measures all 100 corpus crates without generating tables.                                             |
+| `bash run/measure.sh --crate tokio,bytes` | Measures only the named crates.                                                                       |
+| `bash run/check_shipped_data.sh`          | Rebuilds the five paper tables from shipped data and checks exact equality with the submitted tables. |
+
+After a measurement, generate an individual output with one of:
 
 ```bash
-docker/build.sh                                     # "rustc 1.80.0-dev"
-docker/run.sh bash -c 'run/check_shipped_data.sh'   # "The shipped data reproduces every table in the paper."
-docker/run.sh bash -c 'run/reproduce.sh'            # "rebench complete: 12 crate(s)"
+bash tables/rq1_cpu_cycles.sh
+bash tables/rq2_heap.sh
+bash tables/rq3_unsafe_inst_frequency.sh
+bash tables/rq4_inst_types.sh
+bash tables/rq5_unsafe_functions.sh
+bash tables/figure_cycles_cdf.sh
+bash tables/figure_heap_cdf.sh
 ```
 
-A non-zero exit is a failure. Each table script prints the table built from the
-measurement, the same table as submitted, and a per-crate comparison. Read
-**Expected variation** before reading the comparison.
+## Full Test Suite Runtime
 
-## The compiler
+The full crate list contains 100 crates. On our machine with 32 cores with 30 GB of memory, `bash run/reproduce.sh --tier full` takes about **121.7 hours**
+of measurement time. The supported smaller runs are:
+
+| Tier    | Crates Ran | Approximate runtime |
+| ------- | ---------: | ------------------: |
+| `smoke` |         12 |       25-32 minutes |
+| `fast`  |         58 |   about 1.5-2 hours |
+| `full`  |        100 |         121.7 hours |
+
+## FAQ
+
+### Where are the compiler source and compiled toolchain?
+
+The raw source archive is `compiler/compiler-src.tar.zst`. Docker unpacks it
+into `/workspace/compiler-src` in the image. The built compiler is stored in
+the `unsaferust-compiler` Docker volume, mounted at
+`/workspace/compiler-src/build` when the container starts.
+
+### Why does the compiler not live in the image?
+
+Keeping compiler output in a volume makes an interrupted source build resumable
+and prevents its roughly 7 GB build output from becoming an image layer. Remove
+it when no longer needed with:
 
 ```bash
-docker/build.sh                 # unpack the prebuilt toolchain   1 min
-docker/build.sh --from-source   # build it from source            836 s, 7.0 GB
+docker volume rm unsaferust-compiler
 ```
 
-`compiler/stage1-toolchain.tar.zst` (87 MB) is the stage-1 toolchain built from
-`compiler/compiler-src.tar.zst` (213 MB): rustc, the libraries it links, and the
-standard library compiled against it. `tools/package_toolchain.sh` produced it
-and tested it first.
+### Why did a source compiler build fail around LLVM TableGen?
 
-The source is rustc 1.80.0-dev with LLVM 18, the instrumentation passes, and the
-rustc changes that carry unsafe metadata from HIR to LLVM IR. Assertions are on,
-as in the measurements. `compiler/COMMIT` records the commit of the rustc tree
-and of all twelve submodules.
+The artifact image installs CMake 3.31.6 because Ubuntu 22.04's packaged CMake
+3.22.1 cannot parse an LLVM 18 TableGen dependency file.
 
-The compiler lives in a Docker volume, not an image layer. An interrupted build
-resumes when you run the script again. `docker volume rm unsaferust-compiler`
-reclaims the space. Parallelism is capped by available memory; override it with
-`COMPILE_JOBS=8 LINK_JOBS=2 docker/build.sh --from-source`.
+### Cargo and Crate questions?
 
-Docker names: image `unsaferust-artifact:local`, volume `unsaferust-compiler`.
+The corpus archive contains the exact 100 source trees and extracts without
+network access. Cargo still downloads their pinned dependencies from crates.io
+during measurement.
 
-## The crate sources
+### Validating the measured data without running the whole artifact again?
+
+Inside the container, run:
 
 ```bash
-run/fetch_corpus.sh
+bash run/check_shipped_data.sh
 ```
 
-Unpacks all 100 crate source trees, exactly as measured, from
-`corpus/corpus-sources.tar.zst` (75 MB compressed, 419 MB unpacked). No network.
-`run/reproduce.sh` calls this for you if `corpus/sources/` is empty.
-
-They are shipped rather than cloned because 97 of the 100 come from git
-repositories, and cloning 97 repositories from GitHub in one sitting hits the
-unauthenticated rate limit, which would force you to create and paste a personal
-access token.
-
-Measuring itself does need network: each crate's dependencies come from
-crates.io at the versions its `Cargo.lock` pins.
-
-## Measure on its own
-
-```bash
-run/measure.sh --tier smoke          # 12 crates, 20 min
-run/measure.sh --tier fast           # 58 crates, 1.5 h
-run/measure.sh --tier full           # 100 crates, 121.7 h
-run/measure.sh --crate tokio,bytes   # a named list
-```
-
-`--scope alldeps` instruments every crate in the dependency graph instead of
-only the crate under study.
-
-## Script to table or figure
-
-| Script | Paper | Content |
-|---|---|---|
-| `tables/rq1_cpu_cycles.sh` | Table `table:cpu_cycle` | CPU cycles spent in unsafe code |
-| `tables/figure_cycles_cdf.sh` | Figure `fig:cpu_cycle` | distribution of that share |
-| `tables/rq2_heap.sh` | Table `table:heap` | heap memory reached by unsafe code |
-| `tables/figure_heap_cdf.sh` | Figure `fig:heap_standard_cdf` | distribution of the unsafe heap share |
-| `tables/rq4_inst_types.sh` | Table `table:inst` | RQ3 and RQ4: how often executed instructions are unsafe, and of what type |
-| `tables/rq5_unsafe_functions.sh` | Table `table:unsafe_function` | how often functions holding unsafe code run |
-| `tables/rq3_unsafe_inst_frequency.sh` | — | RQ3 on its own; not a table in the submitted paper |
-
-The paper's "on average, 1.8% of executed instructions are unsafe" is the
-Geomean cell of the **Total** row under **Dynamic counts w/o std libs** in
-`table:inst`, built by `tables/rq4_inst_types.sh`.
-
-Each script builds the table from your newest run in `results/`, prints it
-beside the submitted table, and compares crate by crate against our data.
-`--run DIR` selects a run; `--our-data` uses ours as the input instead.
-
-`bench_dyn`, `benchmarks` and `bench_comparisons` describe the benchmark suite
-and were made by hand; there is no script for them.
-
-## Expected variation
-
-Comparisons are in shares — unsafe instructions out of all executed
-instructions, unsafe heap bytes out of all heap bytes — because that is what the
-paper's tables report and what carries across machines. Counts do not: they
-depend on the hardware and on how much work a test suite happens to do.
-
-Three things move the numbers between runs:
-
-1. **Generated test input.** petgraph, zopfli, portable-atomic, http and slotmap
-   generate their test input, so each run does different work. petgraph's unsafe
-   instruction count moved 73% between two of our own runs.
-2. **The machine.** CPU cycles depend on the processor and on load, so RQ1
-   varies more than the instruction counters. Tests that time out or depend on
-   thread scheduling move with load.
-3. **Which binaries ran.** A crate's share is dominated by its largest test
-   binary, so one binary doing different work moves the crate. deranged is the
-   clearest case in RQ2.
-
-Running `run/reproduce.sh` here and comparing against our data, the median
-difference was 0.21% for RQ3, 0.00% for RQ4, 0.15% for RQ5, 8.25% for RQ1 and
-8.52% for RQ2, over 24 crate-and-variant pairs. A few crates outside 10% is the
-expected outcome.
-
-A 12-crate table and the paper's 100-crate table are different statistics, and
-each script says so. The per-crate comparison is unaffected: it compares your
-crates against the same crates in our data.
-
-## Check our data without measuring
-
-```bash
-run/check_shipped_data.sh
-```
-
-Rebuilds every table from the shipped data and compares it character for
-character with the submitted table. Twenty seconds, no network. All five pass.
-
-## The benchmark suite
-
-`benchmark_suite/` is the paper's second contribution, not the study corpus: 19
-crates for measuring what unsafe-Rust defenses cost, run through `cargo bench`.
-Sixteen also appear in the corpus; `rayon`, `rebar` and `simd-json` do not.
-Per-crate commands are in `docs/benchmark_configs.md`.
-
-## Layout
-
-    compiler/            compiler source (213 MB) and prebuilt toolchain (87 MB)
-    corpus/              100 crate sources (75 MB), crate list, generated workloads
-    benchmark_suite/     the 19-crate benchmark suite
-    data/                our measurement data and the tables as submitted
-    docker/              image and compiler-volume scripts
-    run/                 reproduce, fetch, measure, check
-    tables/              one script per table and figure
-    tools/               aggregation, comparison, packaging, harness
-    unsafe_perf_source/  instrumentation runtime library
-    docs/                crate dataset and benchmark configurations
-
-`ARCHITECTURE.md` explains why the artifact is built this way.
-
-## Scope of the results
-
-The corpus crates are libraries, not applications, and most sit low in a
-dependency tree. The workloads are each crate's integration tests plus generated
-drivers that raise public-API coverage from 76.4% to 90.4%.
+It checks the paper tables and figures with your runs measurements.
