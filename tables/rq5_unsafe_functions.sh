@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build this table from YOUR measurement and compare it with the paper.
+# Build this table from YOUR measurement.
 # Measure first with run/measure.sh. Options:
 #   --run DIR      a measurement directory other than the newest in results/
 #   --scope SCOPE  override the scope read from the run (primary|alldeps)

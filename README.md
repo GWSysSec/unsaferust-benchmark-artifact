@@ -1,6 +1,6 @@
 # Dynamic Analysis of Unsafe Rust
 
-# Get Started
+## Get Started
 
 We provide our complete artifact as a docker image. The requirements to run our artifact include having an **x86** machine, with some distro of **Linux** with **Docker** installed.
 
@@ -144,13 +144,3 @@ bash docker/build.sh --from-source
 The corpus archive contains the exact 100 source trees and extracts without
 network access. Cargo still downloads their pinned dependencies from crates.io
 during measurement.
-
-### Validating the measured data without running the whole artifact again?
-
-Inside the container, run:
-
-```bash
-bash run/check_shipped_data.sh
-```
-
-It checks the paper tables and figures with your run's measurements.

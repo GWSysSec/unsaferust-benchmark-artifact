@@ -44,7 +44,7 @@ BENCHMARK_CRATES = [
 EXPERIMENTS = {
     "cpu_cycle": {
         "feature": "cpu_cycle_counter",
-        "output_file": "cpu_cycle.stat",
+        "metric": "cpu_cycle",
         "flags": [
             "-C", "unsafe_include_native_lib=false",
             "-C", "llvm-args=-enable-instmarker",
@@ -54,7 +54,7 @@ EXPERIMENTS = {
     },
     "heap_tracker": {
         "feature": "heap_tracker",
-        "output_file": "heap_stat.stat",
+        "metric": "heap",
         "flags": [
             "-C", "unsafe_include_native_lib=false",
             "-C", "llvm-args=-enable-instmarker",
@@ -63,7 +63,7 @@ EXPERIMENTS = {
     },
     "unsafe_counter": {
         "feature": "unsafe_counter",
-        "output_file": "unsafe_counter.stat",
+        "metric": "unsafe_counter",
         "flags": [
             "-C", "unsafe_include_native_lib=false",
             "-C", "llvm-args=-enable-instmarker",
@@ -73,7 +73,7 @@ EXPERIMENTS = {
     },
     "coverage": {
         "feature": "unsafe_coverage",
-        "output_file": "unsafe_coverage.stat",
+        "metric": "coverage",
         "flags": [
             "-C", "unsafe_include_native_lib=false", # Note: false for coverage
             "-C", "llvm-args=-enable-instmarker",
@@ -82,7 +82,7 @@ EXPERIMENTS = {
     },
     "native": {
         "feature": "", 
-        "output_file": "",
+        "metric": None,
         "flags": []
     }
 }
@@ -295,9 +295,9 @@ def run_crate(crate_name, exp_name, config, output_dir):
         
         env["RUSTFLAGS"] = " ".join(rustflags)
     
-    env["UNSAFE_BENCH_OUTPUT_DIR"] = str(abs_output_dir)
+    env["UNSAFE_STAT_DIR"] = str(abs_output_dir)
     env["CARGO_PRIMARY_PACKAGE"] = "1"
-    print(f"DEBUG: UNSAFE_BENCH_OUTPUT_DIR={abs_output_dir} (cwd={crate_dir})")
+    print(f"DEBUG: UNSAFE_STAT_DIR={abs_output_dir} (cwd={crate_dir})")
     
     # Determine execution strategy
     exec_cwd = crate_dir
@@ -308,14 +308,6 @@ def run_crate(crate_name, exp_name, config, output_dir):
     if custom_config:
         if "cwd" in custom_config:
             exec_cwd = crate_dir / custom_config["cwd"]
-            # Re-calculate relative output dir for the NEW cwd
-            try:
-                abs_exec_cwd = exec_cwd.resolve()
-                rel_output_dir_custom = os.path.relpath(abs_output_dir, abs_exec_cwd)
-                env["UNSAFE_BENCH_OUTPUT_DIR"] = str(rel_output_dir_custom)
-                print(f"DEBUG: Custom CWD UNSAFE_BENCH_OUTPUT_DIR={rel_output_dir_custom}")
-            except Exception as e:
-                print(f"Error calculating relative path for custom cwd: {e}")
         
         if "cmds" in custom_config:
             cmds = custom_config["cmds"]
@@ -326,6 +318,8 @@ def run_crate(crate_name, exp_name, config, output_dir):
     # Execute Commands
     success = True
     cmd_timeout = custom_config.get("timeout", 600) if custom_config else 600
+    metric = config["metric"]
+    existing_stats = set(output_dir.glob(f"*.{metric}.json")) if metric else set()
     for cmd in cmds:
         if not run_cmd(cmd, cwd=exec_cwd, env=env, timeout=cmd_timeout):
             print(f"Command failed: {cmd}")
@@ -335,24 +329,12 @@ def run_crate(crate_name, exp_name, config, output_dir):
     if success:
         print(f"Success: {crate_name}")
         
-        # Native mode only runs the benchmarks; instrumented modes also emit a
-        # stat file that needs to be collected.
-        if config["output_file"]:
-            expected_file = output_dir / config["output_file"]
-            if expected_file.exists():
-                new_name = output_dir / f"{crate_name}_{config['output_file']}"
-                shutil.move(expected_file, new_name)
-                print(f"Saved results to: {new_name.name}")
+        if metric:
+            written_stats = set(output_dir.glob(f"*.{metric}.json")) - existing_stats
+            if written_stats:
+                print(f"Saved {len(written_stats)} {metric} result(s) to: {output_dir}")
             else:
-                fallback_file = Path("/tmp") / config["output_file"]
-                if fallback_file.exists():
-                    print(f"Found results in fallback location: {fallback_file}")
-                    new_name = output_dir / f"{crate_name}_{config['output_file']}"
-                    shutil.move(fallback_file, new_name)
-                    print(f"Saved results to: {new_name.name}")
-                else:
-                    print(f"Warning: Expected output file not found: "
-                          f"{expected_file} or {fallback_file}")
+                print(f"Warning: No {metric} JSON results were written to: {output_dir}")
 
 def main():
     parser = argparse.ArgumentParser(description="Unsafe Rust Benchmark Pipeline")

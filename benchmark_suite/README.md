@@ -24,7 +24,8 @@ python3 benchmark_suite/run_pipeline.py \
   --experiment cpu_cycle
 ```
 
-Results are written to `benchmark_suite/results/<timestamp>/` by default.
+The pipeline writes per-binary JSON statistics to
+`benchmark_suite/results/<timestamp>/` by default.
 
 ## Per-crate configuration
 

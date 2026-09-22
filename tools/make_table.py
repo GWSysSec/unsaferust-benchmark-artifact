@@ -1,22 +1,16 @@
 #!/usr/bin/env python3
-"""Build one of the paper's tables from YOUR measurement, and compare.
+"""Build one of the paper's tables or figures from YOUR measurement.
 
 This is the artifact's main path. You run the harness, and this builds the
-table out of what you measured, then puts it beside the table in the paper so
-you can see whether they say the same thing. Our own measurement data is in the
-artifact too, but only as a third column to compare against, never as the input.
+output from what you measured and keeps it in your run directory. The command
+also points to the shipped reference data and submitted paper output without
+comparing measurements from different machines or crate populations.
 
     run/measure.sh --tier smoke                  # measure
     tables/rq3_unsafe_inst_frequency.sh          # build the table from it
 
 By default it uses the most recent directory under results/. Point it somewhere
 else with --run.
-
-One thing to watch. A table summarises the crates that were measured, so a run
-over a subset produces a subset table, and the paper's is over 100. Those two
-are not the same statistic and the script says so rather than letting the
-numbers be compared silently. Only `--tier full` produces a table over the same
-population as the paper's.
 
 To check our shipped data instead of your own measurement -- useful to confirm
 the data in this artifact is what the paper reports -- pass --our-data.
@@ -35,6 +29,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ANALYSIS = ROOT / "tools" / "analysis"
 PAPER_TABLES = ROOT / "data" / "paper_tables"
+PAPER_FIGURES = ROOT / "data" / "paper_figures"
+PER_CRATE_DATA = ROOT / "data" / "per_crate"
 BUILT = ANALYSIS / "Latex" / "tables"
 BUILT_FIG = ANALYSIS / "Latex" / "figures"
 RESULTS = ROOT / "results"
@@ -191,31 +187,25 @@ def main() -> int:
         print(f"\nfigure written to {built}")
         for ext in (".png", ".pdf"):
             keep(BUILT_FIG / f"{stem}{suffix}{ext}", run_dir)
+        if not args.our_data:
+            print(f"\nyour measurement: {run_dir}")
+            print(f"your generated figures: {run_dir / 'tables'}")
+            print(f"shipped per-crate data: {PER_CRATE_DATA}")
+            print(f"submitted paper figures: {PAPER_FIGURES}")
         return 0
 
     built = BUILT / f"{stem}{suffix}.tex"
     keep(built, run_dir)
     paper = PAPER_TABLES / f"{stem}.tex"
-    print(f"\n{'-'*70}\nyour table\n{'-'*70}")
-    print(built.read_text())
-    print(f"{'-'*70}\nthe same table in the paper\n{'-'*70}")
-    print(paper.read_text() if paper.is_file() else "(not in the submitted paper)")
 
     if not args.our_data:
-        if n_crates < 100:
-            print("=" * 70)
-            print(f"This table summarises {n_crates} crates. The paper's summarises 100.")
-            print("Min, geomean, median and max over different populations are not")
-            print("the same statistic, so read them as a sanity check, not as a")
-            print("reproduction. Only --tier full covers the paper's population.")
-            print("=" * 70)
-        print("\nper-crate comparison against our measurement:")
-        sys.stdout.flush()   # the child writes straight to the terminal
-        subprocess.run([sys.executable, str(ANALYSIS / "verify_reproduction.py"),
-                        str(run_dir),
-                        "--dataset", "published" if scope == "primary" else "alldeps"],
-                       cwd=str(ANALYSIS))
+        print(f"\nyour measurement: {run_dir}")
+        print(f"your generated table: {run_dir / 'tables' / built.name}")
+        print(f"shipped per-crate data: {PER_CRATE_DATA}")
+        print(f"submitted paper table: {paper}")
     elif paper.is_file():
+        print(f"\ngenerated table: {built}")
+        print(f"submitted paper table: {paper}")
         same = built.read_text() == paper.read_text()
         print("=" * 70)
         print("our data reproduces the paper's table exactly" if same

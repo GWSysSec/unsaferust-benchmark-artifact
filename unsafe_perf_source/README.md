@@ -41,12 +41,12 @@ rustflags = [
 
 ## Check output
 
-If compiled and linked correctly, the target program should generate temporary
-output files in `/tmp/` with runtime statistics:
+If compiled and linked correctly, the target program writes one JSON file per
+binary under `$UNSAFE_STAT_DIR` (or `/tmp/` if it is unset):
 
-- **Heap tracking**: `/tmp/heap_stat.stat` - Heap usage and unsafe memory statistics
-- **CPU cycles**: `/tmp/cpu_cycle.stat` - CPU cycle measurements in CSV format  
-- **Unsafe coverage**: `/tmp/unsafe_coverage.stat` - Unsafe code line coverage statistics
+- **Heap tracking**: `<pid>.<binary>.heap.json`
+- **CPU cycles**: `<pid>.<binary>.cpu_cycle.json`
+- **Unsafe coverage**: `<pid>.<binary>.coverage.json`
 
 ## Available Make Targets
 
