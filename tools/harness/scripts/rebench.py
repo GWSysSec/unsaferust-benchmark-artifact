@@ -50,10 +50,8 @@ from pipeline.tools.runtime_bench import (
     BenchResult,
     FeatureResult,
     ensure_unsafe_perf_built,
-    instrument_all_packages,
     run_feature,
     set_failure_log_dir,
-    set_instrument_all_packages,
 )
 from pipeline.tools.workspace import _extract_lib_name, discover_workspace
 
@@ -397,10 +395,7 @@ def rebench_crate(
         "crate": crate_name,
         "tmp_path": str(crate_path),
         "out_dir": str(rebench_out),
-        # True when every crate in the dependency graph was instrumented,
-        # False when only the primary package was. The two are not
-        # comparable, so the mode travels with the data.
-        "instrument_all_deps": instrument_all_packages(),
+        "instrument_all_deps": False,
     }
     try:
         # step 2: workspace discovery
@@ -633,13 +628,6 @@ def main() -> int:
     ap.add_argument("--features", default=None,
                     help="comma-separated subset of {unsafe_counter,heap_tracker,"
                          "cpu_cycle_counter} to run (default: all three)")
-    ap.add_argument("--instrument-all-deps", action="store_true",
-                    help="instrument every crate in the dependency graph, not "
-                         "just the primary package. Build scripts and "
-                         "proc-macro crates stay uninstrumented, because their "
-                         "code runs during the build rather than in the "
-                         "measured test binary. Results are NOT comparable to "
-                         "a default primary-only run.")
     ap.add_argument("--tmp-rebench", default=None,
                     help="working dir for crate copies (default: ROOT/tmp_rebench). "
                          "Use to isolate parallel rebench.py invocations.")
@@ -660,12 +648,6 @@ def main() -> int:
                      f"(valid: {FEATURE_ORDER})")
 
     setup_logging()
-
-    if args.instrument_all_deps:
-        set_instrument_all_packages(True)
-        log.info("instrument-all-deps ON: every crate in the dependency graph "
-                 "is instrumented; build scripts and proc-macro crates are "
-                 "excluded via RUSTC_WRAPPER")
 
     global REBENCH_ROOT
     if args.out_dir:

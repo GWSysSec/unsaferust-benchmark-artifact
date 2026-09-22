@@ -54,7 +54,7 @@ if [ "$MODE" = prebuilt ]; then
     "$IMAGE" bash -c '
       set -eu
       zstd -dc /tmp/stage1.tar.zst | tar x -C /workspace/compiler-src/build
-      cp "$(rustup which --toolchain stable cargo)" "$ARTIFACT_STAGE1/bin/cargo"
+       cp "$(rustup which --toolchain "$ARTIFACT_CARGO_TOOLCHAIN" cargo)" "$ARTIFACT_STAGE1/bin/cargo"
       cd /tmp && "$ARTIFACT_STAGE1/bin/rustc" --version'
   echo
   echo "done. To build the same compiler from source instead:"

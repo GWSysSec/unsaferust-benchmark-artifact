@@ -1,6 +1,18 @@
 # Dynamic Analysis of Unsafe Rust
 
-This guide is the shortest path to getting started
+# Get Started
+
+We provide our complete artifact as a docker image. The requirements to run our artifact include having an **x86** machine, with some distro of **Linux** with **Docker** installed.
+
+```bash
+#Load the tarball image into docker
+docker load -i unsaferust-artifact-v2.tar
+
+# Run an interactive session (terminal) inside the docker image
+docker run -it unsaferust-artifact:v2
+```
+
+You should now be inside the our docker image and can continue as below.
 
 ## Quick Start
 
@@ -12,17 +24,15 @@ experiment and generate every table and figure, run:
 bash run/reproduce.sh --tier full
 ```
 
-This is the artifact's end-to-end reproduction entry point. It extracts the
+This is our complete test reproduction entry point script. It extracts the
 100 crates if needed, measures all 100 crates with the supplied
 instrumented compiler, and generates every table and figure. Results are saved
 under `results/<timestamp>/`.
 
-The 100-crate run takes about 121.7 hours on our 32 core machine.
-
 To run smaller subsets instead:
 
 ```bash
-# 12 crate smoke tier, about 25 minutes
+# 12 crate fastest run
 bash run/reproduce.sh
 
 # 58 crate manageable run
@@ -33,61 +43,21 @@ bash run/reproduce.sh --tier fast
 
 The image contains both our pre-built compiler and source code for our customized Rust compiler with our passes. You start inside the **workspace/artifact** path.
 
-We list the main layout of the Docker image below
-
-```text
-Raw instrumented rustc 1.80.0-dev + LLVM 18 source
-/workspace/compiler-src/
-
-Built compiler, mounted from Docker volume
-/workspace/compiler-src/build/
-
-Repository files and artifact scripts
-/workspace/artifact/
-```
-
-`bash docker/build.sh` uses the prebuilt toolchain by default. To build the
-compiler from the shipped raw source instead, use:
-
-```bash
-bash docker/build.sh --from-source
-```
-
 Below is our structure for the main artifact directory
 
 ```text
-Compiler source archive, prebuilt toolchain, source revision record
-compiler/
-
-100-crate crate archive, crate list, and generated test workloads
-corpus/
-
-Published measurement data plus submitted tables and figures
-data/
-
-Image definition and container setup scripts
-docker/
-
-Crate extraction, measurement, reproduction, and data-check scripts
-run/
-
-Wrappers that generate paper tables and figures
-tables/
-
-Measurement harness, aggregation, comparison, and analysis code
-tools/
-
-Rust runtime library used by the instrumentation
-unsafe_perf_source/
-
-19-crate benchmark suite
-benchmark_suite/
-
-Reference metadata and workload descriptions
-docs/
-
-Output directory created by measurements
-results/
+/workspace/artifact/
+├── compiler/              # Compiler source archive + prebuilt toolchain
+├── corpus/                # 100 crate archive + generated test workloads
+├── data/                  # Published data + submitted tables and figures
+├── docker/                # Docker scripts
+├── run/                   # Scripts to reproduce experiments
+├── tables/                # Scripts that generate table + figures
+├── tools/                 # Helper scripts
+├── unsafe_perf_source/    # Rust runtime library for instrumentation
+├── benchmark_suite/       # 18 crate unsafe benchmark suite
+├── docs/                  # Additional paper data
+└── results/               # Output directory for your experiments
 ```
 
 ## Useful Commands
@@ -120,16 +90,36 @@ bash tables/figure_cycles_cdf.sh
 bash tables/figure_heap_cdf.sh
 ```
 
+## Unsafe Rust Benchmarks
+
+The separate 18 crate benchmark suite lives under `benchmark_suite/` and is not
+part of the test crate reproduction flows above. See
+`benchmark_suite/README.md` for the per-crate configurations and commands if
+you want to inspect or run the individual repositories directly.
+
+To run the benchmark suite without instrumentation, use its standalone entry
+point from `/workspace/artifact`:
+
+```bash
+python3 benchmark_suite/run_pipeline.py
+```
+
+To run only one benchmark crate, pass its name:
+
+```bash
+python3 benchmark_suite/run_pipeline.py --crate matrixmultiply
+```
+
 ## Full Test Suite Runtime
 
-The full crate list contains 100 crates. On our machine with 32 cores with 30 GB of memory, `bash run/reproduce.sh --tier full` takes about **121.7 hours**
+The full crate list contains 100 crates. On our machine with 16 cores with 30 GB of memory, `bash run/reproduce.sh --tier full` takes about 2-3 days
 of measurement time. The supported smaller runs are:
 
 | Tier    | Crates Ran | Approximate runtime |
 | ------- | ---------: | ------------------: |
-| `smoke` |         12 |       25-32 minutes |
+| `smoke` |         12 |    about 25 minutes |
 | `fast`  |         58 |   about 1.5-2 hours |
-| `full`  |        100 |         121.7 hours |
+| `full`  |        100 |      about 2-3 days |
 
 ## FAQ
 
@@ -140,20 +130,12 @@ into `/workspace/compiler-src` in the image. The built compiler is stored in
 the `unsaferust-compiler` Docker volume, mounted at
 `/workspace/compiler-src/build` when the container starts.
 
-### Why does the compiler not live in the image?
-
-Keeping compiler output in a volume makes an interrupted source build resumable
-and prevents its roughly 7 GB build output from becoming an image layer. Remove
-it when no longer needed with:
+`bash docker/build.sh` uses the prebuilt toolchain by default. To build the
+compiler from the shipped raw source instead, use:
 
 ```bash
-docker volume rm unsaferust-compiler
+bash docker/build.sh --from-source
 ```
-
-### Why did a source compiler build fail around LLVM TableGen?
-
-The artifact image installs CMake 3.31.6 because Ubuntu 22.04's packaged CMake
-3.22.1 cannot parse an LLVM 18 TableGen dependency file.
 
 ### Cargo and Crate questions?
 
@@ -169,4 +151,4 @@ Inside the container, run:
 bash run/check_shipped_data.sh
 ```
 
-It checks the paper tables and figures with your runs measurements.
+It checks the paper tables and figures with your run's measurements.

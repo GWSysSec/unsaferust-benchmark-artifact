@@ -189,10 +189,6 @@ def main() -> int:
         out += report(label, res)
 
     print("\n".join(out))
-    print("\nA handful of crates outside 10% is the expected outcome, not a")
-    print("failure. slotmap, petgraph, zopfli, portable-atomic and http")
-    print("generate their test input, so they do different work on every run,")
-    print("and a crate's share is dominated by its largest test binary.")
     return 0
 
 

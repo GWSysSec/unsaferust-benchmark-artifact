@@ -19,8 +19,9 @@ except ImportError:
 
 # Configuration
 SCRIPT_DIR = Path(__file__).parent.absolute()
-BENCHMARK_DIR = SCRIPT_DIR / "benchmarks"
-PERF_DIR = SCRIPT_DIR / "unsafe_perf_source"
+ROOT = SCRIPT_DIR.parent
+BENCHMARK_DIR = SCRIPT_DIR
+PERF_DIR = ROOT / "unsafe_perf_source"
 PERF_TARGET_DIR = PERF_DIR / "target" / "release"
 PERF_RLIB = PERF_TARGET_DIR / "libunsafe_perf.rlib"
 PERF_DEPS = PERF_TARGET_DIR / "deps"
@@ -29,6 +30,15 @@ PERF_DEPS = PERF_TARGET_DIR / "deps"
 # the same stage1 compiler that ships under toolchain/, so they are
 # link-compatible.
 RUNTIME_DIR = SCRIPT_DIR / "unsafe_perf_prebuilt"
+
+BENCHMARK_CRATES = [
+    "matrixmultiply", "arrayvec-0.7.6", "ndarray-0.16.1",
+    "hashbrown-0.15.3", "async-task-4.7.1", "getrandom-0.3.2",
+    "httparse-1.10.1", "smallvec-2.0.0-alpha.11", "memchr",
+    "jpeg-decoder-master", "semver-1.0.26", "rayon", "jni-0.21.1",
+    "parking_lot", "simd-json-0.14.3", "ring", "tokio",
+    "petgraph-0.8.1",
+]
 
 # Experiment Definitions
 EXPERIMENTS = {
@@ -325,26 +335,24 @@ def run_crate(crate_name, exp_name, config, output_dir):
     if success:
         print(f"Success: {crate_name}")
         
-        # Rename output file
-        # The runtime writes to output_dir / output_file
-        expected_file = output_dir / config["output_file"]
-        if config["output_file"] and expected_file.exists():
-            new_name = output_dir / f"{crate_name}_{config['output_file']}"
-            shutil.move(expected_file, new_name)
-            print(f"Saved results to: {new_name.name}")
-        else:
-             fallback_file = Path("/tmp") / config["output_file"]
-             if fallback_file.exists():
-                 print(f"Found results in fallback location: {fallback_file}")
-                 new_name = output_dir / f"{crate_name}_{config['output_file']}"
-                 shutil.move(fallback_file, new_name)
-                 print(f"Saved results to: {new_name.name}")
-             else:
-                 # It implies no coverage/stats were written.
-                 # For some crates (like parking_lot), running the binary works.
-                 # If file not found, maybe it wasn't named as expected?
-                 # But the runtime always writes to {UNSAFE_BENCH_OUTPUT_DIR}/unsafe_coverage.stat etc.
-                 print(f"Warning: Expected output file not found: {expected_file} or {fallback_file}")
+        # Native mode only runs the benchmarks; instrumented modes also emit a
+        # stat file that needs to be collected.
+        if config["output_file"]:
+            expected_file = output_dir / config["output_file"]
+            if expected_file.exists():
+                new_name = output_dir / f"{crate_name}_{config['output_file']}"
+                shutil.move(expected_file, new_name)
+                print(f"Saved results to: {new_name.name}")
+            else:
+                fallback_file = Path("/tmp") / config["output_file"]
+                if fallback_file.exists():
+                    print(f"Found results in fallback location: {fallback_file}")
+                    new_name = output_dir / f"{crate_name}_{config['output_file']}"
+                    shutil.move(fallback_file, new_name)
+                    print(f"Saved results to: {new_name.name}")
+                else:
+                    print(f"Warning: Expected output file not found: "
+                          f"{expected_file} or {fallback_file}")
 
 def main():
     parser = argparse.ArgumentParser(description="Unsafe Rust Benchmark Pipeline")
@@ -382,8 +390,7 @@ def main():
     if args.crate:
         crates_to_run = [args.crate]
     else:
-        # Auto-discover crates
-        crates_to_run = [d.name for d in BENCHMARK_DIR.iterdir() if d.is_dir()]
+        crates_to_run = BENCHMARK_CRATES
 
     print(f"Experiments: {experiments_to_run}")
     print(f"Crates: {len(crates_to_run)}")

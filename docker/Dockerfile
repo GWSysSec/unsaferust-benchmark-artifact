@@ -76,8 +76,10 @@ RUN set -eu; \
 # bootstrap cannot parse registry manifests that require edition 2024, which
 # blocks dependency resolution for several corpus crates. cargo only drives the
 # build, so pairing a current cargo with the stage-1 rustc is fine.
+ARG CARGO_TOOLCHAIN=1.98.1
+ENV ARTIFACT_CARGO_TOOLCHAIN=$CARGO_TOOLCHAIN
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-      | sh -s -- -y --default-toolchain stable --profile minimal
+      | sh -s -- -y --default-toolchain "$ARTIFACT_CARGO_TOOLCHAIN" --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # The shipped stage-1 toolchain makes the distributed image self-contained.
@@ -93,8 +95,10 @@ ENV ARTIFACT_STAGE1="$STAGE1"
 
 # The stage-1 archive contains rustc and its libraries. Use the current Cargo
 # installed above because the bootstrap Cargo is too old for some dependencies.
-RUN cp "$(rustup which --toolchain stable cargo)" "$ARTIFACT_STAGE1/bin/cargo" \
- && "$ARTIFACT_STAGE1/bin/rustc" --version
+RUN cp "$(rustup which --toolchain "$ARTIFACT_CARGO_TOOLCHAIN" cargo)" "$ARTIFACT_STAGE1/bin/cargo" \
+ && rustup toolchain link stage1 "$ARTIFACT_STAGE1" \
+ && rustup default stage1
+ENV RUSTUP_TOOLCHAIN=stage1
 
 # --- everything else ---------------------------------------------------------
 # This copies the complete artifact, including README.md and component README

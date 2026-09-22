@@ -13,7 +13,7 @@ By default it uses the most recent directory under results/. Point it somewhere
 else with --run.
 
 One thing to watch. A table summarises the crates that were measured, so a run
-over 12 crates produces a 12-crate table, and the paper's is over 100. Those two
+over a subset produces a subset table, and the paper's is over 100. Those two
 are not the same statistic and the script says so rather than letting the
 numbers be compared silently. Only `--tier full` produces a table over the same
 population as the paper's.
@@ -139,6 +139,8 @@ def main() -> int:
     args = ap.parse_args()
 
     what, rel, stem, kind = TARGETS[args.target]
+    BUILT.mkdir(parents=True, exist_ok=True)
+    BUILT_FIG.mkdir(parents=True, exist_ok=True)
     print(f"{args.target}: {what}\n")
 
     if args.our_data:

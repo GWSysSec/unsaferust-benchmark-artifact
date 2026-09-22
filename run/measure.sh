@@ -15,7 +15,7 @@
 # --crate names a comma-separated list instead of a tier, for re-measuring one
 # crate without redoing a whole tier.
 #
-# Usage:  run/measure.sh --tier smoke [--out DIR] [--scope primary|alldeps]
+# Usage:  run/measure.sh --tier smoke [--out DIR]
 #         run/measure.sh --crate tokio,bytes
 set -euo pipefail
 
@@ -23,7 +23,6 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 TIER=smoke
 CRATES=
 OUT="$HERE/results/$(date +%Y%m%d_%H%M%S)"
-SCOPE=primary
 CORPUS="${CORPUS_DIR:-$HERE/corpus/sources}"
 
 while [ $# -gt 0 ]; do
@@ -31,7 +30,6 @@ while [ $# -gt 0 ]; do
     --tier)  TIER="$2"; shift 2;;
     --crate) CRATES="$2"; shift 2;;
     --out)   OUT="$2"; shift 2;;
-    --scope) SCOPE="$2"; shift 2;;
     *) echo "unknown option: $1" >&2; exit 2;;
   esac
 done
@@ -83,26 +81,13 @@ bench_runtime:
   min_api_pct: 0.0
 YAML
 
-# The harness owns this switch. Setting UNSAFE_INSTRUMENT_ALL_PACKAGES here
-# instead would instrument the dependency graph but leave two things wrong: the
-# build scripts and proc-macro crates would be instrumented too, and the run
-# summary would still claim the measurement was primary-package-only.
-SCOPE_ARG=()
-if [ "$SCOPE" = alldeps ]; then
-  SCOPE_ARG=(--instrument-all-deps)
-  echo "scope: every crate in the dependency graph"
-elif [ "$SCOPE" = primary ]; then
-  echo "scope: only the crate under study"
-else
-  echo "unknown scope: $SCOPE (primary|alldeps)" >&2; exit 2
-fi
-
 echo "tier:    $TIER"
 echo "corpus:  $CORPUS"
 echo "output:  $OUT"
+echo "scope:   only the crate under study"
 echo
 
 cd "$OUT"
 exec python3 "$HERE/tools/harness/scripts/rebench.py" \
-     "${SEL[@]}" "${SCOPE_ARG[@]}" \
+     "${SEL[@]}" \
      --no-coverage --out-dir "$OUT" --tmp-rebench "$OUT/tmp"

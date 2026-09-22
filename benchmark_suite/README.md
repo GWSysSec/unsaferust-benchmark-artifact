@@ -1,5 +1,31 @@
 # Benchmark Configurations
 
+The following commands run the benchmark suite with our instrumentation and
+perform the selected dynamic analysis on each benchmark:
+
+```bash
+python3 benchmark_suite/run_pipeline.py --experiment cpu_cycle
+python3 benchmark_suite/run_pipeline.py --experiment heap_tracker
+python3 benchmark_suite/run_pipeline.py --experiment unsafe_counter
+python3 benchmark_suite/run_pipeline.py --experiment coverage
+```
+
+Run every instrumentation and analysis mode:
+
+```bash
+python3 benchmark_suite/run_pipeline.py --all
+```
+
+Run one instrumented benchmark crate:
+
+```bash
+python3 benchmark_suite/run_pipeline.py \
+  --crate matrixmultiply \
+  --experiment cpu_cycle
+```
+
+Results are written to `benchmark_suite/results/<timestamp>/` by default.
+
 ## Per-crate configuration
 
     rayon         build rayon-demo with cargo build --release, then run only

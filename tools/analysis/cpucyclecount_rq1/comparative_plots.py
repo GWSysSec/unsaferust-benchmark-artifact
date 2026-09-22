@@ -157,6 +157,7 @@ def main():
     # Create comparative CDF plot with inset
     print("\nCreating comparative CDF plot with inset...")
     figdir = HERE.parent / "Latex" / "figures"
+    figdir.mkdir(parents=True, exist_ok=True)
     stem = ds.stem("cumulative_frequency_unsafe_execution_rq1_rq6")
     for ext in ("png", "pdf"):
         create_comparative_cdf_plot(rq1_percentages, rq6_percentages,

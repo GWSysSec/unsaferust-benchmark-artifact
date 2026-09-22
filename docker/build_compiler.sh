@@ -24,7 +24,7 @@ elapsed=$(( $(date +%s) - started ))
 # cargo from the image: the 1.80 bootstrap cargo cannot parse registry manifests
 # that require edition 2024, which blocks dependency resolution for several
 # corpus crates.
-cp "$(rustup which --toolchain stable cargo)" "$ARTIFACT_STAGE1/bin/cargo"
+cp "$(rustup which --toolchain "$ARTIFACT_CARGO_TOOLCHAIN" cargo)" "$ARTIFACT_STAGE1/bin/cargo"
 
 # Appended, not overwritten. Running this script again on a volume that already
 # holds a finished build takes a few seconds, and that number would otherwise
