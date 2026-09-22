@@ -27,18 +27,19 @@ RUN pip3 install --no-cache-dir "cmake==3.31.6" \
 WORKDIR /workspace
 
 # --- the compiler ------------------------------------------------------------
-COPY compiler/compiler-src.tar.zst /tmp/compiler-src.tar.zst
-RUN mkdir -p /workspace/compiler-src \
- && zstd -dc /tmp/compiler-src.tar.zst | tar x -C /workspace/compiler-src \
- && rm /tmp/compiler-src.tar.zst
+RUN --mount=type=bind,source=compiler/compiler-src.tar.zst,target=/tmp/compiler-src.tar.zst,readonly \
+    --mount=type=bind,source=compiler/offline-bootstrap-source.sha256,target=/tmp/compiler-src.sha256,readonly \
+    mkdir -p /workspace/compiler-src \
+ && cd /tmp && sha256sum --check compiler-src.sha256 \
+ && zstd -dc /tmp/compiler-src.tar.zst | tar x -C /workspace/compiler-src
 
 # The bootstrap configuration is not part of the source tree, so write the one
 # the measurements used. Assertions stay on: they are slower, but turning them
 # off would be a different compiler from the one that produced the data.
 #
 # Parallelism is capped by memory rather than by core count, as a precaution.
-# Compiling LLVM and the vendored Z3 at one job per core needs more memory than
-# a typical machine has, and an LLVM link job can need several gigabytes on its
+# Compiling LLVM at one job per core needs more memory than a typical machine
+# has, and an LLVM link job can need several gigabytes on its
 # own. The image budgets roughly 2 GB per compile job and 8 GB per link job, so
 # a 32-core machine with 30 GB of memory builds with 15 compile jobs and 3 link
 # jobs. Override with --build-arg COMPILE_JOBS=n LINK_JOBS=m.
@@ -82,13 +83,23 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
       | sh -s -- -y --default-toolchain "$ARTIFACT_CARGO_TOOLCHAIN" --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# The shipped stage-1 toolchain makes the distributed image self-contained.
-# `docker/build.sh --from-source` can still build a replacement compiler into a
-# mounted volume for compiler-development work.
-COPY compiler/stage1-toolchain.tar.zst /tmp/stage1-toolchain.tar.zst
-RUN mkdir -p /workspace/compiler-src/build \
- && zstd -dc /tmp/stage1-toolchain.tar.zst | tar x -C /workspace/compiler-src/build \
- && rm /tmp/stage1-toolchain.tar.zst
+# The release image carries Cargo's registry archives, sparse index, and Git
+# checkouts for the corpus and benchmark suite. Extract them after rustup has
+# initialized CARGO_HOME. The archive itself is not needed in the image.
+RUN --mount=type=bind,source=corpus/offline-cargo-cache.tar.zst,target=/tmp/offline-cargo-cache.tar.zst,readonly \
+    --mount=type=bind,source=corpus/offline-cargo-cache.sha256,target=/tmp/offline-cargo-cache.sha256,readonly \
+    cd /tmp && sha256sum --check offline-cargo-cache.sha256 \
+ && zstd -dc /tmp/offline-cargo-cache.tar.zst | tar x -C /root/.cargo
+ENV CARGO_NET_OFFLINE=true
+
+# The shipped stage-1 toolchain is the default. Building the Docker image does
+# not compile rustc. Evaluators can explicitly run
+# docker/build_compiler_from_source.sh inside the released container instead.
+RUN --mount=type=bind,source=compiler/stage1-toolchain.tar.zst,target=/tmp/stage1-toolchain.tar.zst,readonly \
+    --mount=type=bind,source=compiler/stage1-toolchain.sha256,target=/tmp/stage1-toolchain.sha256,readonly \
+    mkdir -p /workspace/compiler-src/build \
+ && cd /tmp && sha256sum --check stage1-toolchain.sha256 \
+ && zstd -dc /tmp/stage1-toolchain.tar.zst | tar x -C /workspace/compiler-src/build
 
 ENV STAGE1=/workspace/compiler-src/build/x86_64-unknown-linux-gnu/stage1
 ENV ARTIFACT_STAGE1="$STAGE1"
@@ -103,7 +114,7 @@ ENV RUSTUP_TOOLCHAIN=stage1
 # --- everything else ---------------------------------------------------------
 # This copies the complete artifact, including README.md and component README
 # files. .dockerignore excludes generated output but no Markdown documentation.
-COPY . /workspace/artifact
+COPY --exclude=corpus/offline-cargo-cache.tar.zst . /workspace/artifact
 WORKDIR /workspace/artifact
 
 RUN python3 -c "import sys; assert sys.version_info >= (3,10)" \

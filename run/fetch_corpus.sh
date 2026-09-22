@@ -8,6 +8,10 @@ OUT="${CORPUS_DIR:-$HERE/corpus/sources}"
 TARBALL="$HERE/corpus/corpus-sources.tar.zst"
 
 [ -f "$TARBALL" ] || { echo "missing $TARBALL" >&2; exit 1; }
+(
+  cd "$HERE/corpus"
+  sha256sum --check corpus-sources.sha256
+)
 
 mkdir -p "$OUT"
 echo "unpacking $TARBALL"
