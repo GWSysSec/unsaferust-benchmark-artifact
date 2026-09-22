@@ -1,5 +1,5 @@
-# The compiler source ships as one compressed tarball, 178 MB, which is too
-# large for plain git. Everything else here is text or small.
+# Large compiler and corpus archives are stored through Git LFS.
 compiler/*.tar.zst filter=lfs diff=lfs merge=lfs -text
+corpus/*.tar.zst filter=lfs diff=lfs merge=lfs -text
 data/paper_figures/*.pdf filter=lfs diff=lfs merge=lfs -text
 data/paper_figures/*.png filter=lfs diff=lfs merge=lfs -text

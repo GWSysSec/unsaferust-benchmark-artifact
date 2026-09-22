@@ -3,6 +3,7 @@ results/
 **/__pycache__/
 *.pyc
 **/target/
+compiler/stage1-from-source.tar.zst
 tools/analysis/Latex/
 # Written when an evaluator builds a table from their own measurement. They are
 # outputs of this artifact, not part of it.

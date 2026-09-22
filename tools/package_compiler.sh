@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Package the instrumented compiler source into compiler/compiler-src.tar.zst.
 #
-# Exports the committed state, not the working tree, so what ships is exactly
-# the commits recorded in compiler/COMMIT. The rustc tree has twelve git
-# submodules; `git archive` covers only the superproject, and leaving the rest
-# out breaks the build immediately, because the workspace manifest names
-# members that live inside src/doc/book. So every submodule is exported too.
+# Exports the committed state, not the working tree, before removing unused
+# LLVM projects, tests, optional SVF integration and vendored Z3. The rustc
+# tree has twelve git submodules; `git archive` covers only the superproject.
+# The workspace manifest names members inside src/doc/book, so every submodule
+# is exported before pruning.
 #
 # The rustc test suite is dropped: 157 MB that no measurement needs.
 set -euo pipefail
@@ -25,6 +25,7 @@ git -C "$BENCH" submodule --quiet foreach --recursive \
   'mkdir -p "'"$WORK"'/src/$sm_path" && git archive HEAD | tar x -C "'"$WORK"'/src/$sm_path"'
 
 rm -rf "$WORK/src/tests"
+python3 "$HERE/tools/prune_compiler_source.py" "$WORK/src"
 
 echo "compressing"
 tar cf - -C "$WORK/src" . | zstd -12 -T0 -q -o "$HERE/compiler/compiler-src.tar.zst" --force
@@ -36,6 +37,8 @@ tar cf - -C "$WORK/src" . | zstd -12 -T0 -q -o "$HERE/compiler/compiler-src.tar.
   echo
   echo "submodules:"
   git -C "$BENCH" submodule status --recursive | sed 's/^/  /'
+  echo
+  echo "packaging: unused LLVM projects, tests, SVF passes, and Z3 source removed"
 } > "$HERE/compiler/COMMIT"
 
 echo

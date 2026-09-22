@@ -15,3 +15,5 @@ submodules:
    3f54088511079db574d18e4441699570a6efa5b9 src/llvm-project (heads/feat/instrument-all-deps)
    37629051518c3df9ac2c1744589362a02ecafa99 src/tools/cargo (0.81.0)
    72daa50ce2350f5a9b5ae6dc3ad6babccd14ec0a src/tools/rustc-perf (72daa50ce)
+
+packaging: unused LLVM projects, tests, SVF passes, and Z3 source removed

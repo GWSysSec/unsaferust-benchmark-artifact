@@ -4,3 +4,4 @@ results
 **/__pycache__
 **/target
 *.tar
+compiler/stage1-from-source.tar.zst
