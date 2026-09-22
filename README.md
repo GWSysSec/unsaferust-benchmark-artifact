@@ -20,11 +20,11 @@ The provided Docker image starts in `/workspace/artifact`. To run every
 experiment and generate every table and figure, run:
 
 ```bash
-# 100 crate, full experimental run
+# 100 crate full run
 bash run/reproduce.sh --tier full
 ```
 
-This is our complete test reproduction entry point script. It extracts the
+This is our complete test reproduction script. It extracts the
 100 crates if needed, measures all 100 crates with the supplied
 instrumented compiler, and generates every table and figure. Results are saved
 under `results/<timestamp>/`.
@@ -37,6 +37,9 @@ bash run/reproduce.sh
 
 # 58 crate manageable run
 bash run/reproduce.sh --tier fast
+
+# 1 crate run
+bash run/reproduce.sh --crate bytes
 ```
 
 ## Image Structure
@@ -53,17 +56,16 @@ Below is our structure for the main artifact directory
 ├── docker/                # Docker scripts
 ├── run/                   # Scripts to reproduce experiments
 ├── tables/                # Scripts that generate table + figures
-├── tools/                 # Helper scripts
+├── tools/                 # Scripts that compare results
 ├── unsafe_perf_source/    # Rust runtime library for instrumentation
 ├── benchmark_suite/       # 18 crate unsafe benchmark suite
-├── docs/                  # Additional paper data
+├── docs/                  # Test workload descriptions + analyzed data
 └── results/               # Output directory for your experiments
 ```
 
 ## Useful Commands
 
-Run the commands inside
-the container, for example with `bash docker/run.sh bash COMMAND`.
+Additional commands that can be run inside the docker image.
 
 | Command                                   | What it does                                                                                          |
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -104,7 +106,7 @@ point from `/workspace/artifact`:
 python3 benchmark_suite/run_pipeline.py
 ```
 
-To run only one benchmark crate, pass its name:
+To run only one benchmark crate, pass its name e.g:
 
 ```bash
 python3 benchmark_suite/run_pipeline.py --crate matrixmultiply
@@ -121,7 +123,7 @@ of measurement time. The supported smaller runs are:
 | `fast`  |         58 |   about 1.5-2 hours |
 | `full`  |        100 |      about 2-3 days |
 
-## FAQ
+## Questions?
 
 ### Where are the compiler source and compiled toolchain?
 

@@ -1,4 +1,4 @@
-# Benchmark Configurations
+# Unsafe Benchmark Quick Start
 
 The following commands run the benchmark suite with our instrumentation and
 perform the selected dynamic analysis on each benchmark:
@@ -28,14 +28,6 @@ Results are written to `benchmark_suite/results/<timestamp>/` by default.
 
 ## Per-crate configuration
 
-    rayon         build rayon-demo with cargo build --release, then run only
-                  `nbody bench --bodies 500`
-    jni           cargo bench --features invocation
-    parking_lot   build the benchmarks folder with cargo build --release, then
-                  ./mutex 2 4 10 2 4 and ./rwlock 4 4 4 10 2 4
-    ring          cargo bench --benches
-    memchr        driven through rebar, which calls cargo underneath
-
 This document details the configuration for the 18 selected benchmark crates used in our artifact.
 
 | Crate              | Bench Run Config                                                                                                                       |
@@ -59,7 +51,7 @@ This document details the configuration for the 18 selected benchmark crates use
 | **tokio**          | Default                                                                                                                                |
 | **petgraph**       | Default                                                                                                                                |
 
-> **Default** means standard `cargo bench` was used and the benchmark suite was provided by the developers.
+> **Default** = `cargo bench` was used.
 
 ## Dynamic Characteristics
 
@@ -92,7 +84,7 @@ The following table summarizes the dynamic unsafe code characteristics observed 
 - **Max Coverage**: 100%
 - **Geomean Coverage**: 57.98%
 
-## Running it
+## Additional Info
 
 `env_presets/env/` holds one preset per instrumentation feature: `cpu.sh`,
 `heap.sh`, `counter.sh` and `coverage.sh`. Source one, then run the crate's
@@ -103,4 +95,4 @@ source env_presets/env/cpu.sh
 cd matrixmultiply && cargo bench
 ```
 
-`run_pipeline.py` is the driver that automates this across the suite.
+`run_pipeline.py` automates this across the suite.
