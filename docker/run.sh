@@ -12,7 +12,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
-IMAGE="${IMAGE:-unsaferust-artifact:v3}"
+IMAGE="${IMAGE:-unsaferust-artifact:v2}"
 VOLUME="${VOLUME:-unsaferust-compiler}"
 
 mkdir -p "$HERE/results" "$HERE/corpus/sources"

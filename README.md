@@ -80,16 +80,15 @@ Additional commands that can be run inside the docker image.
 | `bash run/measure.sh --crate tokio,bytes` | Measures only the named crates.                                                                       |
 | `bash run/check_shipped_data.sh`          | Rebuilds the five paper tables from shipped data and checks exact equality with the submitted tables. |
 
-After a measurement, generate an individual output with one of:
+After a measurement, you can generate a single table or figure as below (matching paper tables and figures commented) :
 
 ```bash
-bash tables/rq1_cpu_cycles.sh
-bash tables/rq2_heap.sh
-bash tables/rq3_unsafe_inst_frequency.sh
-bash tables/rq4_inst_types.sh
-bash tables/rq5_unsafe_functions.sh
-bash tables/figure_cycles_cdf.sh
-bash tables/figure_heap_cdf.sh
+bash tables/rq1_cpu_cycles.sh # Table 2
+bash tables/rq2_heap.sh  # Table 3
+bash tables/rq3_unsafe_inst_frequency.sh # Table 4
+bash tables/rq5_unsafe_functions.sh # Table 5
+bash tables/figure_cycles_cdf.sh # Figure 2
+bash tables/figure_heap_cdf.sh # Figure 3
 ```
 
 ## Unsafe Rust Benchmarks
@@ -132,8 +131,10 @@ into `/workspace/compiler-src` in the image. The built compiler is stored in
 the `unsaferust-compiler` Docker volume, mounted at
 `/workspace/compiler-src/build` when the container starts.
 
-`bash docker/build.sh` uses the prebuilt toolchain by default. To build the
-compiler from the shipped raw source instead, use:
+`bash docker/build.sh` rebuilds `unsaferust-artifact:v2` and populates the
+compiler volume from the prebuilt toolchain.
+
+To build the compiler from the shipped raw source instead, use:
 
 ```bash
 bash docker/build.sh --from-source

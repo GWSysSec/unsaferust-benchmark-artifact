@@ -3,7 +3,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-IMAGE="${BASE_IMAGE:-unsaferust-artifact:v3}"
+IMAGE="${BASE_IMAGE:-unsaferust-artifact:v2}"
 VOLUME="${VOLUME:-unsaferust-compiler-from-source-build}"
 OUTPUT="${OUTPUT:-$HERE/compiler/stage1-from-source.tar.zst}"
 
