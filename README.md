@@ -67,18 +67,18 @@ Below is our structure for the main artifact directory
 
 Additional commands that can be run inside the docker image.
 
-| Command                                   | What it does                                                                                          |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `bash docker/run.sh`                      | Opens a shell with the compiler volume and persistent results mounts.                                 |
-| `bash run/reproduce.sh`                   | Extracts the crates if needed, measures them, and produces every table and figure.                    |
-| `bash run/reproduce.sh --tier fast`       | Runs the 58-crate fast tier, then generates every table and figure.                                   |
-| `bash run/reproduce.sh --tier full`       | Runs all 100 corpus crates, then generates every table and figure.                                    |
-| `bash run/fetch_corpus.sh`                | Extracts the shipped corpus source trees without network access.                                      |
-| `bash run/measure.sh --tier smoke`        | Measures 12 representative crates without generating tables.                                          |
-| `bash run/measure.sh --tier fast`         | Measures 58 faster crates without generating tables.                                                  |
-| `bash run/measure.sh --tier full`         | Measures all 100 corpus crates without generating tables.                                             |
-| `bash run/measure.sh --crate tokio,bytes` | Measures only the named crates.                                                                       |
-| `bash run/check_shipped_data.sh`          | Rebuilds the five paper tables from shipped data and checks exact equality with the submitted tables. |
+| Command                                     | What it does                                                                       |
+| ------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `bash docker/run.sh`                        | Opens a shell with the compiler volume and persistent results mounts.              |
+| `bash run/reproduce.sh`                     | Extracts the crates if needed, measures them, and produces every table and figure. |
+| `bash run/reproduce.sh --tier fast`         | Runs the 58-crate fast tier, then generates every table and figure.                |
+| `bash run/reproduce.sh --tier full`         | Runs all 100 corpus crates, then generates every table and figure.                 |
+| `bash run/fetch_corpus.sh`                  | Extracts the shipped corpus source trees without network access.                   |
+| `bash run/measure.sh --tier smoke`          | Measures 12 representative crates without generating tables.                       |
+| `bash run/measure.sh --tier fast`           | Measures 58 faster crates without generating tables.                               |
+| `bash run/measure.sh --tier full`           | Measures all 100 corpus crates without generating tables.                          |
+| `bash run/measure.sh --crate tokio,bytes`   | Measures only the named crates.                                                    |
+| `bash docker/build_compiler_from_source.sh` | Compiles our compiler from source inside the docker image                          |
 
 After a measurement, you can generate a single table or figure as below (matching paper tables and figures commented) :
 
