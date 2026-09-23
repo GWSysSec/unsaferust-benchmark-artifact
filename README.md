@@ -84,8 +84,8 @@ After a measurement, you can generate a single table or figure as below (matchin
 
 ```bash
 bash tables/rq1_cpu_cycles.sh # Table 2
-bash tables/rq2_heap.sh  # Table 3
-bash tables/rq3_unsafe_inst_frequency.sh # Table 4
+bash tables/rq2_heap.sh  # Table 3
+bash tables/rq4_inst_types.sh # Table 4
 bash tables/rq5_unsafe_functions.sh # Table 5
 bash tables/figure_cycles_cdf.sh # Figure 2
 bash tables/figure_heap_cdf.sh # Figure 3
