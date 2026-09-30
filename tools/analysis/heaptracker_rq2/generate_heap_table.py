@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
 """RQ2: heap memory accessed by unsafe code, by allocation size.
 
-For each crate per variant:
-  - Aggregate size_histogram and unsafe_size_histogram across bins.
-  - Clamp per-bucket unsafe = min(unsafe, total) to handle instrumentation
-    artifacts in a small number of buckets across 7 crates.
-  - Compute Small/Medium/Large object-count and memory-size percentages,
-    plus the Total per-crate percentage.
-  - Mem Inst column = (heap.unsafe_load + heap.unsafe_store) divided by the
-    cross-feature unsafe-mem-inst total from unsafe_counter
-    (unsafe_loads + unsafe_stores).
-Summarize per-crate values with min/geomean/median/max for both variants.
+Per crate and variant: the unsafe share of heap memory in small, medium and
+large allocations and in total, and Mem Inst, the share of unsafe loads and
+stores that target the heap. Summarised with min/geomean/median/max.
 """
 
 from __future__ import annotations
@@ -27,12 +20,7 @@ import datasets  # noqa: E402
 
 
 def load_variant(ds: datasets.Dataset, variant: str) -> dict:
-    """Per-crate heap records for one native-library setting.
-
-    Reads the committed JSON rather than re-aggregating the raw per-binary
-    dumps, so this table can be rebuilt from the data the artifact ships, the
-    way every other table already could. Refresh with ../export_dataset.py.
-    """
+    """Per-crate heap records for one standard-library setting."""
     path = HERE / f"{ds.stem('heap_' + variant)}.json"
     out = {}
     for row in json.loads(path.read_text())["crates"]:
@@ -67,7 +55,7 @@ def clamp_unsafe(total: list[int], unsafe: list[int]) -> list[int]:
 def categorize_objects(hist: list[int]) -> tuple[int, int, int]:
     if not hist:
         return (0, 0, 0)
-    small = hist[0] if len(hist) > 0 else 0
+    small = hist[0]
     medium = sum(hist[1:8])
     large = sum(hist[8:])
     return (small, medium, large)
@@ -76,7 +64,7 @@ def categorize_objects(hist: list[int]) -> tuple[int, int, int]:
 def categorize_memory(hist: list[int]) -> tuple[int, int, int]:
     if not hist:
         return (0, 0, 0)
-    small = hist[0] * BIN_MIDPOINTS[0] if len(hist) > 0 else 0
+    small = hist[0] * BIN_MIDPOINTS[0]
     medium = sum(hist[i] * BIN_MIDPOINTS[i] for i in range(1, min(8, len(hist))))
     large = 0
     for i in range(8, len(hist)):
@@ -133,12 +121,6 @@ def collect_variant(crates: dict, variant: str) -> dict:
         if tot_mem > 0:
             out["mem_total"].append((usm + umm + ulm) / tot_mem * 100.0)
 
-        # Mem Inst column: heap(unsafe ld+st) / unsafe_counter(unsafe ld+st),
-        # both summed over the bins present in BOTH features (mem_inst_common,
-        # computed in aggregate_rebench). Aligning the bin sets restores the
-        # subset bound (heap-touching unsafe mem ops <= all unsafe mem ops);
-        # without it, tokio reads 1291% because rt_threaded is in the heap
-        # numerator but absent from the unsafe_counter denominator (timed out).
         mic = ht.get("_mem_inst_common")
         if mic:
             numer = mic["heap_unsafe_ldst"]
@@ -153,10 +135,6 @@ def main():
     datasets.add_argument(ap)
     ds = datasets.get(ap.parse_args().dataset)
 
-    # The committed JSONs were written with the common-bin filter applied, so
-    # bins present in one heap_tracker variant but not the other (e.g. tokio's
-    # rt_threaded under with_native, which timed out at the 4h cap) are already
-    # excluded and the two variants compare like-for-like.
     wo = collect_variant(load_variant(ds, "without_native"), "without_native")
     w = collect_variant(load_variant(ds, "with_native"), "with_native")
 
@@ -205,7 +183,7 @@ def main():
     out = HERE.parent / "Latex" / "tables" / f"{ds.stem('heap')}.tex"
     out.write_text(latex)
     print(f"Wrote {out}")
-    print(f"dataset: {ds.name} ({ds.scope})")
+    print(f"dataset: {ds.name}")
     print(f"crates w/o={len(wo['mem_total'])} w/={len(w['mem_total'])}")
     for k in keys:
         print(f"  {k}: w/o {stats_wo[k]}  | w/ {stats_w[k]}")

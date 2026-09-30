@@ -1,36 +1,17 @@
 #!/usr/bin/env python3
 """Write one measurement run into the per-research-question data files.
 
-For the dataset named on the command line this writes, into each research
-question's folder, two things:
+For the chosen dataset this writes, into each research question's folder, the
+JSON the table and figure scripts read and a CSV with the same numbers, one row
+per crate and variant. Overwriting the committed published files needs --force.
 
-  * a JSON file in exactly the schema that question's table and figure scripts
-    already read, so those scripts need no new parsing code, and
-  * a CSV file holding the same numbers one row per crate per variant, so the
-    data can be read without running anything.
-
-The published dataset's files are already committed and are what the submitted
-paper reports, so writing them again needs --force. The default dataset to
-export is therefore `alldeps`, the run that instruments every crate in the
-dependency graph.
-
-A *variant* is one of the two native-library settings the corpus is measured
-under. `with_native` counts unsafe code inside the standard library
-(core/std/alloc) towards the unsafe totals; `without_native` does not. The
-research-question JSONs spell these two `nativetrue`/`nativefalse` for the
-instruction counters and `with_native`/`without_native` everywhere else; this
-script writes whichever spelling each folder already uses.
+A variant is one of the two standard-library settings: `with_native` counts
+unsafe code inside core/std/alloc and `without_native` does not. The
+instruction-counter files spell them `nativetrue` and `nativefalse`.
 
 Usage:
-    python3 export_dataset.py                 # alldeps -> *_alldeps.{json,csv}
+    python3 export_dataset.py --dataset yourrun        # needs ARTIFACT_RUN_DIR
     python3 export_dataset.py --dataset published --force
-
-This script was checked against the committed published files before it was
-used on any new run: regenerating the published dataset reproduces all twelve
-of them value for value, including the loom crate, whose CPU-cycle record is
-the one the two earlier porters treated differently. The only differences are
-additive: each RQ1 crate record gains the two whole_program_* fields, which the
-published files predate.
 """
 
 from __future__ import annotations
@@ -58,7 +39,6 @@ RQ3 = HERE / "unsafeinstfrequency_rq3"
 RQ4 = HERE / "unsafeinsttype_rq4"
 RQ5 = HERE / "unsafefunction_rq5"
 
-# The two native-library settings, with the spelling each folder uses.
 VARIANTS = [("without_native", "nativefalse"), ("with_native", "nativetrue")]
 
 
@@ -83,7 +63,6 @@ def write_json(path: Path, payload: dict) -> None:
 def base_metadata(ds: datasets.Dataset, extra: dict | None = None) -> dict:
     meta = {
         "dataset": ds.name,
-        "instrumentation_scope": ds.scope,
         "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "generator": "export_dataset.py",
     }
@@ -94,17 +73,7 @@ def base_metadata(ds: datasets.Dataset, extra: dict | None = None) -> dict:
 # --------------------------------------------------------------- RQ1: cycles
 
 def export_rq1(ds: datasets.Dataset, crates: dict) -> None:
-    """CPU cycles spent in unsafe code.
-
-    Both cycle pairs are written for every crate, and the metadata names which
-    pair `unsafe_percentage` was computed from, so a reader never has to guess
-    which correction is in force. See datasets.py for why the two runs differ.
-    """
-    num_field = ("internal_unsafe_cycles" if ds.cycle_metric == "internal"
-                 else "whole_program_unsafe_cycles")
-    den_field = ("internal_total_cycles" if ds.cycle_metric == "internal"
-                 else "whole_program_total_cycles")
-
+    """CPU cycles spent in unsafe code, as a share of internal cycles."""
     csv_rows: list[dict] = []
     for variant, _suffix in VARIANTS:
         out: dict[str, dict] = {}
@@ -112,19 +81,15 @@ def export_rq1(ds: datasets.Dataset, crates: dict) -> None:
             cc = crates[crate_name].get("cpu_cycle_counter", {}).get(variant)
             if not cc:
                 continue
-            total = cc.get(den_field, 0.0)
-            unsafe = cc.get(num_field, 0.0)
+            total = cc.get("internal_total_cycles", 0.0)
+            unsafe = cc.get("internal_unsafe_cycles", 0.0)
             if total <= 0:
                 continue
             rec = {
-                # the field names the existing RQ1 scripts read
                 "total_cycles": cc.get("total_cycles", 0.0),
                 "external_cycles": cc.get("external_cycles", 0.0),
-                "internal_cycles": cc.get("internal_total_cycles", 0.0),
-                "unsafe_cycles": cc.get("internal_unsafe_cycles", 0.0),
-                # the whole-program pair, named for what it is
-                "whole_program_total_cycles": cc.get("whole_program_total_cycles", 0.0),
-                "whole_program_unsafe_cycles": cc.get("whole_program_unsafe_cycles", 0.0),
+                "internal_cycles": total,
+                "unsafe_cycles": unsafe,
                 "unsafe_percentage": _pct(unsafe, total),
             }
             out[crate_name] = rec
@@ -135,13 +100,7 @@ def export_rq1(ds: datasets.Dataset, crates: dict) -> None:
                 "external_cycles": f"{rec['external_cycles']:.0f}",
                 "internal_cycles": f"{rec['internal_cycles']:.0f}",
                 "internal_unsafe_cycles": f"{rec['unsafe_cycles']:.0f}",
-                "whole_program_unsafe_cycles":
-                    f"{rec['whole_program_unsafe_cycles']:.0f}",
-                "internal_unsafe_pct":
-                    f"{_pct(rec['unsafe_cycles'], rec['internal_cycles']):.4f}",
-                "whole_program_unsafe_pct":
-                    f"{_pct(rec['whole_program_unsafe_cycles'], rec['total_cycles']):.4f}",
-                "reported_unsafe_pct": f"{rec['unsafe_percentage']:.4f}",
+                "internal_unsafe_pct": f"{rec['unsafe_percentage']:.4f}",
             })
 
         name = ds.stem("cpucycle_withnative" if variant == "with_native"
@@ -150,18 +109,14 @@ def export_rq1(ds: datasets.Dataset, crates: dict) -> None:
             "metadata": base_metadata(ds, {
                 "source": str(ds.cpu_root),
                 "variant": variant,
-                "cycle_metric": ds.cycle_metric,
-                "metric": f"{num_field} / {den_field}",
-                "note": "unsafe_percentage uses the pair named in `metric`; "
-                        "both pairs are present in every record.",
+                "metric": "internal_unsafe_cycles / internal_total_cycles",
             }),
             "crates": out,
         })
 
     write_csv(RQ1 / f"{ds.stem('cpu_cycles')}.csv", [
         "crate", "variant", "total_cycles", "external_cycles", "internal_cycles",
-        "internal_unsafe_cycles", "whole_program_unsafe_cycles",
-        "internal_unsafe_pct", "whole_program_unsafe_pct", "reported_unsafe_pct",
+        "internal_unsafe_cycles", "internal_unsafe_pct",
     ], csv_rows)
 
 
@@ -210,13 +165,7 @@ def size_class_totals(hist: list[int]) -> tuple[int, int, int, int, int, int]:
 
 
 def export_rq2(ds: datasets.Dataset, crates: dict) -> None:
-    """Heap memory touched by unsafe code.
-
-    The JSONs keep the legacy field names so generate_heap_plot.py and
-    analyze_unsafe_percentages.py read them unchanged. The CSV adds the
-    size-class percentages the RQ2 table reports, so the table can be checked
-    without re-running the aggregation.
-    """
+    """Heap memory reached by unsafe code; the CSV adds the RQ2 table's size classes."""
     csv_rows: list[dict] = []
     for variant, _suffix in VARIANTS:
         rows = []
@@ -227,11 +176,6 @@ def export_rq2(ds: datasets.Dataset, crates: dict) -> None:
                 continue
             stats = to_legacy_heap(ht)
             row = {"crate_name": crate_name, "aggregated_stats": stats}
-            # The Mem-Inst column divides heap-touching unsafe loads and stores
-            # by all unsafe loads and stores, over the bins present in BOTH
-            # features. That pairing is computed during aggregation, so carry it
-            # in the JSON; otherwise the RQ2 table cannot be rebuilt without the
-            # raw per-binary dumps, and every other table can.
             mic = crates[crate_name].get("mem_inst_common", {}).get(variant)
             if mic:
                 row["mem_inst_common"] = mic
@@ -390,8 +334,7 @@ def export_counters(ds: datasets.Dataset, crates: dict) -> None:
               ["crate", "variant", "total_instructions", "unsafe_instructions",
                "unsafe_instruction_pct"], rows)
 
-    # RQ4: what kind of instruction the unsafe ones are. Percentages are of
-    # unsafe instructions, not of all instructions, matching the RQ4 table.
+    # RQ4: instruction types, as percentages of unsafe instructions.
     fields = ["crate", "variant", "unsafe_instructions"]
     for label, _ in RQ4_TYPES:
         fields += [f"unsafe_{label}", f"unsafe_{label}_pct"]
@@ -408,8 +351,7 @@ def export_counters(ds: datasets.Dataset, crates: dict) -> None:
             rows.append(row)
     write_csv(RQ4 / f"{ds.stem('unsafe_inst_type')}.csv", fields, rows)
 
-    # RQ5: how often functions holding unsafe code run. "Distinctive" counts a
-    # function once however often it runs; "cumulative" counts every call.
+    # RQ5: "distinctive" counts a function once, "cumulative" every call.
     rows = [{
         "crate": c, "variant": v,
         "total_functions_defined": r["total_functions_defined"],
@@ -432,13 +374,9 @@ def export_counters(ds: datasets.Dataset, crates: dict) -> None:
 # --------------------------------------------------------------- repeatability
 
 def export_repeats(ds: datasets.Dataset) -> None:
-    """One row per crate per variant per repetition of the unsafe-counter run.
+    """One row per crate, variant and repetition of the unsafe-counter run.
 
-    The corpus driver writes repetition 1 into <feature>/<variant>/ and any
-    further repetition into <feature>/rep<N>/<variant>/. Repetition 1 is what
-    every table reports; the extra repetitions exist so the spread between
-    repeated measurements of the same workload can be quoted. A crate with only
-    one repetition simply contributes one row.
+    Repetition 1 is <feature>/<variant>/, further ones <feature>/rep<N>/<variant>/.
     """
     root = ds.counter_root
     rows: list[dict] = []
@@ -485,7 +423,7 @@ def export_repeats(ds: datasets.Dataset) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--dataset", default="alldeps", choices=sorted(datasets.DATASETS))
+    ap.add_argument("--dataset", default="published", choices=sorted(datasets.DATASETS))
     ap.add_argument("--force", action="store_true",
                     help="allow overwriting the committed published data files")
     args = ap.parse_args()
@@ -501,12 +439,10 @@ def main() -> int:
         if not root.is_dir():
             raise SystemExit(f"{label} root does not exist: {root}")
 
-    print(f"dataset {ds.name}: {ds.scope}")
-    crates = aggregate_all(root=ds.heap_root, heap_common_bins_only=True,
-                           keep_test_failures=ds.keep_test_failures)
+    print(f"dataset {ds.name}")
+    crates = aggregate_all(root=ds.heap_root, heap_common_bins_only=True)
     if ds.cpu_root != ds.heap_root:
-        cpu_crates = aggregate_all(root=ds.cpu_root,
-                                   keep_test_failures=ds.keep_test_failures)
+        cpu_crates = aggregate_all(root=ds.cpu_root)
         for name, data in cpu_crates.items():
             crates.setdefault(name, {})["cpu_cycle_counter"] = \
                 data.get("cpu_cycle_counter", {})

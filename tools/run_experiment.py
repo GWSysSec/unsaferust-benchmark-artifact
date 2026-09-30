@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Run one full-corpus experiment and preserve its primary-only comparisons."""
+"""Measure all 100 crates for one experiment and compare each crate with the
+published data."""
 from __future__ import annotations
 
 import argparse
@@ -8,14 +9,12 @@ import datetime
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 ANALYSIS = ROOT / "tools" / "analysis"
 sys.path.insert(0, str(ANALYSIS))
-import datasets
 from heaptracker_rq2.generate_heap_table import collect_variant
 from unsafeinsttype_rq4.generate_unsafe_inst_table import ROW_DEFS
 
@@ -52,10 +51,9 @@ def load_records(analysis: Path, group: str, variant: str, suffix: str) -> dict:
         folder = "unsafeinstfrequency_rq3"
         base = "unsafe_counter_nativetrue" if variant == "with_native" else "unsafe_counter_nativefalse"
     data = json.loads((analysis / folder / f"{base}{suffix}.json").read_text())
-    meta = data.get("metadata", {})
     expected = "yourrun" if suffix else "published"
-    if meta.get("dataset") != expected or meta.get("instrumentation_scope") != "primary package only":
-        raise ValueError(f"Unexpected reference or measurement scope: {folder}/{base}{suffix}")
+    if data.get("metadata", {}).get("dataset") != expected:
+        raise ValueError(f"Unexpected dataset in {folder}/{base}{suffix}")
     if group == "heap":
         return {r["crate_name"]: {**r["aggregated_stats"],
                 "_mem_inst_common": r.get("mem_inst_common")} for r in data["crates"]}
@@ -79,7 +77,6 @@ def metrics(group: str, record: dict, variant: str) -> dict:
     result = {"RQ3 unsafe executed instructions": ratio(record, "unsafe_instructions", "total_instructions")}
     total = record.get("unsafe_instructions", 0) or 0
     for label, fields in ROW_DEFS:
-        # Match the paper generator's zero convention for instruction types.
         result["RQ4 " + label] = 100.0 * sum(record.get(k, 0) or 0 for k in fields) / total if total else 0.0
     result["RQ5 distinctive"] = ratio(record, "unsafe_functions_executed", "total_functions_executed")
     result["RQ5 cumulative"] = ratio(record, "unsafe_function_calls", "total_function_calls")
@@ -112,7 +109,7 @@ def compare(group: str, analysis: Path, output: Path, names: dict) -> bool:
         writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
-    lines = [f"Experiment: {group}; reference: published; scope: primary package only",
+    lines = [f"Experiment: {group}; reference: published",
              f"Expected: {len(names)} crates x 2 standard-library variants.",
              f"Missing crate/variant measurements: {len(missing)}",
              "Percentages are compared using signed percentage-point deltas.",
@@ -149,9 +146,8 @@ def main() -> int:
     if len(names) != 100:
         raise ValueError(f"Expected exactly 100 corpus crates, found {len(names)}")
     env = dict(os.environ)
-    for key in ("UNSAFE_INSTRUMENT_ALL_PACKAGES", "CARGO_PRIMARY_PACKAGE",
-                "RUSTC_WRAPPER", "RUSTC_WORKSPACE_WRAPPER", "ARTIFACT_RUN_DIR",
-                "ARTIFACT_RUN_SCOPE", "ARTIFACT_ANALYSIS_DIR"):
+    for key in ("CARGO_PRIMARY_PACKAGE", "RUSTC_WRAPPER", "RUSTC_WORKSPACE_WRAPPER",
+                "ARTIFACT_RUN_DIR"):
         env.pop(key, None)
     stamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     output = (args.compare_only or args.out or ROOT / "results" / f"{args.experiment}_{stamp}").resolve()
@@ -162,8 +158,7 @@ def main() -> int:
         output.mkdir(parents=True, exist_ok=False)
         (output / "experiment.json").write_text(json.dumps({
             "experiment": args.experiment, "features": features.split(","),
-            "instrumentation_scope": "primary package only", "reference": "published",
-            "crates": list(names), "variants": VARIANTS,
+            "reference": "published", "crates": list(names), "variants": VARIANTS,
         }, indent=2) + "\n")
         corpus = Path(env.get("CORPUS_DIR", ROOT / "corpus/sources"))
         if not all((corpus / crate).is_dir() for crate in names):
@@ -173,8 +168,6 @@ def main() -> int:
                             "--features", features, "--out", str(output)], output / "measure.log", env)
         if code:
             return code
-    # Scope must be known before making any numerical comparisons.
-    datasets.require_primary(output)
     found = {path.parent.name for path in output.glob("*/rebench_summary.json")}
     unexpected = sorted(found - names.keys())
     if unexpected:
@@ -182,19 +175,13 @@ def main() -> int:
     missing = [crate for crate in names if not (output / crate / "rebench_summary.json").is_file()]
     (output / "coverage.json").write_text(json.dumps({
         "expected_crates": 100, "missing_summaries": missing,
-        "instrumentation_scope": "primary package only",
     }, indent=2) + "\n")
-    # Isolate generated JSON and tables, so separate experiments can run together.
-    analysis = output / "analysis"
-    if not analysis.exists():
-        shutil.copytree(ANALYSIS, analysis, ignore=shutil.ignore_patterns("Latex", "__pycache__", "*_yourrun.*"))
-    env["ARTIFACT_ANALYSIS_DIR"] = str(analysis)
     failures = bool(missing)
     for table in tables:
         code = run_command([sys.executable, str(ROOT / "tools/make_table.py"), table,
-                            "--run", str(output), "--no-comparison"], output / "tables.log", env)
+                            "--run", str(output)], output / "tables.log", env)
         failures |= code != 0
-    failures |= not compare(args.experiment, analysis, output, names)
+    failures |= not compare(args.experiment, ANALYSIS, output, names)
     print(f"Results: {output}")
     if failures:
         print("Incomplete measurement or report generation; inspect coverage.json and the logs.", file=sys.stderr)

@@ -89,7 +89,7 @@ def _plant_ring_marker_git(dst: Path):
     existence: with .git → regenerate from perl, without .git → expect
     pregenerated/. our copy strips .git, hitting the failing branch. drop a
     marker .git dir wherever a build.rs uses this exact pattern so the perl
-    path runs instead. perl is required (it is on this host).
+    path runs instead. perl is required.
     """
     for buildrs in dst.rglob("build.rs"):
         try:

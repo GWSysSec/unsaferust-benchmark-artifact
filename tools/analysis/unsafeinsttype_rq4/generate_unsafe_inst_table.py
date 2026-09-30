@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """RQ4: distribution of unsafe instruction types.
 
-For each crate per variant, compute per-type % = unsafe_<type> / unsafe_instructions.
-Rows: Load, Store, Ptr arith, Cast, Call (direct), Call (indirect),
-      Call (intrinsic), Atomic, Others, plus Total (= unsafe_inst / total_inst).
-Dynamic columns are sourced from rebench. The Static column group is preserved
-from the prior hand-edited table (rebench has no static-count instrumentation).
+Per crate and variant, each type's share of unsafe instructions; the Total row
+is unsafe instructions over all instructions. The static columns are fixed
+counts over the 100-crate corpus.
 """
 
 from __future__ import annotations
@@ -22,16 +20,12 @@ import datasets  # noqa: E402
 
 
 def load_variant(ds: datasets.Dataset, suffix: str) -> dict:
-    """Return per-crate flat unsafe_counter records for one native-library
-    setting. `suffix` is 'nativefalse' or 'nativetrue'. Refresh the JSONs with
-    ../export_dataset.py after a new measurement run."""
+    """Per-crate unsafe_counter records; `suffix` is 'nativefalse' or 'nativetrue'."""
     p = HERE / f"{ds.stem(f'unsafe_counter_{suffix}')}.json"
     return json.loads(p.read_text())["per_crate_data"]
 
 
-# (label, list of unsafe_counter field names to sum for the numerator)
-# Atomic counts are bundled into Others to match the committed table layout
-# (Load/Store/Ptr arith/Cast/Call/Others — no separate Atomic row).
+# (row label, unsafe_counter fields summed for it); atomics count as Others.
 ROW_DEFS = [
     ("Load",      ["unsafe_loads"]),
     ("Store",     ["unsafe_stores"]),
@@ -41,9 +35,6 @@ ROW_DEFS = [
     ("Others",    ["unsafe_others", "unsafe_atomics"]),
 ]
 
-# Hand-curated static-count percentages (from prior analysis).
-# Call static row restored from the pre-fine-graining table (commit 703955b)
-# since we now merge direct/indirect/intrinsic back into one Call row.
 STATIC_ROWS = {
     "Load":      ("0.0\\%", "9.7\\%",  "9.3\\%",  "75.0\\%"),
     "Store":     ("0.0\\%", "6.0\\%",  "5.2\\%",  "33.7\\%"),
@@ -150,7 +141,7 @@ def main():
     out = HERE.parent / "Latex" / "tables" / f"{ds.stem('inst')}.tex"
     out.write_text(latex)
     print(f"Wrote {out}")
-    print(f"dataset: {ds.name} ({ds.scope})")
+    print(f"dataset: {ds.name}")
     print(f"crates: w/o={len(totals_wo)} w/={len(totals_w)}")
     for label, _ in ROW_DEFS:
         wo = mmgm_max(rows_wo[label])

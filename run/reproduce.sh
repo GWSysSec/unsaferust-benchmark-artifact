@@ -3,8 +3,8 @@
 # from what was measured.
 #
 #   run/reproduce.sh                 12 crates, about 25 minutes
-#   run/reproduce.sh --tier fast     58 crates, about 2 hours
-#   run/reproduce.sh --tier full    100 crates, 121.7 hours
+#   run/reproduce.sh --tier fast     58 crates, about 1.5-2 hours
+#   run/reproduce.sh --tier full    100 crates, about 2-3 days
 #   run/reproduce.sh --crate bytes   one crate
 #
 # Everything it produces lands in results/<timestamp>/, including

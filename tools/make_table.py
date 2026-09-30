@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 """Build one of the paper's tables or figures from YOUR measurement.
 
-This is the artifact's main path. You run the harness, and this builds the
-output from what you measured and keeps it in your run directory. The command
-also points to the shipped reference data and submitted paper output without
-comparing measurements from different machines or crate populations.
-
     run/measure.sh --tier smoke                  # measure
     tables/rq3_unsafe_inst_frequency.sh          # build the table from it
 
@@ -19,7 +14,6 @@ the data in this artifact is what the paper reports -- pass --our-data.
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import shutil
 import subprocess
@@ -67,40 +61,8 @@ def newest_run() -> Path | None:
     return max(runs, key=lambda p: p.stat().st_mtime) if runs else None
 
 
-SCOPE_WORDS = {
-    "primary": "only the crate under study",
-    "alldeps": "every crate in the dependency graph",
-}
-
-
-def scope_of(run: Path) -> str:
-    """Read what the run instrumented out of the run itself.
-
-    The harness writes `instrument_all_deps` into every crate's
-    rebench_summary.json, so the measurement says which of the two scopes it
-    used and the evaluator does not have to remember. A run whose crates
-    disagree is not a single measurement, so say so rather than pick one.
-    """
-    seen = set()
-    for s in run.glob("*/rebench_summary.json"):
-        try:
-            seen.add(bool(json.loads(s.read_text()).get("instrument_all_deps")))
-        except (OSError, ValueError):
-            continue
-    if len(seen) > 1:
-        print("warning: this run mixes both scopes; treating it as primary-only")
-        return "primary"
-    return "alldeps" if seen == {True} else "primary"
-
-
 def keep(built: Path, run_dir: Path | None) -> None:
-    """Copy a generated table or figure next to the run it was built from.
-
-    Everything the generators write lands under tools/analysis/Latex/, which is
-    inside the image when this runs in Docker and is therefore gone when the
-    container exits. The run directory is on the host, so a copy there is what
-    the evaluator still has afterwards.
-    """
+    """Copy a generated table or figure into the run's tables/ directory."""
     if run_dir is None or not built.is_file():
         return
     out = run_dir / "tables"
@@ -127,9 +89,6 @@ def main() -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("target", choices=sorted(TARGETS))
     ap.add_argument("--run", type=Path, help="a measurement directory of your own")
-    ap.add_argument("--scope", default=None, choices=["primary", "alldeps"],
-                    help="what the run instrumented; read from the run itself "
-                         "unless you say otherwise")
     ap.add_argument("--our-data", action="store_true",
                     help="build from the data this artifact ships instead")
     args = ap.parse_args()
@@ -144,28 +103,23 @@ def main() -> int:
         print("source: the measurement data this artifact ships")
         print("        (use this to confirm our data is what the paper reports;")
         print("         the artifact's main path is to measure it yourself)\n")
-        n_crates = 100
     else:
         run = args.run or newest_run()
         if run is None:
             print("No measurement of your own was found under results/.\n")
             print("Measure first, for example:")
-            print("    run/measure.sh --tier smoke      12 crates, about 32 minutes")
-            print("    run/measure.sh --tier fast       58 crates, about 1.5 hours")
-            print("    run/measure.sh --tier full      100 crates, 121.7 hours\n")
+            print("    run/measure.sh --tier smoke      12 crates, about 25 minutes")
+            print("    run/measure.sh --tier fast       58 crates, about 1.5-2 hours")
+            print("    run/measure.sh --tier full      100 crates, about 2-3 days\n")
             print("Or pass --our-data to build the table from the data we ship.")
             return 2
         crates = crates_in(run)
-        n_crates = len(crates)
         print(f"source: your measurement at {run}")
-        print(f"        {n_crates} crates: {', '.join(crates[:8])}"
-              f"{' ...' if n_crates > 8 else ''}\n")
-        scope = args.scope or scope_of(run)
-        print(f"        scope: {SCOPE_WORDS[scope]}\n")
+        print(f"        {len(crates)} crates: {', '.join(crates[:8])}"
+              f"{' ...' if len(crates) > 8 else ''}\n")
         dataset, suffix = "yourrun", "_yourrun"
         run_dir = run.resolve()
-        env = {"ARTIFACT_RUN_DIR": str(run_dir),
-               "ARTIFACT_RUN_SCOPE": scope}
+        env = {"ARTIFACT_RUN_DIR": str(run_dir)}
         code, out = sh([sys.executable, str(ANALYSIS / "export_dataset.py"),
                         "--dataset", "yourrun"], env)
         if code != 0:

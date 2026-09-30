@@ -1,23 +1,11 @@
 #!/usr/bin/env python3
 import os
 import sys
-import shutil
 import subprocess
 import argparse
-import time
 from pathlib import Path
 from datetime import datetime
 
-# Impor aggregator
-try:
-    # Legacy stats aggregator (retired in this artifact); kept import optional so
-    # --showstats degrades gracefully and the per-binary .stat files remain the
-    # source of truth.
-    from aggregator import Aggregator
-except ImportError:
-    Aggregator = None
-
-# Configuration
 SCRIPT_DIR = Path(__file__).parent.absolute()
 ROOT = SCRIPT_DIR.parent
 BENCHMARK_DIR = SCRIPT_DIR
@@ -25,11 +13,8 @@ PERF_DIR = ROOT / "unsafe_perf_source"
 PERF_TARGET_DIR = PERF_DIR / "target" / "release"
 PERF_RLIB = PERF_TARGET_DIR / "libunsafe_perf.rlib"
 PERF_DEPS = PERF_TARGET_DIR / "deps"
-# Prebuilt per-feature instrumentation libraries shipped with the artifact
-# (unsafe_perf_prebuilt/<feature>/libunsafe_perf.rlib + deps/). Built once with
-# the same stage1 compiler that ships under toolchain/, so they are
-# link-compatible.
-RUNTIME_DIR = SCRIPT_DIR / "unsafe_perf_prebuilt"
+
+TIMEOUT = 8 * 3600
 
 BENCHMARK_CRATES = [
     "matrixmultiply", "arrayvec-0.7.6", "ndarray-0.16.1",
@@ -40,7 +25,6 @@ BENCHMARK_CRATES = [
     "petgraph-0.8.1",
 ]
 
-# Experiment Definitions
 EXPERIMENTS = {
     "cpu_cycle": {
         "feature": "cpu_cycle_counter",
@@ -75,19 +59,19 @@ EXPERIMENTS = {
         "feature": "unsafe_coverage",
         "metric": "coverage",
         "flags": [
-            "-C", "unsafe_include_native_lib=false", # Note: false for coverage
+            "-C", "unsafe_include_native_lib=false",
             "-C", "llvm-args=-enable-instmarker",
             "-C", "llvm-args=-enable-dynamic-line-count",
         ]
     },
     "native": {
-        "feature": "", 
+        "feature": "",
         "metric": None,
         "flags": []
     }
 }
 
-# Crate-Specific Configurations
+# Per-crate working directory, commands and extra environment.
 CRATE_CONFIGS = {
     "rayon": {
         "cwd": "rayon-demo",
@@ -98,8 +82,7 @@ CRATE_CONFIGS = {
         ]
     },
     "parking_lot": {
-        # Excluded from parking_lot's workspace: this Cargo root has its own
-        # Cargo.lock and target directory.
+        # not a member of parking_lot's workspace; has its own Cargo.lock
         "cwd": "benchmark",
         "cmds": [
             "cargo clean",
@@ -113,8 +96,7 @@ CRATE_CONFIGS = {
             "cargo install --path ../rebar --locked --force",
             f"{os.path.expanduser('~/.cargo/bin/rebar')} build -e 'rust/memchr/memmem/(oneshot)'",
             f"{os.path.expanduser('~/.cargo/bin/rebar')} measure --verify -e 'rust/memchr/memmem/(oneshot)'",
-        ],
-        "flags": ["-C", "target-feature=-sse2,-avx2"]
+        ]
     },
     "simd-json": {
         "cmds": [
@@ -133,12 +115,10 @@ CRATE_CONFIGS = {
     "ring": {
         "cwd": "bench",
         "cmds": [
-            "cargo clean", 
+            "cargo clean",
             "cargo build --release --locked",
             "cargo bench --locked"
         ],
-        "timeout": 7200,
-        "use_absolute_rustflags": True,
         "env": {"CC": "clang"}
     },
     "tokio": {
@@ -147,26 +127,15 @@ CRATE_CONFIGS = {
             "cargo clean",
             "cargo build --release --locked",
             "cargo bench --locked"
-        ],
-        "timeout": 7200
+        ]
     },
-    "rayon-core": {
-        "skip": True
-    }
 }
 
-def run_cmd(cmd, cwd=None, env=None, timeout=7200):
-    """Run a shell command with default two-hour timeout."""
+
+def run_cmd(cmd, cwd=None, env=None):
     print(f"Running: {cmd} (cwd={cwd})")
     try:
-        subprocess.run(
-            cmd, 
-            cwd=cwd, 
-            env=env, 
-            check=True, 
-            shell=True,
-            timeout=timeout
-        )
+        subprocess.run(cmd, cwd=cwd, env=env, check=True, shell=True, timeout=TIMEOUT)
         return True
     except subprocess.CalledProcessError as e:
         print(f"Command failed with exit code {e.returncode}: {cmd}")
@@ -175,172 +144,82 @@ def run_cmd(cmd, cwd=None, env=None, timeout=7200):
         print(f"Command timed out: {cmd}")
         return False
 
+
 def build_perf(feature):
-    """Provision the instrumentation library for the given feature.
-
-    Prefers the prebuilt per-feature library shipped under
-    unsafe_perf_prebuilt/<feature>/ (rlib + deps) and stages it into
-    unsafe_perf_source/target/release/, so no per-feature recompilation is
-    needed. Falls back to compiling it from source only when no prebuilt library
-    exists for the feature (e.g. unsafe_coverage)."""
-    if not feature:  # native: no instrumentation library
+    """Build the instrumentation library for the given feature."""
+    if not feature:
         return
-
-    prebuilt_rlib = RUNTIME_DIR / feature / "libunsafe_perf.rlib"
-    prebuilt_deps = RUNTIME_DIR / feature / "deps"
-
-    if prebuilt_rlib.exists():
-        print(f"using prebuilt instrumentation library for feature: {feature}")
-        # Replace unsafe_perf_source/target/release with this feature's prebuilt
-        # rlib + deps so the PERF_RLIB / PERF_DEPS paths resolve to the right
-        # instrumentation and features never mix.
-        if PERF_TARGET_DIR.exists():
-            shutil.rmtree(PERF_TARGET_DIR)
-        PERF_TARGET_DIR.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(prebuilt_rlib, PERF_RLIB)
-        if prebuilt_deps.is_dir():
-            shutil.copytree(prebuilt_deps, PERF_DEPS)
-        return
-
-    # Fallback: compile the library from source with the prebuilt stage1 compiler.
-    print(f"no prebuilt instrumentation library for '{feature}'; building from source...")
+    print(f"building the instrumentation library for '{feature}'...")
     env = os.environ.copy()
-    env.pop("RUSTFLAGS", None)  # avoid injecting instrumentation flags into this build
+    env.pop("RUSTFLAGS", None)
     run_cmd("cargo clean", cwd=PERF_DIR, env=env)
     if not run_cmd(f"cargo build --release --features {feature}", cwd=PERF_DIR, env=env):
         print(f"Failed to build perf library for {feature}")
         sys.exit(1)
 
+
 def run_crate(crate_name, exp_name, config, output_dir):
     """Run experiment for a single crate."""
     print(f"Processing crate: {crate_name} [{exp_name}]")
-    
+
     crate_dir = BENCHMARK_DIR / crate_name
     if not crate_dir.exists():
-        # Try finding fuzzy match
         matches = [d for d in BENCHMARK_DIR.iterdir() if d.is_dir() and d.name.startswith(crate_name)]
-        if matches:
-             crate_dir = matches[0]
-             print(f"Found crate directory: {crate_dir.name}")
-        else:
-             print(f"Crate directory not found: {crate_name}")
-             return False
+        if not matches:
+            print(f"Crate directory not found: {crate_name}")
+            return False
+        crate_dir = matches[0]
+        print(f"Found crate directory: {crate_dir.name}")
 
-    # Check for custom config
-    # Matches 'rayon' or 'rayon-1.5.0' -> check if key is in name?
-    # Better: check if crate_name (dirname) starts with key
-    custom_config = None
+    custom_config = {}
     for k, v in CRATE_CONFIGS.items():
         if crate_name == k or crate_name.startswith(k + "-"):
             custom_config = v
             break
-            
-    if custom_config and custom_config.get("skip"):
-        print(f"Skipping {crate_name} as per config.")
-        return True
 
     # The runtime JSON names a binary and PID, but not its benchmark crate.
-    # Keep each crate's results in its own directory to preserve provenance.
     output_dir = output_dir / crate_name
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Prepare environment
     env = os.environ.copy()
-    env["RUSTC_BOOTSTRAP"] = "1" # Force nightly features for unstable flags
-    env["RUSTUP_TOOLCHAIN"] = "stage1" # Force unified toolchain (1.80.0-dev) that supports unsafe info
-    if "RUSTC" in env:
-        del env["RUSTC"] # Ensure we use RUSTUP_TOOLCHAIN selection, not shell override
-    env.pop("RUSTFLAGS", None) # Native mode must not inherit caller instrumentation.
-    
-    # Calculate relative paths for flags when running inside crate_dir
-    
-    # Calculate relative paths for flags when running inside crate_dir
-    # RUSTFLAGS paths must be relative to the CWD of the cargo process (crate_dir)
-    try:
-        # PERF_RLIB is typically "perf/target/release/libunsafe_perf.rlib" relative to root
-        # crate_dir is "benchmarks/foo" relative to root
-        # We need path from benchmarks/foo -> perf/target...
-        # Using os.path.relpath(target, start)
-        
-        # Resolve to absolute first to be safe for calculation, then convert to relative
-        abs_crate_dir = crate_dir.resolve()
-        abs_perf_rlib = PERF_RLIB.resolve()
-        abs_perf_deps = PERF_DEPS.resolve()
-        abs_output_dir = output_dir.resolve()
-        
-        rel_perf_rlib = os.path.relpath(abs_perf_rlib, abs_crate_dir)
-        rel_perf_deps = os.path.relpath(abs_perf_deps, abs_crate_dir)
-        rel_output_dir = os.path.relpath(abs_output_dir, abs_crate_dir)
-        
-    except Exception as e:
-        print(f"Error calculating relative paths: {e}")
-        return False
+    env["RUSTC_BOOTSTRAP"] = "1"
+    env["RUSTUP_TOOLCHAIN"] = "stage1"
+    env.pop("RUSTC", None)
+    env.pop("RUSTFLAGS", None)
 
-    # Construct RUSTFLAGS
-    # Only inject unsafe_perf if NOT native experiment
     if exp_name != "native":
-        use_absolute = custom_config.get("use_absolute_rustflags", False) if custom_config else False
-        
-        if use_absolute or (custom_config and "cwd" in custom_config):
-            # Use absolute paths for workspace members
-            rustflags = [
-                "--emit=llvm-ir,link",
-                "-Z", "unstable-options",
-                f"--extern", f"force:unsafe_perf={PERF_RLIB.resolve()}",
-                "-L", f"{PERF_DEPS.resolve()}"
-            ]
-        else:
-            rustflags = [
-                "--emit=llvm-ir,link",
-                "-Z", "unstable-options",
-                f"--extern", f"force:unsafe_perf={PERF_RLIB}",
-                "-L", f"{PERF_DEPS}"
-            ]
+        rustflags = [
+            "--emit=llvm-ir,link",
+            "-Z", "unstable-options",
+            "--extern", f"force:unsafe_perf={PERF_RLIB}",
+            "-L", f"{PERF_DEPS}",
+        ]
         rustflags.extend(config["flags"])
-        
         env["RUSTFLAGS"] = " ".join(rustflags)
-    
-    env["UNSAFE_STAT_DIR"] = str(abs_output_dir)
+
+    env["UNSAFE_STAT_DIR"] = str(output_dir.resolve())
     env["CARGO_PRIMARY_PACKAGE"] = "1"
-    print(f"DEBUG: UNSAFE_STAT_DIR={abs_output_dir} (cwd={crate_dir})")
-    
-    # Determine execution strategy
-    exec_cwd = crate_dir
-    # Determine execution strategy
-    exec_cwd = crate_dir
-    cmds = ["cargo clean", "cargo build --release --locked", "cargo bench --locked"] # Default sequence
-    
-    if custom_config:
-        if "cwd" in custom_config:
-            exec_cwd = crate_dir / custom_config["cwd"]
-        
-        if "cmds" in custom_config:
-            cmds = custom_config["cmds"]
+    env.update(custom_config.get("env", {}))
 
-        if "env" in custom_config:
-            env.update(custom_config["env"])
+    exec_cwd = crate_dir / custom_config.get("cwd", "")
+    cmds = custom_config.get("cmds", ["cargo clean", "cargo build --release --locked", "cargo bench --locked"])
 
-    # Execute Commands
-    success = True
-    cmd_timeout = custom_config.get("timeout", 7200) if custom_config else 7200
     metric = config["metric"]
     existing_stats = set(output_dir.glob(f"*.{metric}.json")) if metric else set()
     for cmd in cmds:
-        if not run_cmd(cmd, cwd=exec_cwd, env=env, timeout=cmd_timeout):
+        if not run_cmd(cmd, cwd=exec_cwd, env=env):
             print(f"Command failed: {cmd}")
-            success = False
-            break # Stop executing subsequent commands (e.g. run after build) if previous failed
-            
-    if success:
-        print(f"Success: {crate_name}")
-        
-        if metric:
-            written_stats = set(output_dir.glob(f"*.{metric}.json")) - existing_stats
-            if written_stats:
-                print(f"Saved {len(written_stats)} {metric} result(s) to: {output_dir}")
-            else:
-                print(f"Warning: No {metric} JSON results were written to: {output_dir}")
-    return success
+            return False
+
+    print(f"Success: {crate_name}")
+    if metric:
+        written_stats = set(output_dir.glob(f"*.{metric}.json")) - existing_stats
+        if written_stats:
+            print(f"Saved {len(written_stats)} {metric} result(s) to: {output_dir}")
+        else:
+            print(f"Warning: No {metric} JSON results were written to: {output_dir}")
+    return True
+
 
 def main():
     parser = argparse.ArgumentParser(description="Unsafe Rust Benchmark Pipeline")
@@ -348,33 +227,28 @@ def main():
     parser.add_argument("--experiment", choices=EXPERIMENTS.keys(), help="Run specific experiment (default: native)")
     parser.add_argument("--all", action="store_true", help="Run all experiments")
     parser.add_argument("--output", help="Custom output directory")
-    parser.add_argument("--showstats", action="store_true", help="Display aggregated stats table")
-    
+
     args = parser.parse_args()
-    
+
     if not args.all and not args.experiment:
         print("No experiment specified, running in 'native' mode (compile/bench only).")
         print("For coverage, use: python3 run_pipeline.py --experiment coverage")
         args.experiment = "native"
 
-    # Setup Output Directory
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     if args.output:
         base_output_dir = Path(args.output)
     else:
         base_output_dir = SCRIPT_DIR / "results" / timestamp
-    
+
     base_output_dir.mkdir(parents=True, exist_ok=True)
     print(f"Results will be stored in: {base_output_dir}")
 
-    # Determine what to run
-    experiments_to_run = []
     if args.all:
         experiments_to_run = list(EXPERIMENTS.keys())
     else:
         experiments_to_run = [args.experiment]
 
-    crates_to_run = []
     if args.crate:
         crates_to_run = [args.crate]
     else:
@@ -383,40 +257,22 @@ def main():
     print(f"Experiments: {experiments_to_run}")
     print(f"Crates: {len(crates_to_run)}")
 
-    # Execution Loop
     failures = []
     for exp in experiments_to_run:
         print(f"\n=== Starting Experiment: {exp} ===")
         config = EXPERIMENTS[exp]
-        
-        # 1. Build Perf Lib
         build_perf(config["feature"])
-        
-        # 2. Run Crates
         for crate in crates_to_run:
-            # Each crate writes under its own output directory; metric suffixes
-            # distinguish experiments within that directory.
             if not run_crate(crate, exp, config, base_output_dir):
                 failures.append((crate, exp))
 
-    # Aggregation
-    if args.showstats:
-        print("\n=== Aggregating Results ===")
-        if Aggregator is None:
-            print("Stats aggregator is not bundled in this artifact; "
-                  "the per-binary JSON files in the results directory are the "
-                  "source of truth.")
-        else:
-            agg = Aggregator(base_output_dir)
-            agg.collect_all()
-            agg.print_table()
-    
     print(f"\nFull results in: {base_output_dir}")
     if failures:
         print(f"Failed crate/experiment pairs ({len(failures)}): "
               + ", ".join(f"{crate}/{exp}" for crate, exp in failures), file=sys.stderr)
         return 1
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

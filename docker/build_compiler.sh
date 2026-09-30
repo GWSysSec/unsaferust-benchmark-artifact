@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
-# Build the instrumented compiler. This runs inside the image; start it with
-# docker/build.sh rather than by hand.
-#
-# It builds LLVM 18 with assertions and then rustc 1.80 from the source in
-# /workspace/compiler-src. Assertions are on because that is what the paper's
-# measurements were taken with; turning them off would be a different compiler.
+# Build the instrumented compiler inside the image: LLVM 18 with assertions,
+# then rustc 1.80, from the source in /workspace/compiler-src.
 set -euo pipefail
 
 SRC=/workspace/compiler-src
@@ -20,15 +16,9 @@ started=$(date +%s)
 python3 x.py build library --stage 1 -j "$JOBS"
 elapsed=$(( $(date +%s) - started ))
 
-# cargo only drives the build, so the stage-1 rustc is paired with the current
-# cargo from the image: the 1.80 bootstrap cargo cannot parse registry manifests
-# that require edition 2024, which blocks dependency resolution for several
-# corpus crates.
+# the 1.80 bootstrap cargo cannot parse edition-2024 manifests
 cp "$(rustup which --toolchain "$ARTIFACT_CARGO_TOOLCHAIN" cargo)" "$ARTIFACT_STAGE1/bin/cargo"
 
-# Appended, not overwritten. Running this script again on a volume that already
-# holds a finished build takes a few seconds, and that number would otherwise
-# replace the one that says how long the build really took.
 printf '%s  %s seconds (%s hours) on %s cores\n' \
   "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
   "$elapsed" "$(awk -v s="$elapsed" 'BEGIN{printf "%.1f", s/3600}')" "$(nproc)" \

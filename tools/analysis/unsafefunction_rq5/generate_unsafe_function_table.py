@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 """RQ5: unsafe function execution metrics.
 
-Three metric groups:
-  Static       = unsafe_fn declarations / total fn declarations in lib src/
-                 (loaded from static_fn_counts.json; refresh via
-                  rusttest-gen/scripts/compute_static_fn_counts.py)
+  Static       = unsafe fn declarations / all fn declarations (static_fn_counts.json)
   Distinctive  = unsafe_functions_executed / total_functions_executed
-  Cumulative  = unsafe_function_calls    / total_function_calls
-Distinctive/Cumulative come in w/o-std and w/-std variants; Static is a
-single column (stdlib is never part of the user crate's source).
-Summarized with min/geomean/median/max across crates.
+  Cumulative   = unsafe_function_calls / total_function_calls
+Summarised with min/geomean/median/max across crates.
 """
 
 from __future__ import annotations
@@ -26,9 +21,7 @@ import datasets  # noqa: E402
 
 
 def load_variant(ds: datasets.Dataset, suffix: str) -> dict:
-    """Return per-crate flat unsafe_counter records for one native-library
-    setting. `suffix` is 'nativefalse' or 'nativetrue'. Refresh the JSONs with
-    ../export_dataset.py after a new measurement run."""
+    """Per-crate unsafe_counter records; `suffix` is 'nativefalse' or 'nativetrue'."""
     p = HERE / f"{ds.stem(f'unsafe_counter_{suffix}')}.json"
     return json.loads(p.read_text())["per_crate_data"]
 
@@ -115,7 +108,7 @@ def main():
     out = HERE.parent / "Latex" / "tables" / f"{ds.stem('function')}.tex"
     out.write_text(latex)
     print(f"Wrote {out}")
-    print(f"dataset: {ds.name} ({ds.scope})")
+    print(f"dataset: {ds.name}")
     print(f"crates: distinct w/o={len(d_wo)} w/={len(d_w)} | "
           f"accum w/o={len(a_wo)} w/={len(a_w)}")
     print(f"Static       w/o: {s_static}")

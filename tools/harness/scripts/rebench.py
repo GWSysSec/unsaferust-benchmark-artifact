@@ -1,4 +1,4 @@
-"""rebench.py — re-bench a crate against its merged tests.
+"""rebench.py — measure a crate against its merged tests.
 
 Per crate, the flow is:
   1. copy bootcamp/<crate> -> tmp_rebench/<crate>
@@ -13,15 +13,13 @@ Per crate, the flow is:
   7. write rebench_summary.json
   8. delete tmp_rebench/<crate>  (unless --keep-tmp)
 
-cargo test scope is restricted to `--tests` only — we don't want lib unit
-tests, examples, or bins polluting the counters. Only the integ tests in
-tests/*.rs (which include our generated + planted tests) participate.
+Only the integration tests in tests/*.rs, which include the planted generated
+tests, are built and run (cargo test --tests).
 
 Usage:
-  /usr/bin/python3 scripts/rebench.py --crate hashbrown
-  /usr/bin/python3 scripts/rebench.py --crate hashbrown,curl,rayon-core
-  /usr/bin/python3 scripts/rebench.py --all-with-tests
-  /usr/bin/python3 scripts/rebench.py --crate curl --cpu-runs 5 --keep-tmp
+  python3 scripts/rebench.py --crate hashbrown
+  python3 scripts/rebench.py --crate hashbrown,curl
+  python3 scripts/rebench.py --crate curl --cpu-runs 5 --keep-tmp
 """
 
 from __future__ import annotations
@@ -47,7 +45,7 @@ from pipeline.tools.coverage import run_full_coverage
 from pipeline.tools.crate_prep import copy_crate
 from pipeline.tools.csv_book import load_csv
 from pipeline.tools.runtime_bench import (
-    BenchResult,
+    FEATURE_MATRIX,
     FeatureResult,
     ensure_unsafe_perf_built,
     run_feature,
@@ -57,43 +55,31 @@ from pipeline.tools.workspace import _extract_lib_name, discover_workspace
 
 log = logging.getLogger("rebench")
 
-# the rebench bench scope: only integration tests under tests/*.rs.
 TEST_TARGETS = ["--tests"]
 
-# Per-crate cargo features. Required for crates whose tests are cfg-gated
-# behind non-default features (e.g. tokio's 150/151 test files are
-# #![cfg(feature = "...")]-gated and its primary has default = []).
-# This explicit map takes precedence over the feature_label decode below.
+# tokio's tests are gated behind non-default features.
 CRATE_FEATURES: dict[str, list[str]] = {
     "tokio": ["full"],
 }
 
-# Per-crate skip-list for the stdlib_api_tracker MIR pass. Stage1 1.80-dev rustc
-# ICEs ("broken MIR ... violates unwind invariants") when the pass inserts an
-# `asm!("# __unsafe_stdlib_call:...")` marker inside a cleanup block. Only
-# `bytes` 1.0.1 trips this (shallow_clone_vec at src/bytes.rs:1053 has a
-# stdlib Drop call in an unwind-edge basic block). Skipping the tracker drops
-# only the .stdlib_api.json side dump; .unsafe_counter.json is still emitted
-# in full, so RQ3/4/5 (which only use UNSAFE_COUNTER_FIELDS) are unaffected.
+# The stdlib-api-tracker MIR pass crashes stage1 rustc on bytes; RQ3-RQ5 do not
+# use that tracker's output.
 CRATE_NO_STDLIB_TRACKER: set[str] = {"bytes"}
 
-# Per-crate primary-package override (workspace member, relative to the crate
-# root). Use when discover_workspace picks the wrong member for a multi-package
-# workspace. msgpack-rust: the corpus entry is `rmp-serde`, but discovery picks
-# `rmp`; the planted gen_rmp_serde_* tests `use rmp_serde`, which only resolves
-# inside the rmp-serde package (rmp does not depend on rmp_serde — it's the
-# reverse). rmp-serde depends on rmp, so the rmp_* tests still compile there.
+# The corpus entry is rmp-serde, but workspace discovery picks rmp.
 CRATE_PRIMARY: dict[str, str] = {
     "msgpack-rust": "rmp-serde",
 }
 
-# Per-crate dependency pins applied before benching (host `cargo update
-# --precise`). miette --all-features enables `fancy`, pulling backtrace ^0.3.69
-# which resolves to 0.3.76 — its libunwind.rs uses the edition-2024
-# `unsafe extern {}` form that the stage1 1.80-dev rustc cannot parse. Pin to
-# the last backtrace without it. (version confirmed at runtime before use.)
+# miette --all-features resolves backtrace 0.3.76, which stage1 rustc cannot parse.
 CRATE_DEP_PINS: dict[str, list[tuple[str, str]]] = {
     "miette": [("backtrace", "0.3.73")],
+}
+
+# Test targets that are not built. pin-project-lite's macrotest test exits 101
+# outside `cargo test`, and the published RQ2-RQ5 data leave it out.
+CRATE_SKIP_TESTS: dict[str, list[str]] = {
+    "pin-project-lite": ["expandtest"],
 }
 
 
@@ -115,19 +101,12 @@ def apply_dep_pins(crate_name: str, ws_root: Path, cfg) -> list[str]:
             applied.append(f"{dep}@{ver}")
     return applied
 
-# fixed processing order requested in the task.
 FEATURE_ORDER = ["unsafe_counter", "heap_tracker", "cpu_cycle_counter"]
 
 REBENCH_ROOT = ROOT / "rebench"  # default; overridable via --out-dir
 TMP_REBENCH = ROOT / "tmp_rebench"
 
-# Canonical 100-crate corpus + the per-crate feature rung the profiling
-# pipeline discovered (coverage.py's feature ladder). Driving the run from
-# this file (rather than the Sheet6 CSV) decouples the crate list from stale
-# bookkeeping and lets us honor each crate's feature_label — the snag in
-# rebench_v2, where every crate but tokio was benched on DEFAULT features even
-# though 32 of them need --all-features to compile the planted tests and reach
-# their feature-gated unsafe paths.
+# The 100 corpus crates and each one's feature_label.
 CORPUS_CSV = ROOT / "rebench_100crates.csv"
 _FEATURE_LABELS: dict[str, str] | None = None  # dir_name -> feature_label
 
@@ -147,19 +126,12 @@ def _load_feature_labels() -> dict[str, str]:
     return _FEATURE_LABELS
 
 
-def crate_cargo_args(crate_name: str) -> list[str]:
-    """resolve the cargo feature/scope flags for one crate.
-
-    precedence: explicit CRATE_FEATURES override (-> --features X,Y) wins;
-    otherwise decode the corpus feature_label. Only the feature RUNG matters
-    for the bench (the workspace SCOPE is already handled by running cargo in
-    the discovered primary-crate dir with --tests): any label containing
-    'all-features' -> --all-features, everything else -> default (no flag).
-    """
+def crate_cargo_args(crate_name: str, use_feature_label: bool = True) -> list[str]:
+    """Cargo feature flags for one crate: CRATE_FEATURES first, then
+    --all-features when the corpus feature_label asks for it."""
     if crate_name in CRATE_FEATURES:
         return ["--features", ",".join(CRATE_FEATURES[crate_name])]
-    label = _load_feature_labels().get(crate_name, "")
-    if "all-features" in label:
+    if use_feature_label and "all-features" in _load_feature_labels().get(crate_name, ""):
         return ["--all-features"]
     return []
 
@@ -177,11 +149,7 @@ def setup_logging() -> None:
 # ---------------------------------------------------------------------------
 
 def plant_tests(recipes_tests_dir: Path, primary_path: Path) -> int:
-    """copy every *.rs from recipes/<crate>/tests/ into primary/tests/.
-
-    duplicates (same filename) are overwritten — there should not be any
-    given our gen_* / <crate>_* prefix convention vs. upstream test names.
-    """
+    """copy every *.rs from recipes/<crate>/tests/ into primary/tests/."""
     if not recipes_tests_dir.exists():
         log.info(f"  no tests in {recipes_tests_dir} — nothing to plant")
         return 0
@@ -211,7 +179,7 @@ def measure_primary_coverage(
     log.info(f"  [coverage] api surface: {api.total} items "
              f"({api.countable_total} countable)")
 
-    log.info(f"  [coverage] running cargo llvm-cov --tests (primary scope)")
+    log.info("  [coverage] running cargo llvm-cov --tests (primary scope)")
     cov = run_full_coverage(ws)
     if not cov.ok:
         log.warning(f"  [coverage] llvm-cov failed: {cov.error[:200]}")
@@ -242,13 +210,6 @@ def measure_primary_coverage(
     return summary
 
 
-def _feature_to_dict(fr: FeatureResult) -> dict:
-    d = asdict(fr)
-    # variants is dict[str, VariantResult] — asdict already handles dataclasses
-    # nested in dicts. nothing extra needed.
-    return d
-
-
 def run_one_feature(
     crate_path: Path, cfg, feature: str, target_dir: Path, bin_timeout: int,
     cargo_features: list[str] | None = None,
@@ -259,7 +220,7 @@ def run_one_feature(
     target_dir.mkdir(parents=True, exist_ok=True)
     return run_feature(
         crate_path, cfg, feature,
-        out_dir=target_dir.parent,        # unused when variants_root is set
+        out_dir=target_dir.parent,
         bin_timeout=bin_timeout,
         test_targets=TEST_TARGETS,
         variants_root=target_dir,
@@ -273,20 +234,12 @@ def aggregate_cpu_cycle(cpu_dir: Path, run_results: list[FeatureResult]) -> Path
     (variant, bin, metric).
     """
     log.info(f"  [aggregate] cpu_cycle avg from {len(run_results)} run(s)")
-    # bin_name is keyed without the pid suffix; stat filenames look like
-    # `<bin>__<pid>.<bin>.cpu_cycle.json` so we parse the bin substring out.
-    agg: dict[str, dict[str, dict[str, list[float]]]] = {}
     # agg[variant][bin][metric] -> [values from each run]
+    agg: dict[str, dict[str, dict[str, list[float]]]] = {}
 
     hash_suffix = re.compile(r"-[0-9a-f]{16}$")
 
-    # pre-scan for logical-name collisions: cargo names both a lib unittest and
-    # a same-named integration test `<crate>`, so stripping the 16-hex hash
-    # would merge two distinct bins under one key and interleave their per-run
-    # samples (e.g. brotli/pulldown-cmark/zopfli). Detect (variant, logical)
-    # pairs backed by >1 distinct hashed bin and keep the hash for those only;
-    # the hash is stable across run1/2/3 (same RUSTFLAGS), so per-bin sample
-    # arrays stay correctly aligned. Clean crates keep hash-free keys.
+    # Keys drop cargo's hash, except where two binaries share a logical name.
     raw_by_logical: dict[tuple[str, str], set[str]] = {}
     for run_idx, _ in enumerate(run_results, start=1):
         run_dir = cpu_dir / f"run{run_idx}"
@@ -317,15 +270,9 @@ def aggregate_cpu_cycle(cpu_dir: Path, run_results: list[FeatureResult]) -> Path
                 except Exception as e:
                     log.warning(f"    skip unparseable {jf}: {e}")
                     continue
-                # canonical bin name: prefer the JSON's "binary" field, then
-                # strip cargo's `-<16hex>` hash suffix so the avg.json keys
-                # don't change just because the hash bumped.
                 raw_bin = data.get("binary") or jf.name.split("__", 1)[0]
                 logical = hash_suffix.sub("", raw_bin)
-                # keep the hash only when this logical name is ambiguous
                 bin_name = raw_bin if (variant, logical) in collided else logical
-                # only flatten the `stats` block — the schema/pid/binary/metric
-                # fields aren't measurements.
                 stats = data.get("stats", {})
                 flat = _flatten_metrics(stats)
                 bucket = agg.setdefault(variant, {}).setdefault(bin_name, {})
@@ -362,7 +309,6 @@ def _flatten_metrics(data: dict, prefix: str = "") -> dict[str, float]:
             out.update(_flatten_metrics(v, full))
         elif isinstance(v, (int, float)):
             out[full] = float(v)
-        # ignore lists/strings/None
     return out
 
 
@@ -395,7 +341,6 @@ def rebench_crate(
         "crate": crate_name,
         "tmp_path": str(crate_path),
         "out_dir": str(rebench_out),
-        "instrument_all_deps": False,
     }
     try:
         # step 2: workspace discovery
@@ -424,6 +369,12 @@ def rebench_crate(
         # step 3: plant tests
         planted = plant_tests(recipes_tests, primary_path)
         summary["tests_planted"] = planted
+        skipped = CRATE_SKIP_TESTS.get(crate_name, [])
+        for name in skipped:
+            (primary_path / "tests" / f"{name}.rs").unlink()
+        if skipped:
+            summary["skipped_tests"] = skipped
+            log.info(f"  not building tests: {', '.join(skipped)}")
 
         # step 3b: apply any per-crate dependency pins (cargo update --precise)
         # at the workspace root, before the bench builds.
@@ -447,9 +398,7 @@ def rebench_crate(
                 log.warning(f"  coverage failed: {e}")
                 summary["coverage"] = {"error": str(e)}
 
-        # step 5: pre-build the unsafe-perf rlibs ahead of time so the first
-        # run of each feature doesn't carry the build cost. ensure_unsafe_perf
-        # is idempotent.
+        # step 5: pre-build the unsafe-perf rlibs
         for feature in FEATURE_ORDER:
             if feature not in selected_features:
                 continue
@@ -462,22 +411,23 @@ def rebench_crate(
 
         # step 6: run features
         features_out: dict = {}
-        # per-crate feature rung (decoded from the corpus feature_label, with
-        # CRATE_FEATURES overriding). passed verbatim as cargo args.
-        extra = crate_cargo_args(crate_name)
+        # The published RQ2-RQ5 data were measured with default features and
+        # RQ1 with the corpus feature labels.
+        counter_args = crate_cargo_args(crate_name, use_feature_label=False)
+        cycle_args = crate_cargo_args(crate_name)
         label = _load_feature_labels().get(crate_name, "")
         summary["feature_label"] = label
-        summary["cargo_feature_args"] = extra
-        log.info(f"  feature_label={label!r} -> cargo args {extra or '(default)'}")
+        summary["cargo_feature_args"] = {
+            "unsafe_counter": counter_args,
+            "heap_tracker": counter_args,
+            "cpu_cycle_counter": cycle_args,
+        }
+        log.info(f"  feature_label={label!r} -> cargo args {summary['cargo_feature_args']}")
 
         # unsafe_counter (1 run)
         if "unsafe_counter" in selected_features:
             target = rebench_out / "unsafe_counter"
-            # See CRATE_NO_STDLIB_TRACKER docstring: for the listed crates,
-            # remove the LLVM stdlib-api-tracker llvm-arg + the matching MIR-
-            # pass env var for the duration of this feature run, then restore.
-            from pipeline.tools.runtime_bench import FEATURE_MATRIX as _FM
-            _uc_spec = _FM["unsafe_counter"]
+            _uc_spec = FEATURE_MATRIX["unsafe_counter"]
             _saved = (list(_uc_spec["llvm_flags"]), dict(_uc_spec["env"]))
             if crate_name in CRATE_NO_STDLIB_TRACKER:
                 _uc_spec["llvm_flags"] = [
@@ -492,29 +442,25 @@ def rebench_crate(
                          f"tracker (rustc MIR pass ICE workaround)")
             try:
                 fr = run_one_feature(primary_path, cfg, "unsafe_counter", target, bin_timeout,
-                                     extra_cargo_args=extra)
-                # Repetitions land under <feature>/rep<N>/ so the first run
-                # keeps the exact layout the aggregator and every published
-                # analysis already expect. Only the spread is computed from
-                # the extra runs.
+                                     extra_cargo_args=counter_args)
                 for i in range(2, counter_runs + 1):
                     run_one_feature(primary_path, cfg, "unsafe_counter",
                                     target / f"rep{i}", bin_timeout,
-                                    extra_cargo_args=extra)
+                                    extra_cargo_args=counter_args)
             finally:
                 _uc_spec["llvm_flags"], _uc_spec["env"] = _saved
-            features_out["unsafe_counter"] = _feature_to_dict(fr)
+            features_out["unsafe_counter"] = asdict(fr)
 
         # heap_tracker (1 run)
         if "heap_tracker" in selected_features:
             target = rebench_out / "heap_tracker"
             fr = run_one_feature(primary_path, cfg, "heap_tracker", target, bin_timeout,
-                                 extra_cargo_args=extra)
+                                 extra_cargo_args=counter_args)
             for i in range(2, heap_runs + 1):
                 run_one_feature(primary_path, cfg, "heap_tracker",
                                 target / f"rep{i}", bin_timeout,
-                                extra_cargo_args=extra)
-            features_out["heap_tracker"] = _feature_to_dict(fr)
+                                extra_cargo_args=counter_args)
+            features_out["heap_tracker"] = asdict(fr)
 
         # cpu_cycle_counter (N runs)
         if "cpu_cycle_counter" in selected_features:
@@ -525,19 +471,17 @@ def rebench_crate(
                 run_target = cpu_dir / f"run{i}"
                 fr = run_one_feature(
                     primary_path, cfg, "cpu_cycle_counter", run_target, bin_timeout,
-                    extra_cargo_args=extra,
+                    extra_cargo_args=cycle_args,
                 )
                 cpu_runs_results.append(fr)
-            features_out["cpu_cycle_counter"] = [_feature_to_dict(fr) for fr in cpu_runs_results]
+            features_out["cpu_cycle_counter"] = [asdict(fr) for fr in cpu_runs_results]
 
-            # aggregate cpu_cycle
             try:
                 aggregate_cpu_cycle(cpu_dir, cpu_runs_results)
             except Exception as e:
                 log.warning(f"  cpu_cycle aggregation failed: {e}")
 
-        # if running a partial feature set, merge with any existing summary
-        # on disk so we don't blow away features that aren't being re-bench'd.
+        # keep the features of an earlier summary that this run did not measure
         if selected_features != set(FEATURE_ORDER):
             existing_path = rebench_out / "rebench_summary.json"
             if existing_path.exists():
@@ -591,34 +535,21 @@ def main() -> int:
     ap.add_argument("--all-with-tests", action="store_true",
                     help="run on every recipes/<crate>/tests/ with at least one .rs")
     ap.add_argument("--all-csv", action="store_true",
-                    help="run on every crate in cfg.csv_path (the Final Crates CSV)")
+                    help="run on every crate in cfg.csv_path")
     ap.add_argument("--from-corpus", action="store_true",
-                    help="run on the canonical 100-crate corpus (dir_name column "
-                         f"of {CORPUS_CSV.name}); ground-truth crate list keyed to "
-                         "the bootcamp dirs, with per-crate feature_label honored")
+                    help=f"run on the 100-crate corpus listed in {CORPUS_CSV.name}")
     ap.add_argument("--no-coverage", action="store_true",
                     help="skip the per-crate coverage measurement step (bench only)")
     ap.add_argument("--cpu-runs", type=int, default=3,
                     help="number of cpu_cycle_counter runs to average over (default 3)")
     ap.add_argument("--counter-runs", type=int, default=1,
-                    help="how many times to run unsafe_counter, so RQ3 "
-                         "through RQ5 get a spread rather than a single "
-                         "reading (default 1). Cheap: about twelve minutes on "
-                         "aho-corasick for both variants and both repeats. "
-                         "The first run keeps the usual layout; repeats go to "
-                         "<feature>/rep<N>/ and are read only by "
-                         "summarise_repeats.py.")
+                    help="how many times to run unsafe_counter (default 1); "
+                         "repeats go to <feature>/rep<N>/")
     ap.add_argument("--heap-runs", type=int, default=1,
-                    help="how many times to run heap_tracker (default 1). "
-                         "Kept separate from --counter-runs because heap "
-                         "tracking is far more expensive on heavy crates: it "
-                         "measures 2.2 hours per run on aho-corasick, against "
-                         "minutes for the counter, and that cost is the same "
-                         "in both instrumentation scopes (1.04x), so it is a "
-                         "property of the feature rather than of dependency "
-                         "instrumentation.")
-    ap.add_argument("--bin-timeout", type=int, default=7200,
-                    help="per-bin run timeout in seconds (default 7200)")
+                    help="how many times to run heap_tracker (default 1); "
+                         "repeats go to <feature>/rep<N>/")
+    ap.add_argument("--bin-timeout", type=int, default=8 * 3600,
+                    help="per-bin run timeout in seconds (default 28800)")
     ap.add_argument("--keep-tmp", action="store_true",
                     help="don't delete tmp_rebench/<crate> after each crate")
     ap.add_argument("--force", action="store_true",
@@ -655,8 +586,6 @@ def main() -> int:
         REBENCH_ROOT = p if p.is_absolute() else (ROOT / p)
         log.info(f"using output dir: {REBENCH_ROOT}")
 
-    # Must follow the out-dir handling above, so the logs land beside the run
-    # they belong to rather than in the default directory.
     set_failure_log_dir(REBENCH_ROOT / "_build_failures")
 
     if not args.crate and not args.all_with_tests and not args.all_csv \
@@ -668,15 +597,13 @@ def main() -> int:
     if not cfg.unsafe_perf_path:
         print("ERR: bench_runtime.unsafe_perf_path is empty in config.yaml", file=sys.stderr)
         return 1
-    cfg.bench_runtime = True
 
     recipes_dir = ROOT / cfg.recipes_dir
     if args.from_corpus:
         import csv as _csv
         crates = [r["dir_name"].strip() for r in _csv.DictReader(CORPUS_CSV.open())
                   if r.get("dir_name", "").strip()]
-        log.info(f"loaded {len(crates)} crates from corpus {CORPUS_CSV.name} "
-                 f"(bootcamp dir_name ground truth)")
+        log.info(f"loaded {len(crates)} crates from corpus {CORPUS_CSV.name}")
     elif args.all_csv:
         _, rows = load_csv(Path(cfg.csv_path) if Path(cfg.csv_path).is_absolute()
                            else ROOT / cfg.csv_path)

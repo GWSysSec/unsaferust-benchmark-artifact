@@ -19,9 +19,7 @@ import datasets  # noqa: E402
 
 
 def load_variant(ds: datasets.Dataset, suffix: str) -> dict:
-    """Return per-crate flat unsafe_counter records for one native-library
-    setting. `suffix` is 'nativefalse' or 'nativetrue'. Refresh the JSONs with
-    ../export_dataset.py after a new measurement run."""
+    """Per-crate unsafe_counter records; `suffix` is 'nativefalse' or 'nativetrue'."""
     p = HERE / f"{ds.stem(f'unsafe_counter_{suffix}')}.json"
     return json.loads(p.read_text())["per_crate_data"]
 
@@ -81,7 +79,7 @@ def main():
            / f"{ds.stem('unsafe_inst_frequency')}.tex")
     out.write_text(latex)
     print(f"Wrote {out}")
-    print(f"dataset: {ds.name} ({ds.scope})")
+    print(f"dataset: {ds.name}")
     print(f"crates: w/o={len(wo)} w/={len(w)}")
     print(f"w/o: min={mn_wo:.2f} geo={gm_wo:.2f} med={md_wo:.2f} max={mx_wo:.2f}")
     print(f"w/ : min={mn_w:.2f} geo={gm_w:.2f} med={md_w:.2f} max={mx_w:.2f}")
