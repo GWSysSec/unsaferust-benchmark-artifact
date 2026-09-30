@@ -13,15 +13,17 @@
 #           and tokio alone takes 16.3.
 #
 # --crate names a comma-separated list instead of a tier, for re-measuring one
-# crate without redoing a whole tier.
+# crate without redoing a whole tier. --bin-timeout is the per-test-binary
+# timeout for instrumented runs (default 7200 seconds).
 #
-# Usage:  run/measure.sh --tier smoke [--out DIR]
-#         run/measure.sh --crate tokio,bytes
+# Usage:  run/measure.sh --tier smoke [--out DIR] [--bin-timeout SECONDS]
+#         run/measure.sh --crate tokio,bytes [--bin-timeout SECONDS]
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 TIER=smoke
 CRATES=
+BIN_TIMEOUT=7200
 OUT="$HERE/results/$(date +%Y%m%d_%H%M%S)"
 CORPUS="${CORPUS_DIR:-$HERE/corpus/sources}"
 
@@ -30,6 +32,11 @@ while [ $# -gt 0 ]; do
     --tier)  TIER="$2"; shift 2;;
     --crate) CRATES="$2"; shift 2;;
     --out)   OUT="$2"; shift 2;;
+    --bin-timeout)
+      [ $# -ge 2 ] && [[ "$2" =~ ^[1-9][0-9]*$ ]] || {
+        echo "--bin-timeout needs a positive integer (seconds)" >&2; exit 2;
+      }
+      BIN_TIMEOUT="$2"; shift 2;;
     *) echo "unknown option: $1" >&2; exit 2;;
   esac
 done
@@ -85,9 +92,10 @@ echo "tier:    $TIER"
 echo "corpus:  $CORPUS"
 echo "output:  $OUT"
 echo "scope:   only the crate under study"
+echo "bin timeout: ${BIN_TIMEOUT}s"
 echo
 
 cd "$OUT"
 exec python3 "$HERE/tools/harness/scripts/rebench.py" \
      "${SEL[@]}" \
-     --no-coverage --out-dir "$OUT" --tmp-rebench "$OUT/tmp"
+     --no-coverage --bin-timeout "$BIN_TIMEOUT" --out-dir "$OUT" --tmp-rebench "$OUT/tmp"

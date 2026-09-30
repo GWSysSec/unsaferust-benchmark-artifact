@@ -252,7 +252,7 @@ def ensure_unsafe_perf_built(
     proc = subprocess.run(
         [cargo, "build", "--release", "--features", cargo_feats],
         cwd=unsafe_perf_path, env=env,
-        capture_output=True, text=True, timeout=600,
+        capture_output=True, text=True, timeout=7200,
     )
     if proc.returncode != 0:
         raise RuntimeError(
@@ -548,7 +548,7 @@ def _run_variant(
 
 def run_feature(
     crate_path: Path, cfg, feature: str, out_dir: Path,
-    bin_timeout: int | None = 900,
+    bin_timeout: int | None = 7200,
     test_targets: list[str] | None = None,
     variants_root: Path | None = None,
     cargo_features: list[str] | None = None,

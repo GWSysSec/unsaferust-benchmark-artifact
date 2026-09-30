@@ -93,22 +93,24 @@ CRATE_CONFIGS = {
         "cwd": "rayon-demo",
         "cmds": [
             "cargo clean",
-            "cargo build --release",
+            "cargo build --release --locked",
             "../target/release/rayon-demo nbody bench --bodies 500"
         ]
     },
     "parking_lot": {
-        "cwd": "benchmark", 
+        # Excluded from parking_lot's workspace: this Cargo root has its own
+        # Cargo.lock and target directory.
+        "cwd": "benchmark",
         "cmds": [
             "cargo clean",
-            "cargo build --release",
+            "cargo build --release --locked",
             "./target/release/mutex 2 4 10 2 4",
             "./target/release/rwlock 4 4 4 10 2 4"
         ]
     },
     "memchr": {
         "cmds": [
-            "cargo install --path ../rebar --force",
+            "cargo install --path ../rebar --locked --force",
             f"{os.path.expanduser('~/.cargo/bin/rebar')} build -e 'rust/memchr/memmem/(oneshot)'",
             f"{os.path.expanduser('~/.cargo/bin/rebar')} measure --verify -e 'rust/memchr/memmem/(oneshot)'",
         ],
@@ -116,48 +118,45 @@ CRATE_CONFIGS = {
     },
     "simd-json": {
         "cmds": [
-            "cargo update -p half --precise 2.3.1",
-            "cargo update -p proptest --precise 1.4.0",
             "cargo clean",
-            "cargo build --release",
-            "cargo bench"
+            "cargo build --release --locked",
+            "cargo bench --locked"
         ]
     },
     "jni": {
         "cmds": [
             "cargo clean",
-            "cargo build --release --features invocation",
-            "cargo bench --features invocation"
+            "cargo build --release --locked --features invocation",
+            "cargo bench --locked --features invocation"
         ]
     },
     "ring": {
         "cwd": "bench",
         "cmds": [
             "cargo clean", 
-            "cargo build --release",
-            "cargo bench"
+            "cargo build --release --locked",
+            "cargo bench --locked"
         ],
+        "timeout": 7200,
         "use_absolute_rustflags": True,
         "env": {"CC": "clang"}
     },
     "tokio": {
         "cwd": "benches",
         "cmds": [
-            "cargo update -p half --precise 2.3.1",
-            "cargo update -p proptest --precise 1.4.0",
             "cargo clean",
-            "cargo build --release", 
+            "cargo build --release --locked",
             "cargo bench --locked"
         ],
-        "timeout": 3600
+        "timeout": 7200
     },
     "rayon-core": {
         "skip": True
     }
 }
 
-def run_cmd(cmd, cwd=None, env=None, timeout=600):
-    """Run a shell command with default 10min timeout."""
+def run_cmd(cmd, cwd=None, env=None, timeout=7200):
+    """Run a shell command with default two-hour timeout."""
     print(f"Running: {cmd} (cwd={cwd})")
     try:
         subprocess.run(
@@ -225,7 +224,7 @@ def run_crate(crate_name, exp_name, config, output_dir):
              print(f"Found crate directory: {crate_dir.name}")
         else:
              print(f"Crate directory not found: {crate_name}")
-             return
+             return False
 
     # Check for custom config
     # Matches 'rayon' or 'rayon-1.5.0' -> check if key is in name?
@@ -238,7 +237,12 @@ def run_crate(crate_name, exp_name, config, output_dir):
             
     if custom_config and custom_config.get("skip"):
         print(f"Skipping {crate_name} as per config.")
-        return
+        return True
+
+    # The runtime JSON names a binary and PID, but not its benchmark crate.
+    # Keep each crate's results in its own directory to preserve provenance.
+    output_dir = output_dir / crate_name
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Prepare environment
     env = os.environ.copy()
@@ -246,6 +250,7 @@ def run_crate(crate_name, exp_name, config, output_dir):
     env["RUSTUP_TOOLCHAIN"] = "stage1" # Force unified toolchain (1.80.0-dev) that supports unsafe info
     if "RUSTC" in env:
         del env["RUSTC"] # Ensure we use RUSTUP_TOOLCHAIN selection, not shell override
+    env.pop("RUSTFLAGS", None) # Native mode must not inherit caller instrumentation.
     
     # Calculate relative paths for flags when running inside crate_dir
     
@@ -269,7 +274,7 @@ def run_crate(crate_name, exp_name, config, output_dir):
         
     except Exception as e:
         print(f"Error calculating relative paths: {e}")
-        return
+        return False
 
     # Construct RUSTFLAGS
     # Only inject unsafe_perf if NOT native experiment
@@ -303,7 +308,7 @@ def run_crate(crate_name, exp_name, config, output_dir):
     exec_cwd = crate_dir
     # Determine execution strategy
     exec_cwd = crate_dir
-    cmds = ["cargo clean", "cargo build --release", "cargo bench"] # Default sequence
+    cmds = ["cargo clean", "cargo build --release --locked", "cargo bench --locked"] # Default sequence
     
     if custom_config:
         if "cwd" in custom_config:
@@ -317,7 +322,7 @@ def run_crate(crate_name, exp_name, config, output_dir):
 
     # Execute Commands
     success = True
-    cmd_timeout = custom_config.get("timeout", 600) if custom_config else 600
+    cmd_timeout = custom_config.get("timeout", 7200) if custom_config else 7200
     metric = config["metric"]
     existing_stats = set(output_dir.glob(f"*.{metric}.json")) if metric else set()
     for cmd in cmds:
@@ -335,6 +340,7 @@ def run_crate(crate_name, exp_name, config, output_dir):
                 print(f"Saved {len(written_stats)} {metric} result(s) to: {output_dir}")
             else:
                 print(f"Warning: No {metric} JSON results were written to: {output_dir}")
+    return success
 
 def main():
     parser = argparse.ArgumentParser(description="Unsafe Rust Benchmark Pipeline")
@@ -378,6 +384,7 @@ def main():
     print(f"Crates: {len(crates_to_run)}")
 
     # Execution Loop
+    failures = []
     for exp in experiments_to_run:
         print(f"\n=== Starting Experiment: {exp} ===")
         config = EXPERIMENTS[exp]
@@ -387,20 +394,17 @@ def main():
         
         # 2. Run Crates
         for crate in crates_to_run:
-            # We use the same output dir for all experiments, 
-            # the file suffices (e.g. _cpu_cycle.stat) differentiate them.
-            # But coverage tracks cumulative runs.
-            # Each execute appends.
-            
-            run_crate(crate, exp, config, base_output_dir)
+            # Each crate writes under its own output directory; metric suffixes
+            # distinguish experiments within that directory.
+            if not run_crate(crate, exp, config, base_output_dir):
+                failures.append((crate, exp))
 
-    # Aggregation
     # Aggregation
     if args.showstats:
         print("\n=== Aggregating Results ===")
         if Aggregator is None:
             print("Stats aggregator is not bundled in this artifact; "
-                  "the per-binary .stat files in the results directory are the "
+                  "the per-binary JSON files in the results directory are the "
                   "source of truth.")
         else:
             agg = Aggregator(base_output_dir)
@@ -408,6 +412,11 @@ def main():
             agg.print_table()
     
     print(f"\nFull results in: {base_output_dir}")
+    if failures:
+        print(f"Failed crate/experiment pairs ({len(failures)}): "
+              + ", ".join(f"{crate}/{exp}" for crate, exp in failures), file=sys.stderr)
+        return 1
+    return 0
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

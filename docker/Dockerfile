@@ -111,14 +111,24 @@ RUN cp "$(rustup which --toolchain "$ARTIFACT_CARGO_TOOLCHAIN" cargo)" "$ARTIFAC
  && rustup default stage1
 ENV RUSTUP_TOOLCHAIN=stage1
 
+# Layer compatible versions and sparse-index records for the locked benchmark
+# roots over the base cache, after the expensive compiler layers.
+RUN --mount=type=bind,source=corpus/benchmark-cargo-cache.tar.zst,target=/tmp/benchmark-cargo-cache.tar.zst,readonly \
+    --mount=type=bind,source=corpus/benchmark-cargo-cache.sha256,target=/tmp/benchmark-cargo-cache.sha256,readonly \
+    cd /tmp && sha256sum --check benchmark-cargo-cache.sha256 \
+ && zstd -dc /tmp/benchmark-cargo-cache.tar.zst | tar x -C /root/.cargo
+
 # --- everything else ---------------------------------------------------------
 # This copies the complete artifact, including README.md and component README
 # files. .dockerignore excludes generated output but no Markdown documentation.
-COPY --exclude=corpus/offline-cargo-cache.tar.zst . /workspace/artifact
+COPY --exclude=corpus/offline-cargo-cache.tar.zst --exclude=corpus/benchmark-cargo-cache.tar.zst . /workspace/artifact
 WORKDIR /workspace/artifact
 
 RUN python3 -c "import sys; assert sys.version_info >= (3,10)" \
  && pip3 install --no-cache-dir matplotlib numpy pyyaml toml >/dev/null
+
+RUN apt-get update && apt-get install -y --no-install-recommends nano \
+ && rm -rf /var/lib/apt/lists/*
 
 ENV RUSTC_BOOTSTRAP=1
 

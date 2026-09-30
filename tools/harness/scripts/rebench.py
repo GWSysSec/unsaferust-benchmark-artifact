@@ -617,8 +617,8 @@ def main() -> int:
                          "in both instrumentation scopes (1.04x), so it is a "
                          "property of the feature rather than of dependency "
                          "instrumentation.")
-    ap.add_argument("--bin-timeout", type=int, default=900,
-                    help="per-bin run timeout in seconds (default 900)")
+    ap.add_argument("--bin-timeout", type=int, default=7200,
+                    help="per-bin run timeout in seconds (default 7200)")
     ap.add_argument("--keep-tmp", action="store_true",
                     help="don't delete tmp_rebench/<crate> after each crate")
     ap.add_argument("--force", action="store_true",

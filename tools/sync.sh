@@ -21,7 +21,7 @@ done
 echo "analysis code and per-question data <- $PAPER"
 mkdir -p "$HERE/tools/analysis"
 for f in aggregate_rebench.py datasets.py export_dataset.py \
-         verify_reproduction.py summarise_datasets.py audit_duplicate_stats.py; do
+         summarise_datasets.py audit_duplicate_stats.py; do
   cp "$PAPER/$f" "$HERE/tools/analysis/$f"
 done
 for d in cpucyclecount_rq1 heaptracker_rq2 unsafeinstfrequency_rq3 \

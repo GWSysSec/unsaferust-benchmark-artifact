@@ -19,9 +19,7 @@ python3 benchmark_suite/run_pipeline.py --all
 Run one instrumented benchmark crate:
 
 ```bash
-python3 benchmark_suite/run_pipeline.py \
-  --crate matrixmultiply \
-  --experiment cpu_cycle
+python3 benchmark_suite/run_pipeline.py --crate matrixmultiply --experiment cpu_cycle
 ```
 
 The pipeline writes per-binary JSON statistics to
@@ -46,13 +44,22 @@ This document details the configuration for the 18 selected benchmark crates use
 | **semver**         | Default                                                                                                                                |
 | **rayon**          | Build `rayon-demo` with `cargo build --release`, only call `nbody bench` with `--bodies 500` as parameters                             |
 | **jni**            | Using `cargo bench` but with `--features invocation` passed as arguments                                                               |
-| **parking_lot**    | Build `benchmarks` folder using `cargo build --release`. Parameters for executables: `./mutex 2 4 10 2 4` and `./rwlock 4 4 4 10 2 4`. |
+| **parking_lot**    | In `parking_lot/benchmark`, run `cargo build --release --locked`, then `./target/release/mutex 2 4 10 2 4` and `./target/release/rwlock 4 4 4 10 2 4`. |
 | **simd-json**      | Default                                                                                                                                |
 | **ring**           | Build and run all benchmarks by passing `--benches` to default `cargo bench` command                                                   |
 | **tokio**          | Default                                                                                                                                |
 | **petgraph**       | Default                                                                                                                                |
 
 > **Default** = `cargo bench` was used.
+
+`parking_lot/benchmark` is excluded from parking_lot's main workspace and
+uses its own checked-in `Cargo.lock`. The pipeline builds and runs both
+executables from that directory, writing instrumented JSONs under the selected
+output directory's `parking_lot/` subdirectory. To run it on its own:
+
+```bash
+python3 benchmark_suite/run_pipeline.py --crate parking_lot --all
+```
 
 ## Dynamic Characteristics
 

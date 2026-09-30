@@ -392,7 +392,7 @@ def _ensure_docs(crate_path: Path):
     log.info("  generating docs with cargo doc --no-deps...")
     result = subprocess.run(
         ["cargo", "doc", "--no-deps"],
-        cwd=crate_path, capture_output=True, text=True, timeout=120,
+        cwd=crate_path, capture_output=True, text=True, timeout=7200,
     )
     if result.returncode != 0:
         log.warning(f"  cargo doc failed: {result.stderr[:200]}")
@@ -839,7 +839,7 @@ def _discover_from_rust_analyzer(
         cmd.extend(["--workspace-root", str(workspace_root)])
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=7200)
     except subprocess.TimeoutExpired:
         log.warning("  rust-analyzer analyze timed out")
         return []

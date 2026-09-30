@@ -3,3 +3,4 @@
 /package.json
 /target/
 /Cargo.lock
+!/Cargo.lock

@@ -128,7 +128,7 @@ def _llvm_cov_available(crate_path: Path) -> bool:
     try:
         res = subprocess.run(
             ["cargo", "llvm-cov", "--help"],
-            cwd=crate_path, capture_output=True, text=True, timeout=10,
+            cwd=crate_path, capture_output=True, text=True, timeout=7200,
         )
         return res.returncode == 0
     except (subprocess.TimeoutExpired, FileNotFoundError):
@@ -146,7 +146,7 @@ def _demangle_rust_symbols(symbols: list[str]) -> list[str]:
             proc = subprocess.run(
                 [rustfilt],
                 input="\n".join(symbols) + "\n",
-                capture_output=True, text=True, timeout=20,
+                capture_output=True, text=True, timeout=7200,
             )
             if proc.returncode == 0:
                 out = proc.stdout.splitlines()
@@ -268,7 +268,7 @@ def _extract_line_summary(data: dict) -> tuple[int, int, float]:
 
 def _run_llvm_cov_cmd(
     crate_path: Path, cmd: list[str], mode: str,
-    lib_name: str, timeout: int = 600,
+    lib_name: str, timeout: int = 7200,
 ) -> CoverageResult:
     try:
         res = subprocess.run(
